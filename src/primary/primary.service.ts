@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { ChannelType, Client } from 'discord.js';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SecondaryService } from 'src/secondary/secondary.service';
 
 @Injectable()
 export class PrimaryService {
   public constructor(
     private readonly client: Client,
     private readonly db: PrismaService,
+    private readonly secondaryService: SecondaryService,
   ) {}
 
   public async create(creator: string, guildId: string, sectionId?: string) {
@@ -63,8 +65,34 @@ export class PrimaryService {
             id,
           },
         });
-       
+        return;
       }
     }
+
+    if (primary.type !== ChannelType.GuildVoice) {
+      return;
+    }
+
+    const { members } = primary;
+
+    const firstMember = members.first();
+
+    const rest = members.filter((member) => member.id !== firstMember.id);
+
+    if (firstMember) {
+      const newChannel = await this.secondaryService.create(
+        primary.guildId,
+        primary.id,
+        firstMember.id,
+      );
+      await Promise.all(
+        rest.map((member) => member.voice.setChannel(newChannel.id)),
+      );
+    }
+  }
+
+  public async cleanup() {
+    const primaries = await this.db.primary.findMany();
+    await Promise.all(primaries.map(({ id }) => this.update(id)));
   }
 }

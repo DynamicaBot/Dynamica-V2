@@ -9,6 +9,7 @@ import { SecondaryModule } from './secondary/secondary.module';
 import { GuildModule } from './guild/guild.module';
 import { AliasModule } from './alias/alias.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PrismaModule } from './prisma/prisma.module';
       }),
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     PrismaModule,
     SecondaryModule,
     PrimaryModule,

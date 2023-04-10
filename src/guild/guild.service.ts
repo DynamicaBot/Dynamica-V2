@@ -22,4 +22,9 @@ export class GuildService {
         }
     }
 
+    public async cleanup() {
+        const guilds = await this.db.guild.findMany();
+        await Promise.all(guilds.map(({ id }) => this.update(id)));
+    }
+
 }

@@ -59,11 +59,10 @@ export class SecondaryService {
         await this.db.guild.delete({
           where: {
             id: guildId,
-          }
-        })
-        return
+          },
+        });
+        return;
       }
-     
     }
 
     let discordGuildMember = discordGuild.members.cache.get(userId);
@@ -80,12 +79,11 @@ export class SecondaryService {
       } catch (error) {
         await this.db.primary.delete({
           where: {
-            id: primaryId
-          }
-        })
-        return
+            id: primaryId,
+          },
+        });
+        return;
       }
-      
     }
 
     const parent =
@@ -251,12 +249,11 @@ export class SecondaryService {
       } catch (error) {
         await this.db.guild.delete({
           where: {
-            id: guildId
-          }
-        })
-        throw new Error("No access to guild")
+            id: guildId,
+          },
+        });
+        throw new Error('No access to guild');
       }
-      
     }
 
     let discordChannel = discordGuild.channels.cache.get(
@@ -397,5 +394,12 @@ export class SecondaryService {
         /<<(.+)\/(.+)>>/g,
         memberCount === 1 ? plurals[1] : plurals[2],
       )}`; // Plurals
+  }
+
+  public async cleanup() {
+    const secondaries = await this.db.secondary.findMany();
+    await Promise.all(
+      secondaries.map(({ id: secondaryId }) => this.update(secondaryId)),
+    );
   }
 }

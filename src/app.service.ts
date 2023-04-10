@@ -11,6 +11,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { SecondaryService } from './secondary/secondary.service';
 import { PrimaryService } from './primary/primary.service';
 import { GuildService } from './guild/guild.service';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class AppService {
@@ -26,20 +27,7 @@ export class AppService {
   public async onReady(@Context() [client]: ContextOf<'ready'>) {
     this.logger.log(`Bot logged in as ${client.user.tag}`);
 
-    const guilds = await this.db.guild.findMany();
-    await Promise.all(
-      guilds.map( ({ id: guildId }) => this.guildService.update(guildId)),
-    );
-
-    const primaries = await this.db.primary.findMany();
-    await Promise.all(
-      primaries.map(({ id: primaryId }) => this.primaryService.update(primaryId)),
-    );
-
-    const secondaries = await this.db.secondary.findMany();
-    await Promise.all(secondaries.map((secondary) =>
-      this.secondaryService.update(secondary.id),
-    ));
+    this.cleanup();
   }
 
   @On('warn')
@@ -58,5 +46,14 @@ export class AppService {
       )}ms.`,
       ephemeral: true,
     });
+  }
+
+  @Cron('0 0 * * *')
+  public async cleanup() {
+    await this.guildService.cleanup();
+
+    await this.primaryService.cleanup();
+
+    await this.secondaryService.cleanup();
   }
 }
