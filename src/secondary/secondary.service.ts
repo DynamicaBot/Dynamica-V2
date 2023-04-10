@@ -302,8 +302,6 @@ export class SecondaryService {
     const channelNumber =
       ownIndex === -1 ? databasePrimary.secondaries.length + 1 : ownIndex + 1;
 
-    console.log({ channelNumber, ownIndex, secondaryLength: databasePrimary.secondaries.length });
-
     const emoji = databaseSecondary?.emoji ?? '❔';
 
     const plurals = channelNameTemplate.split(/<<(.+)\/(.+)>>/g);
