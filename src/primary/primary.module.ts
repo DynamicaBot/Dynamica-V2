@@ -4,6 +4,7 @@ import { PrimaryCommands } from './primary.commands'
 import { PrimaryEvents } from './primary.events';
 
 @Module({
-    providers: [PrimaryService, PrimaryCommands, PrimaryEvents]
+    providers: [PrimaryService, PrimaryCommands, PrimaryEvents],
+    exports: [PrimaryService]
 })
 export class PrimaryModule {}

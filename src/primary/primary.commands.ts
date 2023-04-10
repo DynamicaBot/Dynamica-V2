@@ -16,7 +16,7 @@ export class PrimaryCommands {
     public async onCreate (@Context() [interaction]: SlashCommandContext, @Options() options: PrimaryCreateDto) {
         const { guildId } = interaction
         try {
-            const newChannel = await this.primaryService.create(guildId, options.section?.id)
+            const newChannel = await this.primaryService.create(interaction.user.id,guildId, options.section?.id)
             return interaction.reply({
                 ephemeral: true,
                 content: `New Primary Channel Created: ${channelMention(newChannel.id)}`
