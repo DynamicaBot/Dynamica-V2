@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Guild {
+  id                String      @id @unique
+  primaryChannels   Primary[]
+  secondaryChannels Secondary[]
+  allowJoinRequests Boolean     @default(false)
+  aliases           Alias[]     @relation("AliasOnGuild")
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @default(now()) @updatedAt
+}
+
+model Primary {
+  id          String      @id @unique
+  creator     String
+  template    String      @default("@@game@@ ##")
+  generalName String      @default("General ##")
+  secondaries Secondary[] @relation("SecondaryOnPrimary")
+  guildId     String
+  guild       Guild      @relation(references: [id], fields: [guildId], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now()) @updatedAt
+}
+
+model Secondary {
+  id        String   @id @unique
+  name      String?
+  creator   String?
+  emoji     String?
+  locked    Boolean  @default(false)
+  guildId   String
+  guild     Guild    @relation(references: [id], fields: [guildId], onDelete: Cascade)
+  primaryId String
+  primary   Primary  @relation(name: "SecondaryOnPrimary", fields: [primaryId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Alias {
+  id        Int      @id @default(autoincrement())
+  activity  String
+  alias     String
+  guildId   String
+  guild     Guild    @relation(name: "AliasOnGuild", fields: [guildId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([guildId, activity])
+}
