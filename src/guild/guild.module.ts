@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { GuildEvents} from './guild.events'
 
-@Module({})
+@Module({
+    providers: [GuildEvents]
+})
 export class GuildModule {}

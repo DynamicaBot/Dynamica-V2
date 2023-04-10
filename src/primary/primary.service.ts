@@ -13,7 +13,17 @@ export class PrimaryService {
     let guild = await this.client.guilds.fetch(guildId);
 
     if (!guild) {
-      guild = await this.client.guilds.fetch(guildId);
+      try {
+        guild = await this.client.guilds.fetch(guildId);
+      } catch (error) {
+        await this.db.guild.delete({
+          where: {
+            id: guildId
+          }
+        })
+        throw new Error("No access to guild")
+      }
+     
     }
 
     const channelId = await guild.channels.create({

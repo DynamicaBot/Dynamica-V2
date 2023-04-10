@@ -15,10 +15,19 @@ export class PrimaryCommands {
     })
     public async onCreate (@Context() [interaction]: SlashCommandContext, @Options() options: PrimaryCreateDto) {
         const { guildId } = interaction
-        const newChannel = await this.primaryService.create(guildId, options.section?.id)
-        return interaction.reply({
-            ephemeral: true,
-            content: `New Primary Channel Created: ${channelMention(newChannel.id)}`
-        })
+        try {
+            const newChannel = await this.primaryService.create(guildId, options.section?.id)
+            return interaction.reply({
+                ephemeral: true,
+                content: `New Primary Channel Created: ${channelMention(newChannel.id)}`
+            })
+        } catch (error) {
+            return interaction.reply({
+                ephemeral: true,
+                content: `An Error occured: ${error.message}`
+            })
+        }
+        
+        
     }
 }

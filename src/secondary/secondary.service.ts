@@ -53,7 +53,17 @@ export class SecondaryService {
     let discordGuild = this.client.guilds.cache.get(guildId);
 
     if (!discordGuild) {
-      discordGuild = await this.client.guilds.fetch(guildId);
+      try {
+        discordGuild = await this.client.guilds.fetch(guildId);
+      } catch (error) {
+        await this.db.guild.delete({
+          where: {
+            id: guildId,
+          }
+        })
+        return
+      }
+     
     }
 
     let discordGuildMember = discordGuild.members.cache.get(userId);
@@ -65,7 +75,17 @@ export class SecondaryService {
     let discordPrimary = discordGuild.channels.cache.get(primaryId);
 
     if (!discordPrimary) {
-      discordPrimary = await discordGuild.channels.fetch(primaryId);
+      try {
+        discordPrimary = await discordGuild.channels.fetch(primaryId);
+      } catch (error) {
+        await this.db.primary.delete({
+          where: {
+            id: primaryId
+          }
+        })
+        return
+      }
+      
     }
 
     const parent =
@@ -118,7 +138,16 @@ export class SecondaryService {
     let discordChannel = this.client.channels.cache.get(channelId);
 
     if (!discordChannel) {
-      discordChannel = await this.client.channels.fetch(channelId);
+      try {
+        discordChannel = await this.client.channels.fetch(channelId);
+      } catch (error) {
+        await this.db.secondary.delete({
+          where: {
+            id: channelId,
+          },
+        });
+        return;
+      }
     }
 
     if (
@@ -170,7 +199,16 @@ export class SecondaryService {
     let discordChannel = this.client.channels.cache.get(channelId);
 
     if (!discordChannel) {
-      discordChannel = await this.client.channels.fetch(channelId);
+      try {
+        discordChannel = await this.client.channels.fetch(channelId);
+      } catch (error) {
+        await this.db.secondary.delete({
+          where: {
+            id: channelId,
+          },
+        });
+        return;
+      }
     }
 
     if (
@@ -208,7 +246,17 @@ export class SecondaryService {
     let discordGuild = this.client.guilds.cache.get(guildId);
 
     if (!discordGuild) {
-      discordGuild = await this.client.guilds.fetch(guildId);
+      try {
+        discordGuild = await this.client.guilds.fetch(guildId);
+      } catch (error) {
+        await this.db.guild.delete({
+          where: {
+            id: guildId
+          }
+        })
+        throw new Error("No access to guild")
+      }
+      
     }
 
     let discordChannel = discordGuild.channels.cache.get(
