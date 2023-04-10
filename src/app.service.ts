@@ -27,7 +27,7 @@ export class AppService {
   public async onReady(@Context() [client]: ContextOf<'ready'>) {
     this.logger.log(`Bot logged in as ${client.user.tag}`);
 
-    this.cleanup();
+    await this.cleanup();
   }
 
   @On('warn')
