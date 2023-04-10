@@ -4,17 +4,22 @@
 	"name": "Node.js & PostgreSQL",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}"
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
+	"customizations": {
+		"vscode": {
+			"extensions": ["dbaeumer.vscode-eslint", "Prisma.prisma"]
+		}
+	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// This can be used to network with other containers or with the host.
 	// "forwardPorts": [3000, 5432],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "yarn install",
+	"postCreateCommand": "yarn install"
 
 	// Configure tool-specific properties.
 	// "customizations": {},

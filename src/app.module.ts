@@ -12,7 +12,7 @@ import { PrismaService } from './prisma/prisma.service';
     }),
     NecordModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
-        token: configService.get<string>('DISCORD_BOT_TOKEN'),
+        token: configService.getOrThrow<string>('DISCORD_BOT_TOKEN'),
         intents: [
           IntentsBitField.Flags.Guilds,
           IntentsBitField.Flags.GuildVoiceStates,
