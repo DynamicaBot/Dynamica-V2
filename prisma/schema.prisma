@@ -22,7 +22,6 @@ model Guild {
 
 model Primary {
   id          String      @id @unique
-  creator     String
   template    String      @default("@@game@@ ##")
   generalName String      @default("General ##")
   secondaries Secondary[] @relation("SecondaryOnPrimary")

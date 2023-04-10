@@ -4,6 +4,11 @@ import { NecordModule } from 'necord';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IntentsBitField } from 'discord.js';
 import { PrismaService } from './prisma/prisma.service';
+import { PrimaryModule } from './primary/primary.module';
+import { SecondaryModule } from './secondary/secondary.module';
+import { GuildModule } from './guild/guild.module';
+import { AliasModule } from './alias/alias.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -21,7 +26,12 @@ import { PrismaService } from './prisma/prisma.service';
       }),
       inject: [ConfigService],
     }),
+    PrismaModule,
+    SecondaryModule,
+    PrimaryModule,
+    GuildModule,
+    AliasModule,
   ],
-  providers: [AppService, PrismaService],
+  providers: [AppService],
 })
 export class AppModule {}

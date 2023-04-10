@@ -10,7 +10,7 @@
 	// "features": {},
 	"customizations": {
 		"vscode": {
-			"extensions": ["dbaeumer.vscode-eslint", "Prisma.prisma"]
+			"extensions": ["dbaeumer.vscode-eslint", "Prisma.prisma", "esbenp.prettier-vscode"]
 		}
 	},
 
