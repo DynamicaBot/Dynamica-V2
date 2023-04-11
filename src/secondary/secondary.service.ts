@@ -109,6 +109,7 @@ export class SecondaryService {
       data: {
         id: newDiscordChannel.id,
         emoji,
+        creator: userId,
         primary: {
           connect: {
             id: primaryId,
