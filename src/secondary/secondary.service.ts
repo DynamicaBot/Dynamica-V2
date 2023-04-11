@@ -183,10 +183,13 @@ export class SecondaryService {
    * @param channelId The secondary channel id
    * @returns void
    */
-  public async update(channelId: string) {
+  public async update(guildId: string, channelId: string) {
     const secondaryChannel = await this.db.secondary.findUnique({
       where: {
-        id: channelId,
+        guildId_id: {
+          guildId,
+          id: channelId,
+        },
       },
     });
 
@@ -399,7 +402,87 @@ export class SecondaryService {
   public async cleanup() {
     const secondaries = await this.db.secondary.findMany();
     await Promise.all(
-      secondaries.map(({ id: secondaryId }) => this.update(secondaryId)),
+      secondaries.map(({ id: secondaryId, guildId }) =>
+        this.update(guildId, secondaryId),
+      ),
     );
+  }
+
+  /**
+   * Updates the owner of the secondary channel
+   * @param channelId The channel to take ownership of
+   * @param userId The user to take ownership of the channel
+   * @returns The updated secondary channel
+   */
+  public async allyourbase(channelId: string, userId: string) {
+    let channel = this.client.channels.cache.get(channelId);
+
+    if (!channel) {
+      channel = await this.client.channels.fetch(channelId);
+    }
+
+    if (channel.type === ChannelType.DM) {
+      return;
+    }
+
+    const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
+      where: {
+        id: channelId,
+      },
+    });
+
+    if (!databaseSecondary) {
+      return;
+    }
+
+    const updatedSecondary = await this.db.secondary.update({
+      where: {
+        id: channelId,
+      },
+      data: {
+        creator: userId,
+      },
+    });
+
+    await this.updateName(updatedSecondary.id);
+
+    return updatedSecondary;
+  }
+
+  /**
+   * Updates the bitrate of a dynamica channel
+   * @param channelId The dynamic channel to update
+   * @param bitrate The bitrate to set the channel to
+   * @param userId The user to check if they are the owner of the channel
+   * @returns The updated channel
+   */
+  public async bitrate(channelId: string, bitrate: number, userId: string) {
+    let channel = this.client.channels.cache.get(channelId);
+
+    if (!channel) {
+      channel = await this.client.channels.fetch(channelId);
+    }
+
+    if (channel.isDMBased()) {
+      throw new Error('Channel is a DM');
+    }
+
+    const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
+      where: {
+        id: channelId,
+      },
+    });
+
+    if (!databaseSecondary) {
+      throw new Error('Channel not a dynamica channel');
+    }
+
+    if (databaseSecondary.creator !== userId) {
+      throw new Error('Not the owner of the channel');
+    }
+
+    await channel.edit({ bitrate });
+
+    return channel;
   }
 }

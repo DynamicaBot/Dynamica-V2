@@ -26,10 +26,12 @@ model Primary {
   template    String      @default("@@game@@ ##")
   generalName String      @default("General ##")
   secondaries Secondary[] @relation("SecondaryOnPrimary")
-  guildId     String?
-  guild       Guild?      @relation(references: [id], fields: [guildId], onDelete: Cascade)
+  guildId     String
+  guild       Guild     @relation(references: [id], fields: [guildId], onDelete: Cascade)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @default(now()) @updatedAt
+
+  @@unique([guildId, id])
 }
 
 model Secondary {
@@ -44,6 +46,8 @@ model Secondary {
   primary   Primary  @relation(name: "SecondaryOnPrimary", fields: [primaryId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([guildId, id])
 }
 
 model Alias {

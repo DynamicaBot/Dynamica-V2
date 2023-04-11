@@ -53,7 +53,13 @@ export class PrimaryService {
     return primary;
   }
 
-  public async update(id: string) {
+  /**
+   * Update a primary in the database, if the bot has left the guild, delete it
+   * @param guildId The guild id to update primaries
+   * @param id The primary id to update
+   * @returns The updated primary
+   */
+  public async update(guildId: string, id: string) {
     let primary = this.client.channels.cache.get(id);
 
     if (!primary) {
@@ -81,8 +87,8 @@ export class PrimaryService {
 
     if (firstMember) {
       const newChannel = await this.secondaryService.create(
-        primary.guildId,
-        primary.id,
+        guildId,
+        id,
         firstMember.id,
       );
       await Promise.all(
@@ -91,8 +97,125 @@ export class PrimaryService {
     }
   }
 
+  /**
+   * Cleanup primaries that are no longer in the guild
+   */
   public async cleanup() {
     const primaries = await this.db.primary.findMany();
-    await Promise.all(primaries.map(({ id }) => this.update(id)));
+    await Promise.all(
+      primaries.map(({ id, guildId }) => this.update(guildId, id)),
+    );
+  }
+
+  /**
+   * Update secondaries for a primary
+   * @param guildId The guild id to update secondaries for
+   * @param primaryId The primary id to update secondaries for
+   * @returns The updated primary
+   */
+  public async updateSecondaries(guildId: string, primaryId: string) {
+    const databasePrimary = await this.db.primary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id: primaryId,
+        },
+      },
+      include: {
+        secondaries: true,
+      },
+    });
+
+    if (!databasePrimary) {
+      throw new Error('No primary found');
+    }
+
+    const { secondaries } = databasePrimary;
+
+    await Promise.all(
+      secondaries.map(({ id }) => this.secondaryService.update(guildId, id)),
+    );
+
+    return databasePrimary;
+  }
+
+  /**
+   * Update the general template for a primary
+   * @param guildId The guild id to update the general template for
+   * @param primaryId The primary id to update the general template for
+   * @param newTemplate The new general template
+   * @returns The updated primary
+   */
+  public async general(
+    guildId: string,
+    primaryId: string,
+    newTemplate: string,
+  ) {
+    const databasePrimary = await this.db.primary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id: primaryId,
+        },
+      },
+    });
+
+    if (!databasePrimary) {
+      throw new Error('No primary found');
+    }
+
+    const updatedPrimary = await this.db.primary.update({
+      where: {
+        guildId_id: {
+          guildId,
+          id: primaryId,
+        },
+      },
+      data: {
+        generalName: newTemplate,
+      },
+    });
+
+    await this.updateSecondaries(guildId, primaryId);
+
+    return updatedPrimary;
+  }
+
+  /**
+   * Update the game template for a primary
+   * @param guildId Update the game template for a primary
+   * @param primaryId The primary id to update the game template for
+   * @param newTemplate The new game template
+   * @returns The updated primary
+   */
+  public async template(guildId: string, primaryId: string, newTemplate: string) {
+    const databasePrimary = await this.db.primary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id: primaryId,
+        },
+      },
+    });
+
+    if (!databasePrimary) {
+      throw new Error('No primary found');
+    }
+
+    const updatedPrimary = await this.db.primary.update({
+      where: {
+        guildId_id: {
+          guildId,
+          id: primaryId,
+        },
+      },
+      data: {
+        template: newTemplate,
+      },
+    });
+
+    await this.updateSecondaries(guildId, primaryId);
+
+    return updatedPrimary;
   }
 }

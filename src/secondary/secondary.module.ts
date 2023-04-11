@@ -4,6 +4,7 @@ import { SecondaryCommands } from './secondary.commands';
 import { SecondaryEvents } from './secondary.events';
 
 @Module({
+  imports: [],
   providers: [SecondaryService, SecondaryCommands, SecondaryEvents],
   exports: [SecondaryService]
 })
