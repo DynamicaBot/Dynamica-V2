@@ -3,13 +3,12 @@ import { AppService } from './app.service';
 import { NecordModule } from 'necord';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IntentsBitField } from 'discord.js';
-import { PrismaService } from './prisma/prisma.service';
-import { PrimaryModule } from './primary/primary.module';
-import { SecondaryModule } from './secondary/secondary.module';
-import { GuildModule } from './guild/guild.module';
-import { AliasModule } from './alias/alias.module';
-import { PrismaModule } from './prisma/prisma.module';
+import { PrismaModule } from './features/prisma/prisma.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { SecondaryModule } from './features/secondary/secondary.module';
+import { PrimaryModule } from './features/primary/primary.module';
+import { GuildModule } from './features/guild/guild.module';
+import { AliasModule } from './features/alias/alias.module';
 
 @Module({
   imports: [

@@ -7,11 +7,11 @@ import {
   SlashCommand,
   type SlashCommandContext,
 } from 'necord';
-import { PrismaService } from './prisma/prisma.service';
-import { SecondaryService } from './secondary/secondary.service';
-import { PrimaryService } from './primary/primary.service';
-import { GuildService } from './guild/guild.service';
+import { PrismaService } from './features/prisma/prisma.service';
+import { GuildService } from './features/guild/guild.service';
 import { Cron } from '@nestjs/schedule';
+import { SecondaryService } from './features/secondary/secondary.service';
+import { PrimaryService } from './features/primary/primary.service';
 
 @Injectable()
 export class AppService {
