@@ -230,4 +230,30 @@ export class PrimaryService {
 
     return updatedPrimary;
   }
+
+  /**
+   * Get the primary info
+   * @param guildId The guild id to get the primary from
+   * @param primaryId The primary id to get the info for
+   * @returns The primary info
+   */
+  public async info(guildId: string, primaryId: string) {
+    const databasePrimary = await this.db.primary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id: primaryId,
+        },
+      },
+      include: {
+        secondaries: true,
+      },
+    });
+
+    if (!databasePrimary) {
+      throw new Error('No primary found');
+    }
+
+    return databasePrimary;
+  }
 }

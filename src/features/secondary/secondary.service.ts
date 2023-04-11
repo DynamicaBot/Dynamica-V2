@@ -555,4 +555,21 @@ export class SecondaryService {
 
     return channel;
   }
+
+  public async info(guildId: string, channelId: string) {
+    const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        },
+      },
+    });
+
+    if (!databaseSecondary) {
+      throw new Error('Channel is not a dynamica channel');
+    }
+
+    return databaseSecondary;
+  }
 }

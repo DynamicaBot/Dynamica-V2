@@ -5,6 +5,7 @@ import { IntentsBitField } from 'discord.js';
 import { NecordModule } from 'necord';
 
 import { AppService } from './app.service';
+import { InfoCommands } from './commands/info.command';
 import { AliasModule } from './features/alias/alias.module';
 import { GuildModule } from './features/guild/guild.module';
 import { PrimaryModule } from './features/primary/primary.module';
@@ -34,6 +35,6 @@ import { SecondaryModule } from './features/secondary/secondary.module';
     GuildModule,
     AliasModule,
   ],
-  providers: [AppService],
+  providers: [AppService, InfoCommands],
 })
 export class AppModule {}

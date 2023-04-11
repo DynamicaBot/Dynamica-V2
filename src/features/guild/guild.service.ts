@@ -61,4 +61,22 @@ export class GuildService {
 
     return newGuild;
   }
+
+  public async info(guildId: string) {
+    const guild = await this.db.guild.findUnique({
+      where: {
+        id: guildId,
+      },
+      include: {
+        primaryChannels: true,
+        secondaryChannels: true,
+      },
+    });
+
+    if (!guild) {
+      throw new Error('Guild not found');
+    }
+
+    return guild;
+  }
 }
