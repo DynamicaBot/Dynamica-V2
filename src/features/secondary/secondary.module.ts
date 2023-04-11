@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { SecondaryService } from './secondary.service';
+
 import { SecondaryCommands } from './secondary.commands';
 import { SecondaryEvents } from './secondary.events';
+import { SecondaryService } from './secondary.service';
 
 @Module({
   imports: [],

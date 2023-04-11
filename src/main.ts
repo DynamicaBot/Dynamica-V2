@@ -1,8 +1,9 @@
 import path from 'path';
-import { ShardingManager } from 'discord.js';
 import { fileURLToPath } from 'url';
-import { config } from 'dotenv';
+
 import { Logger } from '@nestjs/common';
+import { ShardingManager } from 'discord.js';
+import { config } from 'dotenv';
 
 config();
 

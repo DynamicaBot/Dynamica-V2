@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { PrimaryService } from './primary.service';
+
+import { SecondaryService, SecondaryModule } from '@/features/secondary';
+
 import { PrimaryCommands } from './primary.commands';
 import { PrimaryEvents } from './primary.events';
-import { SecondaryService } from '@/features/secondary';
-import { SecondaryModule } from '@/features/secondary';
+import { PrimaryService } from './primary.service';
 
 @Module({
   imports: [SecondaryModule],

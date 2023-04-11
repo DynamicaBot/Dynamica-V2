@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Context, type ContextOf, On } from 'necord';
+
 import { PrismaService } from '@/features/prisma';
 
 @Injectable()

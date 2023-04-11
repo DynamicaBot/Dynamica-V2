@@ -5,9 +5,10 @@ import {
   Client,
   ThreadMemberManager,
 } from 'discord.js';
-import { PrismaService } from '@/features/prisma';
-import { romanize } from 'romans';
 import emojiList from 'emoji-random-list';
+import { romanize } from 'romans';
+
+import { PrismaService } from '@/features/prisma';
 
 @Injectable()
 export class SecondaryService {

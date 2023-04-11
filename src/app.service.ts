@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import {
   Context,
   type ContextOf,
@@ -7,11 +8,11 @@ import {
   SlashCommand,
   type SlashCommandContext,
 } from 'necord';
-import { PrismaService } from './features/prisma/prisma.service';
+
 import { GuildService } from './features/guild/guild.service';
-import { Cron } from '@nestjs/schedule';
-import { SecondaryService } from './features/secondary/secondary.service';
 import { PrimaryService } from './features/primary/primary.service';
+import { PrismaService } from './features/prisma/prisma.service';
+import { SecondaryService } from './features/secondary/secondary.service';
 
 @Injectable()
 export class AppService {

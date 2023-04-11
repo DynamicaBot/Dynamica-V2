@@ -5,11 +5,12 @@ import {
   SlashCommand,
   type SlashCommandContext,
 } from 'necord';
+
+import { AliasService } from './alias.service';
 import { AliasDto } from './dto/Alias.Dto';
 import { UnaliasDto } from './dto/UnaliasDto';
-import { UnaliasAutocompleteInterceptor } from './interceptors/unalias.interceptor';
 import { AliasAutocompleteInterceptor } from './interceptors/alias.interceptor';
-import { AliasService } from './alias.service';
+import { UnaliasAutocompleteInterceptor } from './interceptors/unalias.interceptor';
 
 @Injectable()
 export class AliasCommands {

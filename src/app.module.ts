@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
-import { AppService } from './app.service';
-import { NecordModule } from 'necord';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { IntentsBitField } from 'discord.js';
-import { PrismaModule } from './features/prisma/prisma.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { SecondaryModule } from './features/secondary/secondary.module';
-import { PrimaryModule } from './features/primary/primary.module';
-import { GuildModule } from './features/guild/guild.module';
+import { IntentsBitField } from 'discord.js';
+import { NecordModule } from 'necord';
+
+import { AppService } from './app.service';
 import { AliasModule } from './features/alias/alias.module';
+import { GuildModule } from './features/guild/guild.module';
+import { PrimaryModule } from './features/primary/primary.module';
+import { PrismaModule } from './features/prisma/prisma.module';
+import { SecondaryModule } from './features/secondary/secondary.module';
 
 @Module({
   imports: [

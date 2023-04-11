@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ActivityType } from 'discord.js';
 import { Context, type ContextOf, On } from 'necord';
+
 import { PrismaService } from '@/features/prisma';
+
 import { SecondaryService } from './secondary.service';
 
 @Injectable()

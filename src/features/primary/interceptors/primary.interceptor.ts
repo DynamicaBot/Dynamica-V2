@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { AutocompleteInteraction, CacheType } from 'discord.js';
 import { AutocompleteInterceptor } from 'necord';
-import { PrismaService } from '@/features/prisma/prisma.service';
+
+import { PrismaService } from '@/features/prisma';
 
 @Injectable()
 export class PrimaryAutocompleteInterceptor extends AutocompleteInterceptor {

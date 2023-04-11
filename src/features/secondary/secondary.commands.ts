@@ -1,23 +1,23 @@
 import { Injectable, UseInterceptors } from '@nestjs/common';
 import {
-  Context,
-  Options,
-  SlashCommand,
-  type SlashCommandContext,
-} from 'necord';
-import { SecondaryService } from './secondary.service';
-import {
-  GuildMember,
   PermissionFlagsBits,
   channelMention,
   codeBlock,
   inlineCode,
   userMention,
 } from 'discord.js';
-import { BitrateDto } from './dto/BitrateDto';
-import { SecondaryAutocompleteInterceptor } from './interceptors/secondary.interceptor';
+import {
+  Context,
+  Options,
+  SlashCommand,
+  type SlashCommandContext,
+} from 'necord';
+
 import { AllyourbaseDto } from './dto/AllyourbaseDto';
+import { BitrateDto } from './dto/BitrateDto';
 import { NameDto } from './dto/NameDto';
+import { SecondaryAutocompleteInterceptor } from './interceptors/secondary.interceptor';
+import { SecondaryService } from './secondary.service';
 
 @UseInterceptors(SecondaryAutocompleteInterceptor)
 @Injectable()

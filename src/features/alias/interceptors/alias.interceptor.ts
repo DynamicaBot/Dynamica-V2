@@ -4,7 +4,6 @@ import {
   AutocompleteInteraction,
   CacheType,
   GuildMember,
-  ThreadMemberManager,
 } from 'discord.js';
 import { AutocompleteInterceptor } from 'necord';
 
@@ -13,7 +12,7 @@ export class AliasAutocompleteInterceptor extends AutocompleteInterceptor {
   public async transformOptions(
     interaction: AutocompleteInteraction<CacheType>,
   ) {
-    const { value, name } = interaction.options.getFocused(true);
+    const { value } = interaction.options.getFocused(true);
 
     if (!(interaction.member instanceof GuildMember)) {
       return interaction.respond([

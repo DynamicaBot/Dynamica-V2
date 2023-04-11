@@ -1,5 +1,4 @@
-import { ChannelOption, StringOption } from 'necord';
-import { ChannelType, GuildChannel } from 'discord.js';
+import { StringOption } from 'necord';
 
 export class UnaliasDto {
   @StringOption({

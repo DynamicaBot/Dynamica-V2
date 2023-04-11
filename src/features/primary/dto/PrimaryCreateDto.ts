@@ -1,5 +1,5 @@
-import { ChannelOption } from 'necord';
 import { ChannelType, GuildChannel } from 'discord.js';
+import { ChannelOption } from 'necord';
 
 export class PrimaryCreateDto {
   @ChannelOption({

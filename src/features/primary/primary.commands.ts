@@ -1,4 +1,4 @@
-import { Inject, Injectable, UseInterceptors } from '@nestjs/common';
+import { Injectable, UseInterceptors } from '@nestjs/common';
 import { channelMention } from 'discord.js';
 import {
   Context,
@@ -6,11 +6,12 @@ import {
   SlashCommand,
   type SlashCommandContext,
 } from 'necord';
+
 import { PrimaryCreateDto } from './dto/PrimaryCreateDto';
-import { PrimaryService } from './primary.service';
-import { PrimaryAutocompleteInterceptor } from './interceptors/primary.interceptor';
 import { PrimaryGeneralDto } from './dto/PrimaryGeneralDto';
 import { PrimaryTemplateDto } from './dto/PrimaryTemplateDto';
+import { PrimaryAutocompleteInterceptor } from './interceptors/primary.interceptor';
+import { PrimaryService } from './primary.service';
 
 @Injectable()
 export class PrimaryCommands {

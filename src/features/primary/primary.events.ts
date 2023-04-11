@@ -1,6 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Context, type ContextOf, On } from 'necord';
+
 import { PrismaService } from '@/features/prisma';
+
 import { PrimaryService } from './primary.service';
 
 @Injectable()
