@@ -132,7 +132,7 @@ export class SecondaryService {
    * @param channelId The Id of the channel to update the name of
    * @returns The new name of the channel
    */
-  public async updateName(channelId: string) {
+  public async updateName(guildId: string, channelId: string) {
     let discordChannel = this.client.channels.cache.get(channelId);
 
     if (!discordChannel) {
@@ -157,7 +157,10 @@ export class SecondaryService {
 
     const databaseChannel = await this.db.secondary.findUnique({
       where: {
-        id: channelId,
+        guildId_id: {
+          guildId,
+          id: channelId,
+        }
       },
     });
 
@@ -165,7 +168,7 @@ export class SecondaryService {
 
     const newName = await this.formatName(
       databaseChannel.primaryId,
-      databaseChannel.guildId,
+      guildId,
       channelId,
     );
 
@@ -205,7 +208,10 @@ export class SecondaryService {
       } catch (error) {
         await this.db.secondary.delete({
           where: {
-            id: channelId,
+            guildId_id: {
+              guildId,
+              id: channelId,
+            }
           },
         });
         return;
@@ -228,7 +234,7 @@ export class SecondaryService {
         await discordChannel.delete();
       }
     } else {
-      await this.updateName(channelId);
+      await this.updateName(guildId, channelId);
     }
   }
 
@@ -333,11 +339,9 @@ export class SecondaryService {
 
     const creatorName = creator?.displayName ?? 'Unknown';
 
-    const gameTemplate = databaseSecondary?.name ?? databasePrimary.template;
-
-    const channelNameTemplate = activities.length
-      ? gameTemplate
-      : databasePrimary.generalName;
+    const channelNameTemplate = databaseSecondary?.name ?? (activities.length
+      ? databasePrimary.template
+      : databasePrimary.generalName);
 
     const locked = databaseSecondary?.locked ?? false;
 
@@ -414,7 +418,7 @@ export class SecondaryService {
    * @param userId The user to take ownership of the channel
    * @returns The updated secondary channel
    */
-  public async allyourbase(channelId: string, userId: string) {
+  public async allyourbase(guildId: string, channelId: string, userId: string) {
     let channel = this.client.channels.cache.get(channelId);
 
     if (!channel) {
@@ -427,7 +431,10 @@ export class SecondaryService {
 
     const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
       where: {
-        id: channelId,
+        guildId_id: {
+          guildId,
+          id: channelId,
+        }
       },
     });
 
@@ -444,7 +451,7 @@ export class SecondaryService {
       },
     });
 
-    await this.updateName(updatedSecondary.id);
+    await this.updateName(guildId, updatedSecondary.id);
 
     return updatedSecondary;
   }
@@ -534,7 +541,7 @@ export class SecondaryService {
       },
     });
 
-    await this.updateName(channelId);
+    await this.updateName(guildId, channelId);
 
     return channel;
   }

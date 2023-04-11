@@ -36,6 +36,7 @@ export class SecondaryCommands {
     @Options() { secondary }: AllyourbaseDto,
   ) {
     const newChannel = await this.secondaryService.allyourbase(
+      interaction.guildId,
       secondary,
       interaction.user.id,
     );
