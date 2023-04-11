@@ -17,6 +17,7 @@ import {
 import { BitrateDto } from './dto/BitrateDto';
 import { SecondaryAutocompleteInterceptor } from './interceptors/secondary.interceptor';
 import { AllyourbaseDto } from './dto/AllyourbaseDto';
+import { NameDto } from './dto/NameDto';
 
 @UseInterceptors(SecondaryAutocompleteInterceptor)
 @Injectable()
@@ -59,6 +60,7 @@ export class SecondaryCommands {
   ) {
     try {
       const channel = await this.secondaryService.bitrate(
+        interaction.guildId,
         secondary,
         bitrate,
         interaction.user.id,
@@ -79,6 +81,36 @@ export class SecondaryCommands {
           content: `Unknown error`,
         });
       }
+    }
+  }
+
+  @UseInterceptors(SecondaryAutocompleteInterceptor)
+  @SlashCommand({
+    name: 'name',
+    description: 'Set the channel name template',
+  })
+  async onName(
+    @Context() [interaction]: SlashCommandContext,
+    @Options() { secondary, name }: NameDto,
+  ) {
+    try {
+      const newChannel = await this.secondaryService.name(
+        interaction.guildId,
+        secondary,
+        name,
+        interaction.user.id,
+      );
+      return interaction.reply({
+        ephemeral: true,
+        content: `Channel Name Template Updated: ${channelMention(
+          newChannel.id,
+        )}`,
+      });
+    } catch (error) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `An Error occured: ${error.message}`,
+      });
     }
   }
 }

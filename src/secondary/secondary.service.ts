@@ -456,7 +456,20 @@ export class SecondaryService {
    * @param userId The user to check if they are the owner of the channel
    * @returns The updated channel
    */
-  public async bitrate(channelId: string, bitrate: number, userId: string) {
+  public async bitrate(guildId: string, channelId: string, bitrate: number, userId: string) {
+    const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        }
+      },
+    });
+
+    if (!databaseSecondary) {
+      throw new Error('Channel is not a dynamica channel');
+    }
+
     let channel = this.client.channels.cache.get(channelId);
 
     if (!channel) {
@@ -467,15 +480,6 @@ export class SecondaryService {
       throw new Error('Channel is a DM');
     }
 
-    const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
-      where: {
-        id: channelId,
-      },
-    });
-
-    if (!databaseSecondary) {
-      throw new Error('Channel not a dynamica channel');
-    }
 
     if (databaseSecondary.creator !== userId) {
       throw new Error('Not the owner of the channel');
@@ -485,4 +489,54 @@ export class SecondaryService {
 
     return channel;
   }
+
+  /**
+   * 
+   * @param guildId The id of the guild to update the channel in
+   * @param channelId The id of the channel to update
+   * @param name The name to set the channel to
+   * @param userId The id of the user to check if they are the owner of the channel
+   */
+  public async name (guildId: string, channelId: string, name: string, userId: string) {
+    const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        }
+      },
+    });
+
+    if (!databaseSecondary) {
+      throw new Error('Channel is not a dynamica channel');
+    }
+
+    let channel = this.client.channels.cache.get(channelId);
+
+    if (!channel) {
+      channel = await this.client.channels.fetch(channelId);
+    }
+
+    if (channel.isDMBased()) {
+      throw new Error('Channel is a DM');
+    }
+
+    if (databaseSecondary.creator !== userId) {
+      throw new Error('Not the owner of the channel');
+    }
+
+    await this.db.secondary.update({
+      where: {
+        id: channelId,
+      },
+      data: {
+        name,
+      },
+    });
+
+    await this.updateName(channelId);
+
+    return channel;
+  }
+
 }

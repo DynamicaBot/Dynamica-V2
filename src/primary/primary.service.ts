@@ -11,6 +11,13 @@ export class PrimaryService {
     private readonly secondaryService: SecondaryService,
   ) {}
 
+  /**
+   * Create a primary channel
+   * @param creator The user id of the creator
+   * @param guildId The guild id to create the primary in
+   * @param sectionId The section id to create the primary in
+   * @returns The created primary
+   */
   public async create(creator: string, guildId: string, sectionId?: string) {
     let guild = await this.client.guilds.fetch(guildId);
 
