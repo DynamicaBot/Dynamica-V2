@@ -18,6 +18,7 @@ import { BitrateDto } from './dto/BitrateDto';
 import { LimitDto } from './dto/LimitDto';
 import { LockDto } from './dto/LockDto';
 import { NameDto } from './dto/NameDto';
+import { TransferDto } from './dto/TransferDto';
 import { UnlockDto } from './dto/UnlockDto';
 import { SecondaryAutocompleteInterceptor } from './interceptors/secondary.interceptor';
 import { SecondaryService } from './secondary.service';
@@ -190,6 +191,37 @@ export class SecondaryCommands {
       return interaction.reply({
         ephemeral: true,
         content: `Channel Unlocked: ${channelMention(newChannel.id)}`,
+      });
+    } catch (error) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `An Error occured: ${error.message}`,
+      });
+    }
+  }
+
+  @UseInterceptors(SecondaryAutocompleteInterceptor)
+  @SlashCommand({
+    name: 'transfer',
+    description: 'Transfer ownership of a channel',
+    dmPermission: false,
+  })
+  async onTransfer(
+    @Context() [interaction]: SlashCommandContext,
+    @Options() { secondary, user }: TransferDto,
+  ) {
+    try {
+      const newChannel = await this.secondaryService.transfer(
+        interaction.guildId,
+        secondary,
+        interaction.user.id,
+        user.id,
+      );
+      return interaction.reply({
+        ephemeral: true,
+        content: `Channel Ownership Transferred: ${channelMention(
+          newChannel.id,
+        )}`,
       });
     } catch (error) {
       return interaction.reply({

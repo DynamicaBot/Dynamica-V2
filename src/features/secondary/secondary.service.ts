@@ -751,4 +751,54 @@ export class SecondaryService {
 
     return channel;
   }
+
+  public async transfer(
+    guildId: string,
+    channelId: string,
+    userId: string,
+    newOwnerId: string,
+  ) {
+    const databaseSecondary = await this.db.secondary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        },
+      },
+    });
+
+    if (!databaseSecondary) {
+      throw new Error('Channel is not a dynamica channel');
+    }
+
+    let channel = this.client.channels.cache.get(channelId);
+
+    if (!channel) {
+      channel = await this.client.channels.fetch(channelId);
+    }
+
+    if (channel.isDMBased()) {
+      throw new Error('Channel is a DM');
+    }
+
+    if (databaseSecondary.creator !== userId) {
+      throw new Error('Not the owner of the channel');
+    }
+
+    await this.db.secondary.update({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        },
+      },
+      data: {
+        creator: newOwnerId,
+      },
+    });
+
+    await this.updateName(guildId, channelId);
+
+    return channel;
+  }
 }
