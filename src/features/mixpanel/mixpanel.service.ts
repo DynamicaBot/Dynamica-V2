@@ -22,7 +22,23 @@ export class MixpanelService {
       if (this.mixpanel) {
         this.mixpanel.track(event, properties, (err) => {
           if (err) {
-            reject(err);
+            reject(err.message);
+          } else {
+            resolve();
+          }
+        });
+      } else {
+        resolve();
+      }
+    });
+  }
+
+  public async identify(distinct_id: string, properties: Record<string, any>) {
+    return new Promise<void>((resolve, reject) => {
+      if (this.mixpanel) {
+        this.mixpanel.people.set(distinct_id, properties, (err) => {
+          if (err) {
+            reject(err.message);
           } else {
             resolve();
           }

@@ -31,6 +31,27 @@ export class GuildService {
         });
       }
     }
+
+    const databaseGuild = await this.db.guild.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        _count: {
+          select: {
+            primaryChannels: true,
+            secondaryChannels: true,
+          },
+        },
+      },
+    });
+
+    await this.mixpanel.identify(id, {
+      name: guild.name,
+      members: guild.memberCount,
+      primaries: databaseGuild._count.primaryChannels,
+      secondaries: databaseGuild._count.secondaryChannels,
+    });
   }
 
   /**
