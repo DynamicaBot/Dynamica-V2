@@ -41,7 +41,7 @@ export class AliasService {
     await this.mixpanel.track('Alias Command Run', {
       distinct_id: guildId,
       activity,
-      alias,
+      activityAlias: alias,
     });
 
     return upsertedAlias;
