@@ -15,7 +15,10 @@ import {
 
 import { AllyourbaseDto } from './dto/AllyourbaseDto';
 import { BitrateDto } from './dto/BitrateDto';
+import { LimitDto } from './dto/LimitDto';
+import { LockDto } from './dto/LockDto';
 import { NameDto } from './dto/NameDto';
+import { UnlockDto } from './dto/UnlockDto';
 import { SecondaryAutocompleteInterceptor } from './interceptors/secondary.interceptor';
 import { SecondaryService } from './secondary.service';
 
@@ -53,9 +56,8 @@ export class SecondaryCommands {
     name: 'bitrate',
     description: 'Change the bitrate of a voice channel',
     dmPermission: false,
-    defaultMemberPermissions: [PermissionFlagsBits.ManageChannels],
   })
-  async bitrate(
+  async onBitrate(
     @Context() [interaction]: SlashCommandContext,
     @Options() { bitrate, secondary }: BitrateDto,
   ) {
@@ -106,6 +108,88 @@ export class SecondaryCommands {
         content: `Channel Name Template Updated: ${channelMention(
           newChannel.id,
         )}`,
+      });
+    } catch (error) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `An Error occured: ${error.message}`,
+      });
+    }
+  }
+
+  @UseInterceptors(SecondaryAutocompleteInterceptor)
+  @SlashCommand({
+    name: 'limit',
+    description: 'Set the channel user limit',
+  })
+  async onLimit(
+    @Context() [interaction]: SlashCommandContext,
+    @Options() { secondary, limit }: LimitDto,
+  ) {
+    try {
+      const newChannel = await this.secondaryService.limit(
+        interaction.guildId,
+        secondary,
+        limit,
+        interaction.user.id,
+      );
+      return interaction.reply({
+        ephemeral: true,
+        content: `Channel User Limit Updated: ${channelMention(newChannel.id)}`,
+      });
+    } catch (error) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `An Error occured: ${error.message}`,
+      });
+    }
+  }
+
+  @UseInterceptors(SecondaryAutocompleteInterceptor)
+  @SlashCommand({
+    name: 'lock',
+    description: 'Lock a channel',
+  })
+  async onLock(
+    @Context() [interaction]: SlashCommandContext,
+    @Options() { secondary }: LockDto,
+  ) {
+    try {
+      const newChannel = await this.secondaryService.lock(
+        interaction.guildId,
+        secondary,
+        interaction.user.id,
+      );
+      return interaction.reply({
+        ephemeral: true,
+        content: `Channel Locked: ${channelMention(newChannel.id)}`,
+      });
+    } catch (error) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `An Error occured: ${error.message}`,
+      });
+    }
+  }
+
+  @UseInterceptors(SecondaryAutocompleteInterceptor)
+  @SlashCommand({
+    name: 'unlock',
+    description: 'Unlock a channel',
+  })
+  async onUnlock(
+    @Context() [interaction]: SlashCommandContext,
+    @Options() { secondary }: UnlockDto,
+  ) {
+    try {
+      const newChannel = await this.secondaryService.unlock(
+        interaction.guildId,
+        secondary,
+        interaction.user.id,
+      );
+      return interaction.reply({
+        ephemeral: true,
+        content: `Channel Unlocked: ${channelMention(newChannel.id)}`,
       });
     } catch (error) {
       return interaction.reply({

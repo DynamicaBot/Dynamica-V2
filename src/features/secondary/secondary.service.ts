@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { OverwriteType, PermissionFlagsBits } from 'discord-api-types/v10';
 import {
   ActivityType,
   ChannelType,
   Client,
+  OverwriteResolvable,
   ThreadMemberManager,
 } from 'discord.js';
 import emojiList from 'emoji-random-list';
@@ -470,7 +472,7 @@ export class SecondaryService {
     bitrate: number,
     userId: string,
   ) {
-    const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
+    const databaseSecondary = await this.db.secondary.findUnique({
       where: {
         guildId_id: {
           guildId,
@@ -498,6 +500,52 @@ export class SecondaryService {
     }
 
     await channel.edit({ bitrate });
+
+    return channel;
+  }
+
+  /**
+   * Set a limit on the number of members in a channel
+   * @param guildId The guild that the channel is in
+   * @param channelId The channel to set the limit on
+   * @param limit The limit to set the channel to
+   * @param userId The user to check if they are the owner of the channel
+   * @returns The updated channel
+   */
+  public async limit(
+    guildId: string,
+    channelId: string,
+    limit: number,
+    userId: string,
+  ) {
+    const databaseSecondary = await this.db.secondary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        },
+      },
+    });
+
+    if (!databaseSecondary) {
+      throw new Error('Channel is not a dynamica channel');
+    }
+
+    let channel = this.client.channels.cache.get(channelId);
+
+    if (!channel) {
+      channel = await this.client.channels.fetch(channelId);
+    }
+
+    if (channel.isDMBased()) {
+      throw new Error('Channel is a DM');
+    }
+
+    if (databaseSecondary.creator !== userId) {
+      throw new Error('Not the owner of the channel');
+    }
+
+    await channel.edit({ userLimit: limit });
 
     return channel;
   }
@@ -571,5 +619,136 @@ export class SecondaryService {
     }
 
     return databaseSecondary;
+  }
+
+  /**
+   * Locks a channel so that only the people currently in the channel can join
+   * @param guildId The id of the guild to update the channel in
+   * @param channelId The id of the channel to update
+   * @param userId The id of the user to check if they are the owner of the channel
+   * @returns The updated channel
+   */
+  public async lock(guildId: string, channelId: string, userId: string) {
+    const databaseSecondary = await this.db.secondary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        },
+      },
+    });
+
+    if (!databaseSecondary) {
+      throw new Error('Channel is not a dynamica channel');
+    }
+
+    let channel = this.client.channels.cache.get(channelId);
+
+    if (!channel) {
+      channel = await this.client.channels.fetch(channelId);
+    }
+
+    if (channel.isDMBased()) {
+      throw new Error('Channel is a DM');
+    }
+
+    if (databaseSecondary.creator !== userId) {
+      throw new Error('Not the owner of the channel');
+    }
+
+    const everyoneRole = channel.guild.roles.everyone;
+
+    if (channel.members instanceof ThreadMemberManager) {
+      throw new Error('Channel is a thread');
+    }
+
+    const currentMembersOfChannel = [...channel.members.values()];
+
+    await channel.edit({
+      permissionOverwrites: [
+        ...currentMembersOfChannel.map((member) => ({
+          id: member.id,
+          type: OverwriteType.Member,
+          allow: [PermissionFlagsBits.Connect],
+        })),
+        {
+          id: everyoneRole.id,
+          type: OverwriteType.Role,
+          deny: [PermissionFlagsBits.Connect],
+        },
+      ],
+    });
+
+    await this.db.secondary.update({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        },
+      },
+      data: {
+        locked: true,
+      },
+    });
+
+    await this.updateName(guildId, channelId);
+
+    return channel;
+  }
+
+  /**
+   * Unlock a channel
+   * @param guildId Guild id
+   * @param channelId Channel id
+   * @param userId The user to check if they are the owner of the channel
+   * @returns The updated channel
+   */
+  public async unlock(guildId: string, channelId: string, userId: string) {
+    const databaseSecondary = await this.db.secondary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        },
+      },
+    });
+
+    if (!databaseSecondary) {
+      throw new Error('Channel is not a dynamica channel');
+    }
+
+    let channel = this.client.channels.cache.get(channelId);
+
+    if (!channel) {
+      channel = await this.client.channels.fetch(channelId);
+    }
+
+    if (channel.isDMBased()) {
+      throw new Error('Channel is a DM');
+    }
+
+    if (databaseSecondary.creator !== userId) {
+      throw new Error('Not the owner of the channel');
+    }
+
+    await channel.edit({
+      permissionOverwrites: null,
+    });
+
+    await this.db.secondary.update({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        },
+      },
+      data: {
+        locked: false,
+      },
+    });
+
+    await this.updateName(guildId, channelId);
+
+    return channel;
   }
 }
