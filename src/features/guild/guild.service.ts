@@ -41,6 +41,7 @@ export class GuildService {
           select: {
             primaryChannels: true,
             secondaryChannels: true,
+            aliases: true,
           },
         },
       },
@@ -51,6 +52,7 @@ export class GuildService {
       members: guild.memberCount,
       primaries: databaseGuild._count.primaryChannels,
       secondaries: databaseGuild._count.secondaryChannels,
+      aliases: databaseGuild._count.aliases,
     });
   }
 
