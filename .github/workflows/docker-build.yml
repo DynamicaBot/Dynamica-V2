@@ -24,7 +24,7 @@ jobs:
       - name: Generate
         run: yarn generate
       - name: Build
-        run: yarn tsc
+        run: yarn tsc --noEmit
   docker-build:
     runs-on: ubuntu-latest
     needs: 'type-check'
