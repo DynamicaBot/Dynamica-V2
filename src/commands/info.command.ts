@@ -1,5 +1,10 @@
 import { Injectable, UseInterceptors } from '@nestjs/common';
-import { EmbedBuilder, userMention } from 'discord.js';
+import {
+  EmbedBuilder,
+  channelMention,
+  inlineCode,
+  userMention,
+} from 'discord.js';
 import { Context, Options, type SlashCommandContext, Subcommand } from 'necord';
 
 import { InfoCommandDecorator } from '@/decorators/info.decorator';
@@ -14,7 +19,6 @@ import {
   SecondaryAutocompleteInterceptor,
   SecondaryService,
 } from '@/features/secondary';
-import camelCaseToReadable from '@/utils/camelCaseToReadable';
 import fieldToDiscordEmbed from '@/utils/fieldToDiscordEmbed';
 
 @InfoCommandDecorator()
@@ -32,18 +36,32 @@ export class InfoCommands {
   })
   public async onGuild(@Context() [interaction]: SlashCommandContext) {
     const guildInfo = await this.guildService.info(interaction.guildId);
-    const fields = Object.entries(guildInfo).map(([key, value]) => ({
-      name: camelCaseToReadable(key),
-      value:
-        key === 'creator'
-          ? userMention(value as string)
-          : fieldToDiscordEmbed(value),
-    }));
     const embed = new EmbedBuilder()
       .setColor('Blue')
       .setTitle('Guild Info')
-      .addFields(fields);
-    return interaction.reply({ embeds: [embed] });
+      .addFields(
+        {
+          name: 'Allow Join Requests',
+          value: fieldToDiscordEmbed(guildInfo.allowJoinRequests),
+        },
+        {
+          name: 'Primary Channels',
+          value: guildInfo.primaryChannels.length
+            ? guildInfo.primaryChannels
+                .map((channel) => channelMention(channel.id))
+                .join('\n')
+            : inlineCode(`None`),
+        },
+        {
+          name: 'Secondary Channels',
+          value: guildInfo.secondaryChannels.length
+            ? guildInfo.secondaryChannels
+                .map((channel) => channelMention(channel.id))
+                .join(', ')
+            : inlineCode(`None`),
+        },
+      );
+    return interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
   @UseInterceptors(PrimaryAutocompleteInterceptor)
@@ -60,18 +78,34 @@ export class InfoCommands {
       interaction.guildId,
       primary,
     );
-    const fields = Object.entries(primaryInfo).map(([key, value]) => ({
-      name: camelCaseToReadable(key),
-      value:
-        key === 'creator'
-          ? userMention(value as string)
-          : fieldToDiscordEmbed(value),
-    }));
+
     const embed = new EmbedBuilder()
       .setColor('Blue')
       .setTitle('Primary Info')
-      .addFields(fields);
-    return interaction.reply({ embeds: [embed] });
+      .addFields(
+        { name: 'Creator', value: userMention(primaryInfo.creator) },
+        {
+          name: 'Created At',
+          value: fieldToDiscordEmbed(primaryInfo.createdAt),
+        },
+        {
+          name: 'General Template',
+          value: inlineCode(primaryInfo.generalName),
+        },
+        {
+          name: 'Activity Template',
+          value: inlineCode(primaryInfo.template),
+        },
+        {
+          name: 'Secondary Channels',
+          value: primaryInfo.secondaries.length
+            ? primaryInfo.secondaries
+                .map((channel) => channelMention(channel.id))
+                .join('\n')
+            : inlineCode(`None`),
+        },
+      );
+    return interaction.reply({ embeds: [embed], ephemeral: true });
   }
 
   @UseInterceptors(SecondaryAutocompleteInterceptor)
@@ -88,17 +122,34 @@ export class InfoCommands {
       interaction.guildId,
       secondary,
     );
-    const fields = Object.entries(secondaryInfo).map(([key, value]) => ({
-      name: camelCaseToReadable(key),
-      value:
-        key === 'creator'
-          ? userMention(value as string)
-          : fieldToDiscordEmbed(value),
-    }));
+
     const embed = new EmbedBuilder()
       .setColor('Blue')
       .setTitle('Secondary Info')
-      .addFields(fields);
-    return interaction.reply({ embeds: [embed] });
+      .addFields(
+        {
+          name: 'Name Override',
+          value: secondaryInfo.name.length
+            ? fieldToDiscordEmbed(secondaryInfo.name)
+            : inlineCode(`None`),
+        },
+        {
+          name: 'Primary',
+          value: channelMention(secondaryInfo.primaryId),
+        },
+        {
+          name: 'Creator',
+          value: userMention(secondaryInfo.creator),
+        },
+        {
+          name: 'Created At',
+          value: fieldToDiscordEmbed(secondaryInfo.createdAt),
+        },
+        {
+          name: 'Locked',
+          value: fieldToDiscordEmbed(secondaryInfo.locked),
+        },
+      );
+    return interaction.reply({ embeds: [embed], ephemeral: true });
   }
 }
