@@ -11,7 +11,7 @@ export async function bootstrap() {
   const botPath = path.join(fileURLToPath(import.meta.url), '../bot.js');
 
   const manager = new ShardingManager(botPath, {
-    token: process.env['DISCORD_BOT_TOKEN'],
+    token: process.env['TOKEN'],
   });
 
   const logger = new Logger('Shard Manager');

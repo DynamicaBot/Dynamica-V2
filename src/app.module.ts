@@ -19,7 +19,7 @@ import { SecondaryModule } from './features/secondary/secondary.module';
     }),
     NecordModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
-        token: configService.getOrThrow<string>('DISCORD_BOT_TOKEN'),
+        token: configService.getOrThrow<string>('TOKEN'),
         intents: [
           IntentsBitField.Flags.Guilds,
           IntentsBitField.Flags.GuildVoiceStates,
