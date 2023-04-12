@@ -3,9 +3,14 @@ import { Context, type ContextOf, On } from 'necord';
 
 import { PrismaService } from '@/features/prisma';
 
+import { MixpanelService } from '../mixpanel';
+
 @Injectable()
 export class GuildEvents {
-  constructor(private readonly db: PrismaService) {}
+  constructor(
+    private readonly db: PrismaService,
+    private readonly mixpanel: MixpanelService,
+  ) {}
 
   @On('guildCreate')
   public async onGuildCreate(@Context() [guild]: ContextOf<'guildCreate'>) {
@@ -13,6 +18,9 @@ export class GuildEvents {
       data: {
         id: guild.id,
       },
+    });
+    await this.mixpanel.track('Guild Joined', {
+      distinct_id: guild.id,
     });
   }
 
@@ -22,6 +30,9 @@ export class GuildEvents {
       where: {
         id: guild.id,
       },
+    });
+    await this.mixpanel.track('Guild Left', {
+      distinct_id: guild.id,
     });
   }
 }

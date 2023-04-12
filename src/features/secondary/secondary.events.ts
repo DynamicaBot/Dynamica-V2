@@ -4,6 +4,8 @@ import { Context, type ContextOf, On } from 'necord';
 
 import { PrismaService } from '@/features/prisma';
 
+import { MixpanelService } from '../mixpanel';
+
 import { SecondaryService } from './secondary.service';
 
 @Injectable()
@@ -11,6 +13,7 @@ export class SecondaryEvents {
   constructor(
     private readonly db: PrismaService,
     private readonly secondaryService: SecondaryService,
+    private readonly mixpanel: MixpanelService,
   ) {}
 
   @On('voiceStateUpdate')
@@ -98,6 +101,11 @@ export class SecondaryEvents {
       where: {
         id: databaseChannel.id,
       },
+    });
+
+    await this.mixpanel.track('Secondary Deleted', {
+      distinct_id: channel.guild.id,
+      channelId: channel.id,
     });
   }
 

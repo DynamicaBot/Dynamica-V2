@@ -3,11 +3,14 @@ import { Client } from 'discord.js';
 
 import { PrismaService } from '@/features/prisma';
 
+import { MixpanelService } from '../mixpanel';
+
 @Injectable()
 export class GuildService {
   public constructor(
     private readonly db: PrismaService,
     private readonly client: Client,
+    private readonly mixpanel: MixpanelService,
   ) {}
 
   /**
@@ -59,6 +62,11 @@ export class GuildService {
       },
     });
 
+    await this.mixpanel.track('Allowjoin Command Run', {
+      distinct_id: guildId,
+      allowJoinRequests: newGuild.allowJoinRequests ? 'Yes' : 'No',
+    });
+
     return newGuild;
   }
 
@@ -76,6 +84,10 @@ export class GuildService {
     if (!guild) {
       throw new Error('Guild not found');
     }
+
+    await this.mixpanel.track('Info Guild Command Run', {
+      distinct_id: guildId,
+    });
 
     return guild;
   }

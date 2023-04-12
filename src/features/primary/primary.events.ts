@@ -3,6 +3,8 @@ import { Context, type ContextOf, On } from 'necord';
 
 import { PrismaService } from '@/features/prisma';
 
+import { MixpanelService } from '../mixpanel';
+
 import { PrimaryService } from './primary.service';
 
 @Injectable()
@@ -10,6 +12,7 @@ export class PrimaryEvents {
   constructor(
     private readonly db: PrismaService,
     private readonly primaryService: PrimaryService,
+    private readonly mixpanel: MixpanelService,
   ) {}
 
   @On('channelDelete')
@@ -30,6 +33,10 @@ export class PrimaryEvents {
       where: {
         id: channel.id,
       },
+    });
+
+    await this.mixpanel.track('Primary Deleted', {
+      distinct_id: channel.guild.id,
     });
   }
 }

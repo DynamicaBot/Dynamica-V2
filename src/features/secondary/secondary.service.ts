@@ -12,6 +12,8 @@ import { romanize } from 'romans';
 
 import { PrismaService } from '@/features/prisma';
 
+import { MixpanelService } from '../mixpanel';
+
 @Injectable()
 export class SecondaryService {
   private readonly logger = new Logger(SecondaryService.name);
@@ -19,6 +21,7 @@ export class SecondaryService {
   public constructor(
     private readonly client: Client,
     private readonly db: PrismaService,
+    private readonly mixpanel: MixpanelService,
   ) {}
 
   /**
@@ -128,6 +131,12 @@ export class SecondaryService {
 
     await discordGuildMember.voice.setChannel(newDiscordChannel);
 
+    await this.mixpanel.track('Secondary Created', {
+      distinct_id: guildId,
+      name: channelName,
+      channelId: newDiscordChannel.id,
+    });
+
     return newDatabaseChannel;
   }
 
@@ -178,6 +187,13 @@ export class SecondaryService {
         name: newName,
       });
     }
+
+    await this.mixpanel.track('Secondary Name Updated', {
+      distinct_id: guildId,
+      channelId: channelId,
+      name: newName,
+      oldName: currentName,
+    });
 
     return newName;
   }
@@ -456,6 +472,11 @@ export class SecondaryService {
 
     await this.updateName(guildId, updatedSecondary.id);
 
+    await this.mixpanel.track('Allyourbase Command Run', {
+      distinct_id: guildId,
+      channelId: updatedSecondary.id,
+    });
+
     return updatedSecondary;
   }
 
@@ -500,6 +521,11 @@ export class SecondaryService {
     }
 
     await channel.edit({ bitrate });
+
+    await this.mixpanel.track('Bitrate Command Run', {
+      distinct_id: guildId,
+      channelId: databaseSecondary.id,
+    });
 
     return channel;
   }
@@ -546,6 +572,11 @@ export class SecondaryService {
     }
 
     await channel.edit({ userLimit: limit });
+
+    await this.mixpanel.track('Limit Command Run', {
+      distinct_id: guildId,
+      channelId: databaseSecondary.id,
+    });
 
     return channel;
   }
@@ -601,6 +632,11 @@ export class SecondaryService {
 
     await this.updateName(guildId, channelId);
 
+    await this.mixpanel.track('Name Command Run', {
+      distinct_id: guildId,
+      channelId: databaseSecondary.id,
+    });
+
     return channel;
   }
 
@@ -617,6 +653,11 @@ export class SecondaryService {
     if (!databaseSecondary) {
       throw new Error('Channel is not a dynamica channel');
     }
+
+    await this.mixpanel.track('Info Secondary Command Run', {
+      distinct_id: guildId,
+      channelId: databaseSecondary.id,
+    });
 
     return databaseSecondary;
   }
@@ -693,6 +734,11 @@ export class SecondaryService {
 
     await this.updateName(guildId, channelId);
 
+    await this.mixpanel.track('Lock Command Run', {
+      distinct_id: guildId,
+      channelId: databaseSecondary.id,
+    });
+
     return channel;
   }
 
@@ -749,6 +795,11 @@ export class SecondaryService {
 
     await this.updateName(guildId, channelId);
 
+    await this.mixpanel.track('Unlock Command Run', {
+      distinct_id: guildId,
+      channelId: databaseSecondary.id,
+    });
+
     return channel;
   }
 
@@ -798,6 +849,11 @@ export class SecondaryService {
     });
 
     await this.updateName(guildId, channelId);
+
+    await this.mixpanel.track('Transfer Command Run', {
+      distinct_id: guildId,
+      channelId: databaseSecondary.id,
+    });
 
     return channel;
   }

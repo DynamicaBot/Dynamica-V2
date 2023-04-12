@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/features/prisma';
 
+import { MixpanelService } from '../mixpanel';
 import { SecondaryService } from '../secondary/secondary.service';
 
 @Injectable()
@@ -9,6 +10,7 @@ export class AliasService {
   constructor(
     private readonly db: PrismaService,
     private readonly secondaryService: SecondaryService,
+    private readonly mixpanel: MixpanelService,
   ) {}
 
   /**
@@ -34,6 +36,12 @@ export class AliasService {
         activity,
         alias,
       },
+    });
+
+    await this.mixpanel.track('Alias Command Run', {
+      distinct_id: guildId,
+      activity,
+      alias,
     });
 
     return upsertedAlias;
@@ -68,6 +76,11 @@ export class AliasService {
       },
     });
 
+    await this.mixpanel.track('Unalias Command Run', {
+      distinct_id: guildId,
+      activity,
+    });
+
     return deletedAlias;
   }
 
@@ -81,6 +94,10 @@ export class AliasService {
       where: {
         guildId,
       },
+    });
+
+    await this.mixpanel.track('Aliases Command Run', {
+      distinct_id: guildId,
     });
 
     return aliases;
