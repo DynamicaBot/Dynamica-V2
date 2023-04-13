@@ -125,7 +125,7 @@ export class SecondaryEvents {
 
     if (!databaseSecondary) return;
 
-    const oldActivities = oldPresence.activities.filter(
+    const oldActivities = (oldPresence.activities ?? []).filter(
       (activity) =>
         activity.type === ActivityType.Playing ||
         activity.type === ActivityType.Competing,
@@ -135,7 +135,7 @@ export class SecondaryEvents {
       ...new Set(oldActivities.map((activity) => activity.name)),
     ].sort();
 
-    const newActivities = newPresence.activities.filter(
+    const newActivities = (newPresence.activities ?? []).filter(
       (activity) =>
         activity.type === ActivityType.Playing ||
         activity.type === ActivityType.Competing,

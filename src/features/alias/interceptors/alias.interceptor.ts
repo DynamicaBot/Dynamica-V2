@@ -37,7 +37,7 @@ export class AliasAutocompleteInterceptor extends AutocompleteInterceptor {
     const channelMembers = [...voiceChannel.members.values()];
 
     const activities = channelMembers.flatMap(
-      (guildMember) => guildMember.presence.activities,
+      (guildMember) => guildMember.presence?.activities ?? [],
     );
 
     const filteredActivities = activities.filter(

@@ -317,7 +317,7 @@ export class SecondaryService {
     const channelMembers = [...discordChannel.members.values()];
 
     const activities = channelMembers.flatMap(
-      (guildMember) => guildMember.presence.activities,
+      (guildMember) => guildMember.presence?.activities ?? [],
     );
 
     const filteredActivities = activities.filter(
