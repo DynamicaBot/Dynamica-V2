@@ -21,7 +21,7 @@ export class PrimaryModals {
     const primary = this.db.primary.findUnique({
       where: {
         guildId_id: {
-          guildId: interaction.guild.id,
+          guildId: interaction.guildId,
           id,
         },
       },
