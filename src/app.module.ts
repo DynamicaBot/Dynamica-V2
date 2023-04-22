@@ -8,11 +8,10 @@ import { AppService } from './app.service';
 import { InfoCommands } from './commands/info.command';
 import { AliasModule } from './features/alias/alias.module';
 import { GuildModule } from './features/guild/guild.module';
+import { MqttModule } from './features/mqtt/mqtt.module';
 import { PrimaryModule } from './features/primary/primary.module';
 import { PrismaModule } from './features/prisma/prisma.module';
 import { SecondaryModule } from './features/secondary/secondary.module';
-import { MqttModule } from './mqtt/mqtt.module';
-import { MqttService } from './mqtt/mqtt.service';
 
 @Module({
   imports: [

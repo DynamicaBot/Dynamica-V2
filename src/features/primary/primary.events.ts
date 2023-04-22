@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Context, type ContextOf, On } from 'necord';
 
+import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
-import { MqttService } from '@/mqtt/mqtt.service';
+import { getPresence } from '@/utils/presence';
 
 @Injectable()
 export class PrimaryEvents {
@@ -32,6 +33,10 @@ export class PrimaryEvents {
     });
 
     const primaryCount = await this.db.primary.count();
+    const secondaryCount = await this.db.secondary.count();
+
+    channel.client.user.setPresence(getPresence(primaryCount + secondaryCount));
+
     await this.mqtt.publish(`dynamica/primaries`, primaryCount);
   }
 }

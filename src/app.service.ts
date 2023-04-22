@@ -10,10 +10,11 @@ import {
 } from 'necord';
 
 import { GuildService } from './features/guild/guild.service';
+import { MqttService } from './features/mqtt/mqtt.service';
 import { PrimaryService } from './features/primary/primary.service';
 import { PrismaService } from './features/prisma/prisma.service';
 import { SecondaryService } from './features/secondary/secondary.service';
-import { MqttService } from './mqtt/mqtt.service';
+import { getPresence } from './utils/presence';
 
 @Injectable()
 export class AppService {
@@ -44,6 +45,10 @@ export class AppService {
       this.mqtt.publish(`dynamica/aliases`, aliasCount),
       this.mqtt.publish(`dynamica/presence`, client.readyAt.toISOString()),
     ]);
+
+    const totalChannels = primaryCount + secondaryCount;
+
+    client.user.setPresence(getPresence(totalChannels));
   }
 
   @On('warn')

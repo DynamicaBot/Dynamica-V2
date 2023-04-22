@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ChannelType, Client } from 'discord.js';
 
+import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 import { SecondaryService } from '@/features/secondary';
-import { MqttService } from '@/mqtt/mqtt.service';
+import { getPresence } from '@/utils/presence';
 
 @Injectable()
 export class PrimaryService {
@@ -61,6 +62,9 @@ export class PrimaryService {
     });
 
     const primaryCount = await this.db.primary.count();
+    const secondaryCount = await this.db.secondary.count();
+
+    this.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 
     await this.mqtt.publish(`dynamica/primaries`, primaryCount);
 
