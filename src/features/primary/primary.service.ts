@@ -1,5 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { ChannelType, Client } from 'discord.js';
+import {
+  ActionRowBuilder,
+  ChannelType,
+  Client,
+  ModalActionRowComponentBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+} from 'discord.js';
 
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
@@ -265,5 +273,45 @@ export class PrimaryService {
     }
 
     return databasePrimary;
+  }
+
+  public async createPrimaryModal(
+    guildId: string,
+    id: string,
+  ): Promise<ModalBuilder> {
+    const databasePrimary = await this.db.primary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id,
+        },
+      },
+    });
+
+    if (!databasePrimary) {
+      throw new Error('No primary found');
+    }
+
+    const { generalName, template } = databasePrimary;
+
+    return new ModalBuilder()
+      .setTitle('Edit Primary Channel')
+      .setCustomId(`primary/${id}`)
+      .setComponents([
+        new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents([
+          new TextInputBuilder()
+            .setCustomId('general')
+            .setLabel('General Template')
+            .setStyle(TextInputStyle.Short)
+            .setValue(generalName),
+        ]),
+        new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents([
+          new TextInputBuilder()
+            .setCustomId('template')
+            .setLabel('Game Template')
+            .setStyle(TextInputStyle.Short)
+            .setValue(template),
+        ]),
+      ]);
   }
 }

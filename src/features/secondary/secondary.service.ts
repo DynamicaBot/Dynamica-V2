@@ -1,9 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OverwriteType, PermissionFlagsBits } from 'discord-api-types/v10';
 import {
+  ActionRowBuilder,
   ActivityType,
   ChannelType,
   Client,
+  ModalActionRowComponentBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
   ThreadMemberManager,
 } from 'discord.js';
 import emojiList from 'emoji-random-list';
@@ -809,5 +814,35 @@ export class SecondaryService {
     await this.updateName(guildId, channelId);
 
     return channel;
+  }
+
+  async createSecondaryModal(
+    guildId: string,
+    id: string,
+  ): Promise<ModalBuilder> {
+    const secondaryProperties = await this.db.secondary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id,
+        },
+      },
+    });
+
+    if (!secondaryProperties) {
+      throw new Error('Channel is not a dynamica channel');
+    }
+
+    return new ModalBuilder()
+      .setTitle('Edit Secondary Channel')
+      .setCustomId(`secondary/${id}`)
+      .setComponents([
+        new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents([
+          new TextInputBuilder()
+            .setCustomId('name')
+            .setLabel('Name')
+            .setStyle(TextInputStyle.Short),
+        ]),
+      ]);
   }
 }
