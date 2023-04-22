@@ -12,6 +12,7 @@ import { PrimaryModule } from './features/primary/primary.module';
 import { PrismaModule } from './features/prisma/prisma.module';
 import { SecondaryModule } from './features/secondary/secondary.module';
 import { MqttModule } from './mqtt/mqtt.module';
+import { MqttService } from './mqtt/mqtt.service';
 
 @Module({
   imports: [

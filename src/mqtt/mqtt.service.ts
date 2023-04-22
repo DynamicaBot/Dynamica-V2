@@ -36,10 +36,20 @@ export class MqttService {
    * @returns Promise that resolves when the message is published
    */
   public async publish(topic: string, message: string | number) {
-    if (!this.client || !this.client.connected) {
-      this.logger.warn('MQTT not configured, skipping');
+    if (!this.client) {
       return;
     }
+
+    const waitReady = new Promise<void>((resolve) => {
+      this.client.once('connect', (err) => {
+        if (err) {
+          this.logger.error('MQTT error', err);
+        }
+        resolve();
+      });
+    });
+
+    await waitReady;
 
     await new Promise<void>((resolve, reject) => {
       this.client?.publish(topic, `${message}`, { retain: true }, (error) => {
