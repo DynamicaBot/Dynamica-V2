@@ -1,8 +1,11 @@
 name: Docker Build
 
 on:
-  release:
-    types: ['released']
+  workflow_run:
+    workflows: ['Release']
+    branches: [main]
+    types:
+      - completed
 
 permissions:
   contents: read
