@@ -8,10 +8,10 @@ import { AppService } from './app.service';
 import { InfoCommands } from './commands/info.command';
 import { AliasModule } from './features/alias/alias.module';
 import { GuildModule } from './features/guild/guild.module';
-import { MixpanelModule } from './features/mixpanel';
 import { PrimaryModule } from './features/primary/primary.module';
 import { PrismaModule } from './features/prisma/prisma.module';
 import { SecondaryModule } from './features/secondary/secondary.module';
+import { MqttModule } from './mqtt/mqtt.module';
 
 @Module({
   imports: [
@@ -29,14 +29,13 @@ import { SecondaryModule } from './features/secondary/secondary.module';
       }),
       inject: [ConfigService],
     }),
-    MixpanelModule,
     ScheduleModule.forRoot(),
     PrismaModule,
     SecondaryModule,
     PrimaryModule,
     GuildModule,
     AliasModule,
-    MixpanelModule,
+    MqttModule,
   ],
   providers: [AppService, InfoCommands],
 })

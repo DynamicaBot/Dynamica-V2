@@ -2,17 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { Context, type ContextOf, On } from 'necord';
 
 import { PrismaService } from '@/features/prisma';
-
-import { MixpanelService } from '../mixpanel';
-
-import { PrimaryService } from './primary.service';
+import { MqttService } from '@/mqtt/mqtt.service';
 
 @Injectable()
 export class PrimaryEvents {
   constructor(
     private readonly db: PrismaService,
-    private readonly primaryService: PrimaryService,
-    private readonly mixpanel: MixpanelService,
+    private readonly mqtt: MqttService,
   ) {}
 
   @On('channelDelete')
@@ -35,8 +31,7 @@ export class PrimaryEvents {
       },
     });
 
-    await this.mixpanel.track('Primary Deleted', {
-      distinct_id: channel.guild.id,
-    });
+    const primaryCount = await this.db.primary.count();
+    await this.mqtt.publish(`dynamica/primaries`, primaryCount);
   }
 }

@@ -3,8 +3,7 @@ import { ChannelType, Client } from 'discord.js';
 
 import { PrismaService } from '@/features/prisma';
 import { SecondaryService } from '@/features/secondary';
-
-import { MixpanelService } from '../mixpanel';
+import { MqttService } from '@/mqtt/mqtt.service';
 
 @Injectable()
 export class PrimaryService {
@@ -12,7 +11,7 @@ export class PrimaryService {
     private readonly client: Client,
     private readonly db: PrismaService,
     private readonly secondaryService: SecondaryService,
-    private readonly mixpanel: MixpanelService,
+    private readonly mqtt: MqttService,
   ) {}
 
   /**
@@ -61,10 +60,9 @@ export class PrimaryService {
       },
     });
 
-    await this.mixpanel.track('Primary Created', {
-      distinct_id: guild.id,
-      channelId: channelId.id,
-    });
+    const primaryCount = await this.db.primary.count();
+
+    await this.mqtt.publish(`dynamica/primaries`, primaryCount);
 
     return primary;
   }
@@ -194,11 +192,6 @@ export class PrimaryService {
 
     await this.updateSecondaries(guildId, primaryId);
 
-    await this.mixpanel.track('General Command Run', {
-      distinct_id: guildId,
-      channelId: primaryId,
-    });
-
     return updatedPrimary;
   }
 
@@ -241,11 +234,6 @@ export class PrimaryService {
 
     await this.updateSecondaries(guildId, primaryId);
 
-    await this.mixpanel.track('Template Command Run', {
-      distinct_id: guildId,
-      channelId: primaryId,
-    });
-
     return updatedPrimary;
   }
 
@@ -271,11 +259,6 @@ export class PrimaryService {
     if (!databasePrimary) {
       throw new Error('No primary found');
     }
-
-    await this.mixpanel.track('Info Primary Command Run', {
-      distinct_id: guildId,
-      channelId: primaryId,
-    });
 
     return databasePrimary;
   }

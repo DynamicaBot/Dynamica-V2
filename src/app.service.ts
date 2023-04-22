@@ -13,6 +13,7 @@ import { GuildService } from './features/guild/guild.service';
 import { PrimaryService } from './features/primary/primary.service';
 import { PrismaService } from './features/prisma/prisma.service';
 import { SecondaryService } from './features/secondary/secondary.service';
+import { MqttService } from './mqtt/mqtt.service';
 
 @Injectable()
 export class AppService {
@@ -22,6 +23,7 @@ export class AppService {
     private readonly secondaryService: SecondaryService,
     private readonly primaryService: PrimaryService,
     private readonly guildService: GuildService,
+    private readonly mqtt: MqttService,
   ) {}
 
   @Once('ready')
@@ -29,6 +31,19 @@ export class AppService {
     this.logger.log(`Bot logged in as ${client.user.tag}`);
 
     await this.cleanup();
+
+    const guildCount = await this.db.guild.count();
+    const primaryCount = await this.db.primary.count();
+    const secondaryCount = await this.db.secondary.count();
+    const aliasCount = await this.db.alias.count();
+
+    await Promise.all([
+      this.mqtt.publish(`dynamica/guilds`, guildCount),
+      this.mqtt.publish(`dynamica/primaries`, primaryCount),
+      this.mqtt.publish(`dynamica/secondaries`, secondaryCount),
+      this.mqtt.publish(`dynamica/aliases`, aliasCount),
+      this.mqtt.publish(`dynamica/presence`, client.readyAt.toISOString()),
+    ]);
   }
 
   @On('warn')

@@ -2,15 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Client } from 'discord.js';
 
 import { PrismaService } from '@/features/prisma';
-
-import { MixpanelService } from '../mixpanel';
+import { MqttService } from '@/mqtt/mqtt.service';
 
 @Injectable()
 export class GuildService {
   public constructor(
     private readonly db: PrismaService,
     private readonly client: Client,
-    private readonly mixpanel: MixpanelService,
+    private readonly mqtt: MqttService,
   ) {}
 
   /**
@@ -31,29 +30,6 @@ export class GuildService {
         });
       }
     }
-
-    const databaseGuild = await this.db.guild.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        _count: {
-          select: {
-            primaryChannels: true,
-            secondaryChannels: true,
-            aliases: true,
-          },
-        },
-      },
-    });
-
-    await this.mixpanel.identify(id, {
-      name: guild.name,
-      members: guild.memberCount,
-      primaries: databaseGuild._count.primaryChannels,
-      secondaries: databaseGuild._count.secondaryChannels,
-      aliases: databaseGuild._count.aliases,
-    });
   }
 
   /**
@@ -85,11 +61,6 @@ export class GuildService {
       },
     });
 
-    await this.mixpanel.track('Allowjoin Command Run', {
-      distinct_id: guildId,
-      allowJoinRequests: newGuild.allowJoinRequests ? 'Yes' : 'No',
-    });
-
     return newGuild;
   }
 
@@ -107,10 +78,6 @@ export class GuildService {
     if (!guild) {
       throw new Error('Guild not found');
     }
-
-    await this.mixpanel.track('Info Guild Command Run', {
-      distinct_id: guildId,
-    });
 
     return guild;
   }

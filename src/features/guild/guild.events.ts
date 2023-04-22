@@ -1,16 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Context, type ContextOf, On } from 'necord';
 
 import { PrismaService } from '@/features/prisma';
-
-import { MixpanelService } from '../mixpanel';
+import { MqttService } from '@/mqtt/mqtt.service';
 
 @Injectable()
 export class GuildEvents {
   constructor(
     private readonly db: PrismaService,
-    private readonly mixpanel: MixpanelService,
+    private readonly mqtt: MqttService,
   ) {}
+
+  private readonly logger = new Logger(GuildEvents.name);
 
   @On('guildCreate')
   public async onGuildCreate(@Context() [guild]: ContextOf<'guildCreate'>) {
@@ -19,9 +20,9 @@ export class GuildEvents {
         id: guild.id,
       },
     });
-    await this.mixpanel.track('Guild Joined', {
-      distinct_id: guild.id,
-    });
+    const guildCount = await this.db.guild.count();
+    this.logger.log(`Joined guild ${guild.name} (${guild.id})`);
+    await this.mqtt.publish(`dynamica/guilds`, guildCount);
   }
 
   @On('guildDelete')
@@ -31,8 +32,8 @@ export class GuildEvents {
         id: guild.id,
       },
     });
-    await this.mixpanel.track('Guild Left', {
-      distinct_id: guild.id,
-    });
+    const guildCount = await this.db.guild.count();
+    this.logger.log(`Left guild ${guild.name} (${guild.id})`);
+    await this.mqtt.publish(`dynamica/guilds`, guildCount);
   }
 }

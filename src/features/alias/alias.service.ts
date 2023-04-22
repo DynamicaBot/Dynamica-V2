@@ -1,16 +1,13 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/features/prisma';
-
-import { MixpanelService } from '../mixpanel';
-import { SecondaryService } from '../secondary/secondary.service';
+import { MqttService } from '@/mqtt/mqtt.service';
 
 @Injectable()
 export class AliasService {
   constructor(
     private readonly db: PrismaService,
-    private readonly secondaryService: SecondaryService,
-    private readonly mixpanel: MixpanelService,
+    private readonly mqtt: MqttService,
   ) {}
 
   /**
@@ -38,11 +35,9 @@ export class AliasService {
       },
     });
 
-    await this.mixpanel.track('Alias Command Run', {
-      distinct_id: guildId,
-      activity,
-      activityAlias: alias,
-    });
+    const aliasCount = await this.db.alias.count();
+
+    await this.mqtt.publish(`dynamica/aliases`, aliasCount);
 
     return upsertedAlias;
   }
@@ -76,10 +71,9 @@ export class AliasService {
       },
     });
 
-    await this.mixpanel.track('Unalias Command Run', {
-      distinct_id: guildId,
-      activity,
-    });
+    const aliasCount = await this.db.alias.count();
+
+    await this.mqtt.publish(`dynamica/aliases`, aliasCount);
 
     return deletedAlias;
   }
@@ -94,10 +88,6 @@ export class AliasService {
       where: {
         guildId,
       },
-    });
-
-    await this.mixpanel.track('Aliases Command Run', {
-      distinct_id: guildId,
     });
 
     return aliases;

@@ -3,8 +3,7 @@ import { ActivityType } from 'discord.js';
 import { Context, type ContextOf, On } from 'necord';
 
 import { PrismaService } from '@/features/prisma';
-
-import { MixpanelService } from '../mixpanel';
+import { MqttService } from '@/mqtt/mqtt.service';
 
 import { SecondaryService } from './secondary.service';
 
@@ -13,7 +12,7 @@ export class SecondaryEvents {
   constructor(
     private readonly db: PrismaService,
     private readonly secondaryService: SecondaryService,
-    private readonly mixpanel: MixpanelService,
+    private readonly mqtt: MqttService,
   ) {}
 
   @On('voiceStateUpdate')
@@ -103,10 +102,9 @@ export class SecondaryEvents {
       },
     });
 
-    await this.mixpanel.track('Secondary Deleted', {
-      distinct_id: channel.guild.id,
-      channelId: channel.id,
-    });
+    const secondaryCount = await this.db.secondary.count();
+
+    this.mqtt.publish(`dynamica/secondaries`, secondaryCount);
   }
 
   @On('presenceUpdate')
