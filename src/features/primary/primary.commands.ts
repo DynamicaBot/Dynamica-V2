@@ -8,6 +8,7 @@ import {
 } from 'necord';
 
 import { PrimaryCreateDto } from './dto/PrimaryCreateDto';
+import { PrimaryDto } from './dto/PrimaryDto';
 import { PrimaryGeneralDto } from './dto/PrimaryGeneralDto';
 import { PrimaryTemplateDto } from './dto/PrimaryTemplateDto';
 import { PrimaryAutocompleteInterceptor } from './interceptors/primary.interceptor';
@@ -99,6 +100,30 @@ export class PrimaryCommands {
           newChannel.id,
         )}`,
       });
+    } catch (error) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `An Error occured: ${error.message}`,
+      });
+    }
+  }
+
+  @UseInterceptors(PrimaryAutocompleteInterceptor)
+  @SlashCommand({
+    name: 'primary',
+    description: 'Set the channel settings',
+    defaultMemberPermissions: 'ManageChannels',
+  })
+  public async onSettings(
+    @Context() [interaction]: SlashCommandContext,
+    @Options() { primary }: PrimaryDto,
+  ) {
+    try {
+      const newChannel = await this.primaryService.createPrimaryModal(
+        interaction.guildId,
+        primary,
+      );
+      return interaction.showModal(newChannel);
     } catch (error) {
       return interaction.reply({
         ephemeral: true,
