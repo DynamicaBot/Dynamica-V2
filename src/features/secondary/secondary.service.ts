@@ -9,8 +9,9 @@ import {
 import emojiList from 'emoji-random-list';
 import { romanize } from 'romans';
 
+import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
-import { MqttService } from '@/mqtt/mqtt.service';
+import { getPresence } from '@/utils/presence';
 
 @Injectable()
 export class SecondaryService {
@@ -130,6 +131,9 @@ export class SecondaryService {
     await discordGuildMember.voice.setChannel(newDiscordChannel);
 
     const secondaryCount = await this.db.secondary.count();
+    const primaryCount = await this.db.primary.count();
+
+    this.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 
     this.mqtt.publish('dynamica/secondaries', secondaryCount.toString());
 

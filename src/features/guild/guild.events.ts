@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Context, type ContextOf, On } from 'necord';
 
+import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
-import { MqttService } from '@/mqtt/mqtt.service';
 
 @Injectable()
 export class GuildEvents {

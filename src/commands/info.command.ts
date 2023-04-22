@@ -1,4 +1,4 @@
-import { Injectable, UseInterceptors } from '@nestjs/common';
+import { UseInterceptors } from '@nestjs/common';
 import {
   EmbedBuilder,
   channelMention,

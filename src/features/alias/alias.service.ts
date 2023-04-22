@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
+import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
-import { MqttService } from '@/mqtt/mqtt.service';
 
 @Injectable()
 export class AliasService {
