@@ -13,7 +13,7 @@
     "dev": "tsup --watch",
     "start": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "semantic-release": "semantic-release --branches main"
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
@@ -57,5 +57,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/DynamicaBot/Dynamica-V2.git"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ]
   }
 }
