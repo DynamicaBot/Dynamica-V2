@@ -41,6 +41,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           # list of Docker images to use as base name for tags
+          context: 'git'
           images: |
             ghcr.io/dynamicabot/dynamica-v2
           # generate Docker tags based on the following events/attributes
