@@ -41,6 +41,11 @@ export class MqttService {
     }
 
     const waitReady = new Promise<void>((resolve) => {
+      if (this.client?.connected) {
+        resolve();
+        return;
+      }
+
       this.client.once('connect', (err) => {
         if (err) {
           this.logger.error('MQTT error', err);
