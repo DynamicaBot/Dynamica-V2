@@ -17,6 +17,9 @@ export class SecondaryModals {
     @Ctx() [interaction]: ModalContext,
     @ModalParam('id') id: string,
   ) {
-    throw new Error('Not implemented');
+    return interaction.reply({
+      content: 'Not Implemented',
+      ephemeral: true,
+    });
   }
 }
