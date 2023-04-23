@@ -1,0 +1,16 @@
+name: Check
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read # for checkout
+
+jobs:
+  type-check:
+    uses: ./.github/workflows/typecheck.yml
+    name: Check Types
+  lint:
+    uses: ./.github/workflows/lint.yml
+    name: Lint
