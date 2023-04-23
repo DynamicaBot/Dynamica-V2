@@ -1,7 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:base",
+    ":semanticCommits"
   ],
   "packageRules": [
     {
@@ -17,19 +18,6 @@
         "*"
       ],
       "automerge": true
-    },
-    {
-      "groupName": "all major dependencies",
-      "matchManagers": [
-        "npm"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "matchPackagePatterns": [
-        "*"
-      ],
-      "automerge": false
     }
   ]
 }
