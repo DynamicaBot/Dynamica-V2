@@ -19,6 +19,10 @@ jobs:
       packages: write
     outputs:
       published: ${{ steps.semantic.outputs.new_release_published }}
+      version: ${{ steps.semantic.outputs.new_release_version }}
+      major: ${{ steps.semantic.outputs.new_release_major_version }}
+      minor: ${{ steps.semantic.outputs.new_release_minor_version }}
+      patch: ${{ steps.semantic.outputs.new_release_patch_version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -47,16 +51,14 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           # list of Docker images to use as base name for tags
-          context: 'git'
           images: |
             ghcr.io/dynamicabot/dynamica-v2
           # generate Docker tags based on the following events/attributes
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}.{{minor}}.{{patch}}
-            type=semver,pattern={{major}}
-
+            type=raw,value=${{ needs.release.outputs.version }}
+            type=raw,value=${{ needs.release.outputs.major }}
+            type=raw,value=${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}
+            type=raw,value=${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}.${{ needs.release.outputs.patch }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
