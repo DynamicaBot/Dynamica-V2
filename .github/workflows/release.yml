@@ -62,6 +62,7 @@ jobs:
             ghcr.io/dynamicabot/dynamica-v2
           # generate Docker tags based on the following events/attributes
           tags: |
+            type=raw,value=latest
             type=raw,value=${{ needs.release.outputs.version }}
             type=raw,value=${{ needs.release.outputs.major }}
             type=raw,value=${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}
@@ -111,6 +112,7 @@ jobs:
             suffix=-pterodactyl,onlatest=true
           # generate Docker tags based on the following events/attributes
           tags: |
+            type=raw,value=latest
             type=raw,value=${{ needs.release.outputs.version }}
             type=raw,value=${{ needs.release.outputs.major }}
             type=raw,value=${{ needs.release.outputs.major }}.${{ needs.release.outputs.minor }}
