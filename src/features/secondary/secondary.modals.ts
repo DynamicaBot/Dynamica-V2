@@ -12,14 +12,40 @@ export class SecondaryModals {
     private readonly secondaryService: SecondaryService,
   ) {}
 
-  @Modal('secondary/:id')
-  public onSecondaryModal(
+  @Modal('secondary/modals/:id')
+  public async onSecondaryModal(
     @Ctx() [interaction]: ModalContext,
     @ModalParam('id') id: string,
   ) {
-    return interaction.reply({
-      content: 'Not Implemented',
-      ephemeral: true,
-    });
+    try {
+      const newName = interaction.fields.getTextInputValue('name');
+
+      const updatedSecondary = await this.secondaryService.name(
+        interaction.guildId,
+        id,
+        newName.length ? newName : null,
+        interaction.user.id,
+      );
+
+      // const updatedComponents =
+      //   await this.secondaryService.createSecondarySettingsComponents(
+      //     interaction.guildId,
+      //     id,
+      //   );
+
+      // await interaction({
+      //   components: [updatedComponents],
+      // });
+
+      return interaction.reply({
+        ephemeral: true,
+        content: `Channel name updated to ${updatedSecondary.name}`,
+      });
+    } catch (error) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `An Error occured: ${error.message}`,
+      });
+    }
   }
 }

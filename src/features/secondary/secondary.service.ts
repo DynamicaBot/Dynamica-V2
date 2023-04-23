@@ -3,6 +3,8 @@ import { OverwriteType, PermissionFlagsBits } from 'discord-api-types/v10';
 import {
   ActionRowBuilder,
   ActivityType,
+  ButtonBuilder,
+  ButtonStyle,
   ChannelType,
   Client,
   ModalActionRowComponentBuilder,
@@ -10,6 +12,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
   ThreadMemberManager,
+  UserSelectMenuBuilder,
 } from 'discord.js';
 import emojiList from 'emoji-random-list';
 import { romanize } from 'romans';
@@ -134,6 +137,17 @@ export class SecondaryService {
     });
 
     await discordGuildMember.voice.setChannel(newDiscordChannel);
+
+    const channelSettingsComponents =
+      await this.createSecondarySettingsComponents(
+        guildId,
+        newDiscordChannel.id,
+      );
+
+    await newDiscordChannel.send({
+      content: `Edit the channel settings here`,
+      components: [channelSettingsComponents],
+    });
 
     const secondaryCount = await this.db.secondary.count();
     const primaryCount = await this.db.primary.count();
@@ -574,7 +588,7 @@ export class SecondaryService {
   public async name(
     guildId: string,
     channelId: string,
-    name: string,
+    name: string | null,
     userId: string,
   ) {
     const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
@@ -660,6 +674,10 @@ export class SecondaryService {
 
     if (!channel) {
       channel = await this.client.channels.fetch(channelId);
+    }
+
+    if (!channel) {
+      throw new Error('Channel not found');
     }
 
     if (channel.isDMBased()) {
@@ -833,16 +851,112 @@ export class SecondaryService {
       throw new Error('Channel is not a dynamica channel');
     }
 
+    const textInput = new TextInputBuilder()
+      .setCustomId('name')
+      .setLabel('Name')
+      .setStyle(TextInputStyle.Short)
+      .setRequired(false);
+
+    if (secondaryProperties.name) {
+      textInput.setValue(secondaryProperties.name);
+    }
+
     return new ModalBuilder()
       .setTitle('Edit Secondary Channel')
-      .setCustomId(`secondary/${id}`)
+      .setCustomId(`secondary/modals/${id}`)
       .setComponents([
         new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents([
-          new TextInputBuilder()
-            .setCustomId('name')
-            .setLabel('Name')
-            .setStyle(TextInputStyle.Short),
+          textInput,
         ]),
       ]);
+  }
+
+  async createSecondaryTransferSelect(
+    guildId: string,
+    channelId: string,
+    userId: string,
+  ): Promise<UserSelectMenuBuilder> {
+    const databaseSecondary = await this.db.secondary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        },
+      },
+    });
+
+    if (!databaseSecondary) {
+      throw new Error('Channel is not a dynamica channel');
+    }
+
+    let channel = this.client.channels.cache.get(channelId);
+
+    if (!channel) {
+      channel = await this.client.channels.fetch(channelId);
+    }
+
+    if (channel.isDMBased()) {
+      throw new Error('Channel is a DM');
+    }
+
+    if (databaseSecondary.creator !== userId) {
+      throw new Error('Not the owner of the channel');
+    }
+
+    return new UserSelectMenuBuilder()
+      .setCustomId(`secondary/selectors/transfer/${channelId}`)
+      .setPlaceholder('Select a new owner for the channel')
+      .setMaxValues(1)
+      .setMinValues(1);
+  }
+
+  async createSecondarySettingsComponents(
+    guildId: string,
+    channelId: string,
+  ): Promise<ActionRowBuilder<ButtonBuilder>> {
+    const databaseChannel = await this.db.secondary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        },
+      },
+    });
+
+    if (!databaseChannel) {
+      throw new Error('Channel is not a dynamica channel');
+    }
+
+    const lockButton = new ButtonBuilder()
+      .setCustomId(`secondary/buttons/lock/${channelId}`)
+      .setEmoji('🔒')
+      .setLabel('Lock')
+      .setStyle(ButtonStyle.Primary);
+
+    const unlockButton = new ButtonBuilder()
+      .setCustomId(`secondary/buttons/unlock/${channelId}`)
+      .setEmoji('🔓')
+      .setLabel('Unlock')
+      .setStyle(ButtonStyle.Primary);
+
+    const transferButton = new ButtonBuilder()
+      .setCustomId(`secondary/buttons/transfer/${channelId}`)
+      .setEmoji('👑')
+      .setLabel('Transfer')
+      .setStyle(ButtonStyle.Primary);
+
+    const settingsButton = new ButtonBuilder()
+      .setCustomId(`secondary/buttons/settings/${channelId}`)
+      .setEmoji('⚙️')
+      .setLabel('Settings')
+      .setStyle(ButtonStyle.Primary);
+
+    const isLocked = databaseChannel.locked;
+
+    return new ActionRowBuilder<ButtonBuilder>().addComponents(
+      transferButton,
+      isLocked ? unlockButton : lockButton,
+      settingsButton,
+    );
   }
 }
