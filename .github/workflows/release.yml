@@ -36,7 +36,7 @@ jobs:
       packages: write
     runs-on: ubuntu-latest
     needs: 'release'
-    if: needs.release.outputs.published == true
+    if: needs.release.outputs.published == 'true'
     name: 'Build and Publish Image'
     steps:
       - name: Checkout
