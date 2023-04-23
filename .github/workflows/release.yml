@@ -10,8 +10,10 @@ permissions:
 jobs:
   type-check:
     uses: ./.github/workflows/typecheck.yml
+    name: Check Types
   lint:
     uses: ./.github/workflows/lint.yml
+    name: Lint
   release:
     name: Release
     runs-on: ubuntu-latest
