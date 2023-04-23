@@ -5,7 +5,7 @@ name: Type Check
 
 jobs:
   typecheck:
-    name: Typecheck
+    name: Check Types
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -20,5 +20,5 @@ jobs:
         run: yarn generate
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/problem-matchers/tsc.json"
-      - name: Type Check
+      - name: Check Types
         run: yarn tsc --noEmit
