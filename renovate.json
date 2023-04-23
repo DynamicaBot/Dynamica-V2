@@ -6,7 +6,7 @@
   ],
   "packageRules": [
     {
-      "groupName": "all non-major dependencies",
+      "groupName": "chore(deps): update all non-major dependencies",
       "matchManagers": [
         "npm"
       ],
@@ -19,5 +19,8 @@
       ],
       "automerge": true
     }
-  ]
+  ],
+  "lockFileMaintenance": {
+    "enabled": true
+  }
 }

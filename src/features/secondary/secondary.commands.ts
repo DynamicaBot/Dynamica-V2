@@ -146,6 +146,7 @@ export class SecondaryCommands {
     }
   }
 
+  // TODO: Migrate to button in channel chat
   @UseInterceptors(SecondaryAutocompleteInterceptor)
   @SlashCommand({
     name: 'lock',
@@ -173,6 +174,7 @@ export class SecondaryCommands {
     }
   }
 
+  // TODO: Migrate to button in channel chat
   @UseInterceptors(SecondaryAutocompleteInterceptor)
   @SlashCommand({
     name: 'unlock',
@@ -200,6 +202,7 @@ export class SecondaryCommands {
     }
   }
 
+  // TODO: Migrate to button in channel chat
   @UseInterceptors(SecondaryAutocompleteInterceptor)
   @SlashCommand({
     name: 'transfer',
