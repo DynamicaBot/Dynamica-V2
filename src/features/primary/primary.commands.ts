@@ -9,8 +9,6 @@ import {
 
 import { PrimaryCreateDto } from './dto/PrimaryCreateDto';
 import { PrimaryDto } from './dto/PrimaryDto';
-import { PrimaryGeneralDto } from './dto/PrimaryGeneralDto';
-import { PrimaryTemplateDto } from './dto/PrimaryTemplateDto';
 import { PrimaryAutocompleteInterceptor } from './interceptors/primary.interceptor';
 import { PrimaryService } from './primary.service';
 
@@ -37,66 +35,6 @@ export class PrimaryCommands {
       return interaction.reply({
         ephemeral: true,
         content: `New Primary Channel Created: ${channelMention(
-          newChannel.id,
-        )}`,
-      });
-    } catch (error) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `An Error occured: ${error.message}`,
-      });
-    }
-  }
-
-  @UseInterceptors(PrimaryAutocompleteInterceptor)
-  @SlashCommand({
-    name: 'general',
-    description: 'Set the general channel name template',
-    defaultMemberPermissions: 'ManageChannels',
-  })
-  public async onGeneral(
-    @Context() [interaction]: SlashCommandContext,
-    @Options() { primary, template }: PrimaryGeneralDto,
-  ) {
-    try {
-      const newChannel = await this.primaryService.general(
-        interaction.guildId,
-        primary,
-        template,
-      );
-      return interaction.reply({
-        ephemeral: true,
-        content: `General Channel Name Template Updated: ${channelMention(
-          newChannel.id,
-        )}`,
-      });
-    } catch (error) {
-      return interaction.reply({
-        ephemeral: true,
-        content: `An Error occured: ${error.message}`,
-      });
-    }
-  }
-
-  @UseInterceptors(PrimaryAutocompleteInterceptor)
-  @SlashCommand({
-    name: 'template',
-    description: 'Set the channel name template',
-    defaultMemberPermissions: 'ManageChannels',
-  })
-  public async onTemplate(
-    @Context() [interaction]: SlashCommandContext,
-    @Options() { primary, template }: PrimaryTemplateDto,
-  ) {
-    try {
-      const newChannel = await this.primaryService.template(
-        interaction.guildId,
-        primary,
-        template,
-      );
-      return interaction.reply({
-        ephemeral: true,
-        content: `Channel Name Template Updated: ${channelMention(
           newChannel.id,
         )}`,
       });
