@@ -7,6 +7,8 @@ import {
   type SlashCommandContext,
 } from 'necord';
 
+import createErrorEmbed from '@/utils/createErrorEmbed';
+
 import { PrimaryCreateDto } from './dto/PrimaryCreateDto';
 import { PrimaryDto } from './dto/PrimaryDto';
 import { PrimaryAutocompleteInterceptor } from './interceptors/primary.interceptor';
@@ -39,9 +41,11 @@ export class PrimaryCommands {
         )}`,
       });
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
+        embeds: [errorEmbed],
         ephemeral: true,
-        content: `An Error occured: ${error.message}`,
       });
     }
   }
@@ -63,9 +67,11 @@ export class PrimaryCommands {
       );
       return interaction.showModal(newChannel);
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
+        embeds: [errorEmbed],
         ephemeral: true,
-        content: `An Error occured: ${error.message}`,
       });
     }
   }

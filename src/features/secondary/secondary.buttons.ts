@@ -6,6 +6,8 @@ import {
 } from 'discord.js';
 import { Button, type ButtonContext, ComponentParam, Context } from 'necord';
 
+import createErrorEmbed from '@/utils/createErrorEmbed';
+
 import { SecondaryService } from './secondary.service';
 
 @Injectable()
@@ -34,9 +36,11 @@ export class SecondaryButtons {
         components: [messageComponents],
       });
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
+        embeds: [errorEmbed],
         ephemeral: true,
-        content: `An Error occured: ${error.message}`,
       });
     }
   }
@@ -61,9 +65,11 @@ export class SecondaryButtons {
         components: [messageComponents],
       });
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
+        embeds: [errorEmbed],
         ephemeral: true,
-        content: `An Error occured: ${error.message}`,
       });
     }
   }
@@ -91,8 +97,10 @@ export class SecondaryButtons {
         components: [row],
       });
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
-        content: `An Error occured: ${error.message}`,
+        embeds: [errorEmbed],
         ephemeral: true,
       });
     }
@@ -115,9 +123,11 @@ export class SecondaryButtons {
       //   components: [messageComponents],
       // });
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
+        embeds: [errorEmbed],
         ephemeral: true,
-        content: `An Error occured: ${error.message}`,
       });
     }
   }
@@ -138,9 +148,11 @@ export class SecondaryButtons {
         content: `All your base are belong to us ${channelMention(id)}`,
       });
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
+        embeds: [errorEmbed],
         ephemeral: true,
-        content: `An Error occured: ${error.message}`,
       });
     }
   }

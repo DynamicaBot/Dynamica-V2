@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 
 import { SecondaryService, SecondaryModule } from '@/features/secondary';
 
-import { SecondaryModals } from '../secondary/secondary.modals';
-
 import { PrimaryCommands } from './primary.commands';
 import { PrimaryEvents } from './primary.events';
 import { PrimaryModals } from './primary.modals';

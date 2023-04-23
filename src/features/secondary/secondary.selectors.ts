@@ -10,6 +10,8 @@ import {
   type UserSelectContext,
 } from 'necord';
 
+import createErrorEmbed from '@/utils/createErrorEmbed';
+
 import { SecondaryService } from './secondary.service';
 
 @Injectable()
@@ -39,9 +41,11 @@ export class SecondarySelectors {
         components: [],
       });
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
+        embeds: [errorEmbed],
         ephemeral: true,
-        content: `An Error occured: ${error.message}`,
       });
     }
   }

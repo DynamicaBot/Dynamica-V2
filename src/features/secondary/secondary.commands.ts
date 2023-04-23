@@ -13,6 +13,8 @@ import {
   type SlashCommandContext,
 } from 'necord';
 
+import createErrorEmbed from '@/utils/createErrorEmbed';
+
 import { AllyourbaseDto } from './dto/AllyourbaseDto';
 import { BitrateDto } from './dto/BitrateDto';
 import { LimitDto } from './dto/LimitDto';
@@ -39,17 +41,26 @@ export class SecondaryCommands {
     @Context() [interaction]: SlashCommandContext,
     @Options() { secondary }: AllyourbaseDto,
   ) {
-    const newChannel = await this.secondaryService.allyourbase(
-      interaction.guildId,
-      secondary,
-      interaction.user.id,
-    );
-
-    return interaction.reply({
-      content: `${userMention(
+    try {
+      const newChannel = await this.secondaryService.allyourbase(
+        interaction.guildId,
+        secondary,
         interaction.user.id,
-      )} has taken ownership of ${channelMention(newChannel.id)}`,
-    });
+      );
+
+      return interaction.reply({
+        content: `${userMention(
+          interaction.user.id,
+        )} has taken ownership of ${channelMention(newChannel.id)}`,
+      });
+    } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
+      return interaction.reply({
+        embeds: [errorEmbed],
+        ephemeral: true,
+      });
+    }
   }
 
   @UseInterceptors(SecondaryAutocompleteInterceptor)
@@ -76,15 +87,12 @@ export class SecondaryCommands {
         )} has been set to ${codeBlock(bitrate.toString())}`,
       });
     } catch (error) {
-      if (error instanceof Error) {
-        return interaction.reply({
-          content: `Error: ${inlineCode(error.message)}`,
-        });
-      } else {
-        return interaction.reply({
-          content: `Unknown error`,
-        });
-      }
+      const errorEmbed = createErrorEmbed(error.message);
+
+      return interaction.reply({
+        embeds: [errorEmbed],
+        ephemeral: true,
+      });
     }
   }
 
@@ -111,9 +119,11 @@ export class SecondaryCommands {
         )}`,
       });
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
+        embeds: [errorEmbed],
         ephemeral: true,
-        content: `An Error occured: ${error.message}`,
       });
     }
   }
@@ -139,9 +149,11 @@ export class SecondaryCommands {
         content: `Channel User Limit Updated: ${channelMention(newChannel.id)}`,
       });
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
+        embeds: [errorEmbed],
         ephemeral: true,
-        content: `An Error occured: ${error.message}`,
       });
     }
   }
@@ -167,9 +179,11 @@ export class SecondaryCommands {
         content: `Channel Locked: ${channelMention(newChannel.id)}`,
       });
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
+        embeds: [errorEmbed],
         ephemeral: true,
-        content: `An Error occured: ${error.message}`,
       });
     }
   }
@@ -195,9 +209,11 @@ export class SecondaryCommands {
         content: `Channel Unlocked: ${channelMention(newChannel.id)}`,
       });
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
+        embeds: [errorEmbed],
         ephemeral: true,
-        content: `An Error occured: ${error.message}`,
       });
     }
   }
@@ -227,9 +243,11 @@ export class SecondaryCommands {
         )}`,
       });
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
+        embeds: [errorEmbed],
         ephemeral: true,
-        content: `An Error occured: ${error.message}`,
       });
     }
   }
