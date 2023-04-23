@@ -144,12 +144,10 @@ export class SecondaryService {
         newDiscordChannel.id,
       );
 
-    const message = await newDiscordChannel.send({
+    await newDiscordChannel.send({
       content: `Edit the channel settings here`,
       components: [channelSettingsComponents],
     });
-
-    await message.pin();
 
     const secondaryCount = await this.db.secondary.count();
     const primaryCount = await this.db.primary.count();
