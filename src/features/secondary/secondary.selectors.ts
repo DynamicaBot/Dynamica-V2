@@ -32,11 +32,11 @@ export class SecondarySelectors {
         selectedMember.user.id,
       );
 
-      return interaction.reply({
-        ephemeral: true,
+      return interaction.update({
         content: `Channel Transferred to ${userMention(
           selectedMember.user.id,
         )}`,
+        components: [],
       });
     } catch (error) {
       return interaction.reply({

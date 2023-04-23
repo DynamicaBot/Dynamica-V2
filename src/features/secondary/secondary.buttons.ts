@@ -104,21 +104,38 @@ export class SecondaryButtons {
     @ComponentParam('id') id: string,
   ) {
     try {
-      const messageComponents =
-        await this.secondaryService.createSecondarySettingsComponents(
-          interaction.guildId,
-          id,
-        );
-
       const modal = await this.secondaryService.createSecondaryModal(
         interaction.guildId,
         id,
       );
 
-      await interaction.showModal(modal);
+      return interaction.showModal(modal);
 
-      return interaction.update({
-        components: [messageComponents],
+      // return interaction.update({
+      //   components: [messageComponents],
+      // });
+    } catch (error) {
+      return interaction.reply({
+        ephemeral: true,
+        content: `An Error occured: ${error.message}`,
+      });
+    }
+  }
+
+  @Button('secondary/buttons/allyourbase/:id')
+  public async onAllyourbase(
+    @Context() [interaction]: ButtonContext,
+    @ComponentParam('id') id: string,
+  ) {
+    try {
+      await this.secondaryService.allyourbase(
+        interaction.guildId,
+        id,
+        interaction.user.id,
+      );
+
+      return interaction.reply({
+        content: `All your base are belong to us ${channelMention(id)}`,
       });
     } catch (error) {
       return interaction.reply({

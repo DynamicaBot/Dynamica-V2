@@ -470,7 +470,27 @@ export class SecondaryService {
     });
 
     if (!databaseSecondary) {
-      return;
+      throw new Error('No secondary channel found');
+    }
+
+    if (databaseSecondary.creator === userId) {
+      throw new Error('You already own this channel');
+    }
+
+    let discordGuild = this.client.guilds.cache.get(guildId);
+
+    if (!discordGuild) {
+      discordGuild = await this.client.guilds.fetch(guildId);
+    }
+
+    const discordMember = await discordGuild.members.fetch(userId);
+
+    if (!discordMember) {
+      throw new Error('User not found');
+    }
+
+    if (!discordMember.permissions.has(PermissionFlagsBits.ManageChannels)) {
+      throw new Error('You do not have permission to do this');
     }
 
     const updatedSecondary = await this.db.secondary.update({
@@ -951,12 +971,19 @@ export class SecondaryService {
       .setLabel('Settings')
       .setStyle(ButtonStyle.Primary);
 
+    const allyourbaseButton = new ButtonBuilder()
+      .setCustomId(`secondary/buttons/allyourbase/${channelId}`)
+      .setEmoji('👑')
+      .setLabel('Take Ownership')
+      .setStyle(ButtonStyle.Primary);
+
     const isLocked = databaseChannel.locked;
 
     return new ActionRowBuilder<ButtonBuilder>().addComponents(
       transferButton,
       isLocked ? unlockButton : lockButton,
       settingsButton,
+      allyourbaseButton,
     );
   }
 }
