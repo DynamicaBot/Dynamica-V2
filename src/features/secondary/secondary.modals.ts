@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Ctx, Modal, type ModalContext, ModalParam } from 'necord';
 
+import createErrorEmbed from '@/utils/createErrorEmbed';
+
 import { PrismaService } from '../prisma';
 
 import { SecondaryService } from './secondary.service';
@@ -42,9 +44,11 @@ export class SecondaryModals {
         content: `Channel name updated to ${updatedSecondary.name}`,
       });
     } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
       return interaction.reply({
+        embeds: [errorEmbed],
         ephemeral: true,
-        content: `An Error occured: ${error.message}`,
       });
     }
   }
