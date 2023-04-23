@@ -1,0 +1,11 @@
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  type-check:
+    uses: ./.github/workflows/typecheck.yml
+  lint:
+    uses: ./.github/workflows/lint.yml

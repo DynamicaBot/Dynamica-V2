@@ -1,0 +1,24 @@
+on:
+  workflow_call:
+
+name: Type Check
+
+jobs:
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Yarn
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: 'yarn'
+      - name: Install Dependancies
+        run: yarn install --frozen-lockfile
+      - name: Generate
+        run: yarn generate
+      - name: Add Problem Matcher
+        run: echo "::add-matcher::.github/problem-matchers/tsc.json"
+      - name: Type Check
+        run: yarn tsc --noEmit
