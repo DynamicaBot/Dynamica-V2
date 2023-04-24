@@ -1,5 +1,8 @@
+import { YogaDriverConfig, YogaDriver } from '@graphql-yoga/nestjs';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
 import { ScheduleModule } from '@nestjs/schedule';
 import { IntentsBitField } from 'discord.js';
 import { NecordModule } from 'necord';
@@ -15,6 +18,13 @@ import { SecondaryModule } from './features/secondary/secondary.module';
 
 @Module({
   imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      // typePaths: ['./**/*.graphql'],
+      autoSchemaFile: 'schema.gql',
+      introspection: true,
+      installSubscriptionHandlers: true,
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),

@@ -8,6 +8,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
+import { PubSub } from 'graphql-subscriptions';
 
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
@@ -22,6 +23,8 @@ export class PrimaryService {
     private readonly secondaryService: SecondaryService,
     private readonly mqtt: MqttService,
   ) {}
+
+  public pubSub = new PubSub();
 
   /**
    * Create a primary channel
@@ -68,6 +71,8 @@ export class PrimaryService {
         },
       },
     });
+
+    await this.pubSub.publish('primaryCreated', { primaryCreated: primary });
 
     const primaryCount = await this.db.primary.count();
     const secondaryCount = await this.db.secondary.count();

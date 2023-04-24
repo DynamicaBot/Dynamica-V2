@@ -4,21 +4,27 @@ import { Context, type ContextOf, On } from 'necord';
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 
+import { GuildService } from './guild.service';
+
 @Injectable()
 export class GuildEvents {
   constructor(
     private readonly db: PrismaService,
     private readonly mqtt: MqttService,
+    private readonly guildService: GuildService,
   ) {}
 
   private readonly logger = new Logger(GuildEvents.name);
 
   @On('guildCreate')
   public async onGuildCreate(@Context() [guild]: ContextOf<'guildCreate'>) {
-    await this.db.guild.create({
+    const createdGuild = await this.db.guild.create({
       data: {
         id: guild.id,
       },
+    });
+    this.guildService.pubSub.publish('guildCreated', {
+      guildCreated: createdGuild,
     });
     const guildCount = await this.db.guild.count();
     this.logger.log(`Joined guild ${guild.name} (${guild.id})`);
@@ -27,10 +33,13 @@ export class GuildEvents {
 
   @On('guildDelete')
   public async onGuildDelete(@Context() [guild]: ContextOf<'guildDelete'>) {
-    await this.db.guild.delete({
+    const deletedGuild = await this.db.guild.delete({
       where: {
         id: guild.id,
       },
+    });
+    this.guildService.pubSub.publish('guildDeleted', {
+      guildDeleted: deletedGuild,
     });
     const guildCount = await this.db.guild.count();
     this.logger.log(`Left guild ${guild.name} (${guild.id})`);
