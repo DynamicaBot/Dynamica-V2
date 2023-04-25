@@ -1,3 +1,4 @@
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { YogaDriverConfig, YogaDriver } from '@graphql-yoga/nestjs';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
@@ -27,6 +28,15 @@ import { SecondaryModule } from './features/secondary/secondary.module';
         'graphql-ws': true,
         'subscriptions-transport-ws': true,
       },
+      playground: false,
+      csrfPrevention: false,
+      plugins: [
+        ApolloServerPluginLandingPageLocalDefault({
+          embed: {
+            endpointIsEditable: true,
+          },
+        }),
+      ],
     }),
     ConfigModule.forRoot({
       isGlobal: true,
