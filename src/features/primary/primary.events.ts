@@ -5,11 +5,14 @@ import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
 
+import { PrimaryService } from './primary.service';
+
 @Injectable()
 export class PrimaryEvents {
   constructor(
     private readonly db: PrismaService,
     private readonly mqtt: MqttService,
+    private readonly primaryService: PrimaryService,
   ) {}
 
   @On('channelDelete')
@@ -26,10 +29,13 @@ export class PrimaryEvents {
 
     if (!databasePrimary) return;
 
-    await this.db.primary.delete({
+    const deletedPrimary = await this.db.primary.delete({
       where: {
         id: channel.id,
       },
+    });
+    this.primaryService.pubSub.publish('primaryDeleted', {
+      primaryDeleted: deletedPrimary,
     });
 
     const primaryCount = await this.db.primary.count();

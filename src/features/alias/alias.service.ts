@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { PubSub } from 'graphql-subscriptions';
 
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
@@ -9,6 +10,8 @@ export class AliasService {
     private readonly db: PrismaService,
     private readonly mqtt: MqttService,
   ) {}
+
+  public readonly pubSub = new PubSub();
 
   /**
    * Upsert an alias for an activity
@@ -33,6 +36,10 @@ export class AliasService {
         activity,
         alias,
       },
+    });
+
+    this.pubSub.publish('aliasUpserted', {
+      aliasUpserted: upsertedAlias,
     });
 
     const aliasCount = await this.db.alias.count();
@@ -69,6 +76,10 @@ export class AliasService {
           activity,
         },
       },
+    });
+
+    this.pubSub.publish('aliasDeleted', {
+      aliasDeleted: deletedAlias,
     });
 
     const aliasCount = await this.db.alias.count();

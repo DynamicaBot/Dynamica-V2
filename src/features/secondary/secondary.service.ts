@@ -15,6 +15,7 @@ import {
   UserSelectMenuBuilder,
 } from 'discord.js';
 import emojiList from 'emoji-random-list';
+import { PubSub } from 'graphql-subscriptions';
 import { romanize } from 'romans';
 
 import { MqttService } from '@/features/mqtt';
@@ -24,6 +25,8 @@ import { getPresence } from '@/utils/presence';
 @Injectable()
 export class SecondaryService {
   private readonly logger = new Logger(SecondaryService.name);
+
+  public readonly pubSub = new PubSub();
 
   public constructor(
     private readonly client: Client,
@@ -152,6 +155,9 @@ export class SecondaryService {
     const secondaryCount = await this.db.secondary.count();
     const primaryCount = await this.db.primary.count();
 
+    await this.pubSub.publish('secondaryCreated', {
+      secondaryCreated: newDatabaseChannel,
+    });
     this.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 
     this.mqtt.publish('dynamica/secondaries', secondaryCount.toString());

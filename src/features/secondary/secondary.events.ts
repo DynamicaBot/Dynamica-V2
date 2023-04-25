@@ -97,7 +97,7 @@ export class SecondaryEvents {
 
     if (!databaseChannel) return;
 
-    await this.db.secondary.delete({
+    const deletedSecondary = await this.db.secondary.delete({
       where: {
         id: databaseChannel.id,
       },
@@ -105,6 +105,10 @@ export class SecondaryEvents {
 
     const secondaryCount = await this.db.secondary.count();
     const primaryCount = await this.db.primary.count();
+
+    this.secondaryService.pubSub.publish('secondaryDeleted', {
+      secondaryDeleted: deletedSecondary,
+    });
 
     channel.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 
