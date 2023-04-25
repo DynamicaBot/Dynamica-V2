@@ -23,7 +23,10 @@ import { SecondaryModule } from './features/secondary/secondary.module';
       // typePaths: ['./**/*.graphql'],
       autoSchemaFile: 'schema.gql',
       introspection: true,
-      installSubscriptionHandlers: true,
+      subscriptions: {
+        'graphql-ws': true,
+        'subscriptions-transport-ws': true,
+      },
     }),
     ConfigModule.forRoot({
       isGlobal: true,
