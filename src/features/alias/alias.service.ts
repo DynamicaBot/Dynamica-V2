@@ -3,6 +3,7 @@ import { PubSub } from 'graphql-subscriptions';
 
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
+import UpdateMode from '@/utils/UpdateMode';
 
 @Injectable()
 export class AliasService {
@@ -38,8 +39,11 @@ export class AliasService {
       },
     });
 
-    this.pubSub.publish('aliasUpserted', {
-      aliasUpserted: upsertedAlias,
+    this.pubSub.publish('aliasUpdate', {
+      aliasUpdate: {
+        data: upsertedAlias,
+        mode: UpdateMode.Update,
+      },
     });
 
     const aliasCount = await this.db.alias.count();
@@ -78,8 +82,11 @@ export class AliasService {
       },
     });
 
-    this.pubSub.publish('aliasDeleted', {
-      aliasDeleted: deletedAlias,
+    this.pubSub.publish('aliasUpdate', {
+      aliasUpdate: {
+        data: deletedAlias,
+        mode: UpdateMode.Delete,
+      },
     });
 
     const aliasCount = await this.db.alias.count();

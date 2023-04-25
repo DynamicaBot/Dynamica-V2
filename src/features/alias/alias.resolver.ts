@@ -12,7 +12,7 @@ import {
 
 import { PrismaService } from '../prisma';
 
-import { Alias } from './alias.model';
+import { Alias, AliasUpdate } from './alias.model';
 import { AliasService } from './alias.service';
 
 @Resolver((of) => Alias)
@@ -27,14 +27,9 @@ export class AliasResolver {
     return this.db.alias.findMany();
   }
 
-  @Subscription((returns) => Alias)
-  aliasUpserted() {
-    return this.aliasService.pubSub.asyncIterator('aliasUpserted');
-  }
-
-  @Subscription((returns) => Alias)
-  aliasDeleted() {
-    return this.aliasService.pubSub.asyncIterator('aliasDeleted');
+  @Subscription((returns) => AliasUpdate)
+  aliasUpdate() {
+    return this.aliasService.pubSub.asyncIterator('aliasUpdate');
   }
 
   @Query((returns) => Alias)

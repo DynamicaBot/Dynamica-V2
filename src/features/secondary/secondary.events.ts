@@ -5,6 +5,7 @@ import { Context, type ContextOf, On } from 'necord';
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
+import UpdateMode from '@/utils/UpdateMode';
 
 import { SecondaryService } from './secondary.service';
 
@@ -106,8 +107,11 @@ export class SecondaryEvents {
     const secondaryCount = await this.db.secondary.count();
     const primaryCount = await this.db.primary.count();
 
-    this.secondaryService.pubSub.publish('secondaryDeleted', {
-      secondaryDeleted: deletedSecondary,
+    this.secondaryService.pubSub.publish('secondaryUpdate', {
+      secondaryUpdate: {
+        mode: UpdateMode.Delete,
+        data: deletedSecondary,
+      },
     });
 
     channel.client.user.setPresence(getPresence(primaryCount + secondaryCount));

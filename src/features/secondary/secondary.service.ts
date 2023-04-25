@@ -21,6 +21,7 @@ import { romanize } from 'romans';
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
+import UpdateMode from '@/utils/UpdateMode';
 
 @Injectable()
 export class SecondaryService {
@@ -155,8 +156,11 @@ export class SecondaryService {
     const secondaryCount = await this.db.secondary.count();
     const primaryCount = await this.db.primary.count();
 
-    await this.pubSub.publish('secondaryCreated', {
-      secondaryCreated: newDatabaseChannel,
+    await this.pubSub.publish('secondaryUpdate', {
+      secondaryUpdate: {
+        mode: UpdateMode.Create,
+        data: newDatabaseChannel,
+      },
     });
     this.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 

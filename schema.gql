@@ -17,6 +17,17 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type AliasUpdate {
+  mode: UpdateMode!
+  data: Alias!
+}
+
+enum UpdateMode {
+  Update
+  Delete
+  Create
+}
+
 type Primary {
   id: ID!
   creator: String!
@@ -29,6 +40,11 @@ type Primary {
   guild: Guild!
 }
 
+type PrimaryUpdate {
+  mode: UpdateMode!
+  data: Primary!
+}
+
 type Guild {
   id: ID!
   allowJoinRequests: Boolean!
@@ -37,6 +53,11 @@ type Guild {
   secondaries: [Secondary!]!
   aliases: [Alias!]!
   primaries: [Primary!]!
+}
+
+type GuildUpdate {
+  mode: UpdateMode!
+  data: Guild!
 }
 
 type Secondary {
@@ -53,6 +74,11 @@ type Secondary {
   primary: Primary!
 }
 
+type SecondaryUpdate {
+  mode: UpdateMode!
+  data: Secondary!
+}
+
 type Query {
   secondaries: [Secondary!]!
   secondary(id: ID!): Secondary!
@@ -65,12 +91,8 @@ type Query {
 }
 
 type Subscription {
-  secondaryCreated: Secondary!
-  secondaryDeleted: Secondary!
-  primaryCreated: Primary!
-  primaryDeleted: Primary!
-  guildCreated: Guild!
-  guildDeleted: Guild!
-  aliasUpserted: Alias!
-  aliasDeleted: Alias!
+  secondaryUpdate: SecondaryUpdate!
+  primaryUpdate: PrimaryUpdate!
+  guildUpdate: GuildUpdate!
+  aliasUpdate: AliasUpdate!
 }

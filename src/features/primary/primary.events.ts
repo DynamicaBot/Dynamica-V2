@@ -4,6 +4,7 @@ import { Context, type ContextOf, On } from 'necord';
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
+import UpdateMode from '@/utils/UpdateMode';
 
 import { PrimaryService } from './primary.service';
 
@@ -34,8 +35,8 @@ export class PrimaryEvents {
         id: channel.id,
       },
     });
-    this.primaryService.pubSub.publish('primaryDeleted', {
-      primaryDeleted: deletedPrimary,
+    this.primaryService.pubSub.publish('primaryUpdate', {
+      primaryUpdate: { mode: UpdateMode.Delete, data: deletedPrimary },
     });
 
     const primaryCount = await this.db.primary.count();

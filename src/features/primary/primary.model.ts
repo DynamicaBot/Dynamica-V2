@@ -1,6 +1,8 @@
 import { Field, ObjectType, GraphQLISODateTime, ID } from '@nestjs/graphql';
 import { Primary as PrismaPrimary } from '@prisma/client';
 
+import { UpdateModel } from '@/utils/UpdateModel';
+
 import { Guild } from '../guild/guild.model';
 import { Secondary } from '../secondary/secondary.model';
 
@@ -24,4 +26,10 @@ export class Primary implements PrismaPrimary {
   secondaries: Secondary[];
   @Field((type) => Guild)
   guild: Guild;
+}
+
+@ObjectType()
+export class PrimaryUpdate extends UpdateModel {
+  @Field(() => Primary)
+  data: Primary;
 }

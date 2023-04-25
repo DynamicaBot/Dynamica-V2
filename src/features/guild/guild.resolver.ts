@@ -12,7 +12,7 @@ import {
 
 import { PrismaService } from '../prisma';
 
-import { Guild } from './guild.model';
+import { Guild, GuildUpdate } from './guild.model';
 import { GuildService } from './guild.service';
 
 @Resolver((of) => Guild)
@@ -27,14 +27,9 @@ export class GuildResolver {
     return this.db.guild.findMany();
   }
 
-  @Subscription((returns) => Guild)
-  guildCreated() {
-    return this.guildService.pubSub.asyncIterator('guildCreated');
-  }
-
-  @Subscription((returns) => Guild)
-  guildDeleted() {
-    return this.guildService.pubSub.asyncIterator('guildDeleted');
+  @Subscription((returns) => GuildUpdate)
+  guildUpdate() {
+    return this.guildService.pubSub.asyncIterator('guildUpdate');
   }
 
   @Query((returns) => Guild)

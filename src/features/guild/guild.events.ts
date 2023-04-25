@@ -3,6 +3,7 @@ import { Context, type ContextOf, On } from 'necord';
 
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
+import UpdateMode from '@/utils/UpdateMode';
 
 import { GuildService } from './guild.service';
 
@@ -23,8 +24,11 @@ export class GuildEvents {
         id: guild.id,
       },
     });
-    this.guildService.pubSub.publish('guildCreated', {
-      guildCreated: createdGuild,
+    this.guildService.pubSub.publish('guildUpdate', {
+      guildUpdate: {
+        data: createdGuild,
+        mode: UpdateMode.Create,
+      },
     });
     const guildCount = await this.db.guild.count();
     this.logger.log(`Joined guild ${guild.name} (${guild.id})`);
@@ -38,8 +42,8 @@ export class GuildEvents {
         id: guild.id,
       },
     });
-    this.guildService.pubSub.publish('guildDeleted', {
-      guildDeleted: deletedGuild,
+    this.guildService.pubSub.publish('guildUpdate', {
+      guildUpdate: { data: deletedGuild, mode: UpdateMode.Delete },
     });
     const guildCount = await this.db.guild.count();
     this.logger.log(`Left guild ${guild.name} (${guild.id})`);

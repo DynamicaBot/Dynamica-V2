@@ -14,6 +14,7 @@ import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 import { SecondaryService } from '@/features/secondary';
 import { getPresence } from '@/utils/presence';
+import UpdateMode from '@/utils/UpdateMode';
 
 @Injectable()
 export class PrimaryService {
@@ -72,7 +73,9 @@ export class PrimaryService {
       },
     });
 
-    await this.pubSub.publish('primaryCreated', { primaryCreated: primary });
+    await this.pubSub.publish('primaryUpdate', {
+      primaryUpdate: { data: primary, mode: UpdateMode.Create },
+    });
 
     const primaryCount = await this.db.primary.count();
     const secondaryCount = await this.db.secondary.count();

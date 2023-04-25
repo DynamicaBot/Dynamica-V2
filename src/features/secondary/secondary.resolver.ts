@@ -12,7 +12,7 @@ import {
 
 import { PrismaService } from '../prisma';
 
-import { Secondary } from './secondary.model';
+import { Secondary, SecondaryUpdate } from './secondary.model';
 import { SecondaryService } from './secondary.service';
 
 @Resolver((of) => Secondary)
@@ -27,14 +27,9 @@ export class SecondaryResolver {
     return this.db.secondary.findMany();
   }
 
-  @Subscription((returns) => Secondary)
-  secondaryCreated() {
-    return this.secondaryService.pubSub.asyncIterator('secondaryCreated');
-  }
-
-  @Subscription((returns) => Secondary)
-  secondaryDeleted() {
-    return this.secondaryService.pubSub.asyncIterator('secondaryDeleted');
+  @Subscription((returns) => SecondaryUpdate)
+  secondaryUpdate() {
+    return this.secondaryService.pubSub.asyncIterator('secondaryUpdate');
   }
 
   @Query((returns) => Secondary)
