@@ -81,6 +81,8 @@ jobs:
       contents: read
       packages: write
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Restore Dist
         uses: actions/download-artifact@v2
         with:
@@ -110,7 +112,8 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: prisma
-
+      - name: List
+        run: ls -la
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
