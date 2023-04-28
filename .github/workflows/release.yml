@@ -95,7 +95,7 @@ jobs:
       contents: read
       packages: write
     runs-on: ubuntu-latest
-    needs: 'release'
+    needs: ['release', 'build']
     if: needs.release.outputs.published == 'true'
     name: 'Build and Publish Image'
     steps:
@@ -143,13 +143,14 @@ jobs:
         id: docker_build
         with:
           context: .
+          file: ./partial.Dockerfile
           target: 'runner'
           tags: ${{ steps.meta.outputs.tags }}
           push: true
           labels: ${{ steps.meta.outputs.labels }}
   docker-build-pterodactyl:
     runs-on: ubuntu-latest
-    needs: 'release'
+    needs: ['release', 'build']
     name: 'Build and Publish Image (Pterodactyl)'
     if: needs.release.outputs.published == 'true'
     permissions:
@@ -203,6 +204,7 @@ jobs:
         id: docker_build
         with:
           context: .
+          file: ./partial.Dockerfile
           target: 'pterodactyl'
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
