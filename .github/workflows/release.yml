@@ -39,17 +39,83 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [release]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Yarn
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: 'yarn'
+      - name: Install Dependancies
+        run: yarn install --frozen-lockfile
+      - name: Generate
+        run: yarn generate
+      - name: Build
+        run: yarn build
+      - name: Upload Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: dist
+      - name: Upload Prisma
+        uses: actions/upload-artifact@v2
+        with:
+          name: prisma
+          path: node_modules/.prisma
+  sentry:
+    name: Sentry
+    runs-on: ubuntu-latest
+    needs: [release, build]
+    env:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Restore Dist
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+      - name: Unzip Dist
+        run: unzip -o build.zip -d dist
+      - uses: getsentry/action-release@v1
+        with:
+          environment: 'production'
+          sourcemaps: './dist'
+          version: ${{ needs.release.outputs.version }}
   docker-build:
     permissions:
       contents: read
       packages: write
     runs-on: ubuntu-latest
-    needs: 'release'
+    needs: ['release', 'build']
     if: needs.release.outputs.published == 'true'
     name: 'Build and Publish Image'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Restore Dist
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+      - name: Unzip Dist
+        run: unzip -o build.zip -d dist
+      - name: Restore Prisma
+        uses: actions/download-artifact@v2
+        with:
+          name: prisma
+      - name: Unzip Prisma
+        run: unzip -o prisma.zip -d node_modules/.prisma
 
       - name: Docker meta
         id: meta
@@ -83,13 +149,14 @@ jobs:
         id: docker_build
         with:
           context: .
+          file: ./partial.Dockerfile
           target: 'runner'
           tags: ${{ steps.meta.outputs.tags }}
           push: true
           labels: ${{ steps.meta.outputs.labels }}
   docker-build-pterodactyl:
     runs-on: ubuntu-latest
-    needs: 'release'
+    needs: ['release', 'build']
     name: 'Build and Publish Image (Pterodactyl)'
     if: needs.release.outputs.published == 'true'
     permissions:
@@ -98,6 +165,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Restore Dist
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+      - name: Unzip Dist
+        run: unzip -o build.zip -d dist
+      - name: Restore Prisma
+        uses: actions/download-artifact@v2
+        with:
+          name: prisma
+      - name: Unzip Prisma
+        run: unzip -o prisma.zip -d node_modules/.prisma
 
       - name: Docker meta
         id: meta
@@ -134,6 +214,7 @@ jobs:
         id: docker_build
         with:
           context: .
+          file: ./partial.Dockerfile
           target: 'pterodactyl'
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
