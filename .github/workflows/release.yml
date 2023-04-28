@@ -60,12 +60,12 @@ jobs:
       - name: Build
         run: yarn build
       - name: Upload Build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: build
           path: dist
       - name: Upload Prisma
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: prisma
           path: node_modules/.prisma
