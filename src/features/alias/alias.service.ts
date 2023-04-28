@@ -5,14 +5,15 @@ import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 import UpdateMode from '@/utils/UpdateMode';
 
+import { PubSubService } from '../pubsub';
+
 @Injectable()
 export class AliasService {
   constructor(
     private readonly db: PrismaService,
     private readonly mqtt: MqttService,
+    private readonly pubSub: PubSubService,
   ) {}
-
-  public readonly pubSub = new PubSub();
 
   /**
    * Upsert an alias for an activity

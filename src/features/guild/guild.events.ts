@@ -5,6 +5,8 @@ import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 import UpdateMode from '@/utils/UpdateMode';
 
+import { PubSubService } from '../pubsub';
+
 import { GuildService } from './guild.service';
 
 @Injectable()
@@ -12,7 +14,7 @@ export class GuildEvents {
   constructor(
     private readonly db: PrismaService,
     private readonly mqtt: MqttService,
-    private readonly guildService: GuildService,
+    private readonly pubSub: PubSubService,
   ) {}
 
   private readonly logger = new Logger(GuildEvents.name);
@@ -24,7 +26,7 @@ export class GuildEvents {
         id: guild.id,
       },
     });
-    this.guildService.pubSub.publish('guildUpdate', {
+    this.pubSub.publish('guildUpdate', {
       guildUpdate: {
         data: createdGuild,
         mode: UpdateMode.Create,
@@ -42,7 +44,7 @@ export class GuildEvents {
         id: guild.id,
       },
     });
-    this.guildService.pubSub.publish('guildUpdate', {
+    this.pubSub.publish('guildUpdate', {
       guildUpdate: { data: deletedGuild, mode: UpdateMode.Delete },
     });
     const guildCount = await this.db.guild.count();

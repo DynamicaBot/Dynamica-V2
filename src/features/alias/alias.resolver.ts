@@ -11,6 +11,7 @@ import {
 } from '@nestjs/graphql';
 
 import { PrismaService } from '../prisma';
+import { PubSubService } from '../pubsub';
 
 import { Alias, AliasUpdate } from './alias.model';
 import { AliasService } from './alias.service';
@@ -19,7 +20,7 @@ import { AliasService } from './alias.service';
 export class AliasResolver {
   constructor(
     private readonly db: PrismaService,
-    private readonly aliasService: AliasService,
+    private readonly pubSub: PubSubService,
   ) {}
 
   @Query((returns) => [Alias])
@@ -29,7 +30,7 @@ export class AliasResolver {
 
   @Subscription((returns) => AliasUpdate)
   aliasUpdate() {
-    return this.aliasService.pubSub.asyncIterator('aliasUpdate');
+    return this.pubSub.asyncIterator('aliasUpdate');
   }
 
   @Query((returns) => Alias)
