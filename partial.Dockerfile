@@ -19,7 +19,7 @@ RUN yarn install --production --frozen-lockfile
 CMD npx prisma migrate deploy && yarn start
 
 # Runner
-FROM build as pterodactyl
+FROM base as pterodactyl
 
 ENV NODE_ENV="production"
 ENV DATABASE_URL "file:/home/container/dynamica/db.sqlite"
