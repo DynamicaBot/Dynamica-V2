@@ -16,6 +16,8 @@ import { SecondaryService } from '@/features/secondary';
 import { getPresence } from '@/utils/presence';
 import UpdateMode from '@/utils/UpdateMode';
 
+import { PubSubService } from '../pubsub';
+
 @Injectable()
 export class PrimaryService {
   public constructor(
@@ -23,9 +25,8 @@ export class PrimaryService {
     private readonly db: PrismaService,
     private readonly secondaryService: SecondaryService,
     private readonly mqtt: MqttService,
+    private readonly pubSub: PubSubService,
   ) {}
-
-  public pubSub = new PubSub();
 
   /**
    * Create a primary channel

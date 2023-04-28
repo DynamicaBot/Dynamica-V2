@@ -11,15 +11,15 @@ import {
 } from '@nestjs/graphql';
 
 import { PrismaService } from '../prisma';
+import { PubSubService } from '../pubsub';
 
 import { Guild, GuildUpdate } from './guild.model';
-import { GuildService } from './guild.service';
 
 @Resolver((of) => Guild)
 export class GuildResolver {
   constructor(
     private readonly db: PrismaService,
-    private readonly guildService: GuildService,
+    private readonly pubSub: PubSubService,
   ) {}
 
   @Query((returns) => [Guild])
@@ -29,7 +29,7 @@ export class GuildResolver {
 
   @Subscription((returns) => GuildUpdate)
   guildUpdate() {
-    return this.guildService.pubSub.asyncIterator('guildUpdate');
+    return this.pubSub.asyncIterator('guildUpdate');
   }
 
   @Query((returns) => Guild)

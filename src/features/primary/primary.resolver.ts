@@ -11,6 +11,7 @@ import {
 } from '@nestjs/graphql';
 
 import { PrismaService } from '../prisma';
+import { PubSubService } from '../pubsub';
 
 import { Primary, PrimaryUpdate } from './primary.model';
 import { PrimaryService } from './primary.service';
@@ -20,6 +21,7 @@ export class PrimaryResolver {
   constructor(
     private readonly db: PrismaService,
     private readonly primaryService: PrimaryService,
+    private readonly pubSub: PubSubService,
   ) {}
 
   @Query((returns) => [Primary])
@@ -29,7 +31,7 @@ export class PrimaryResolver {
 
   @Subscription((returns) => PrimaryUpdate)
   primaryUpdate() {
-    return this.primaryService.pubSub.asyncIterator('primaryUpdate');
+    return this.pubSub.asyncIterator('primaryUpdate');
   }
 
   @Query((returns) => Primary)

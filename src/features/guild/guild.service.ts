@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Client } from 'discord.js';
-import { PubSub } from 'graphql-subscriptions';
 
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
@@ -12,8 +11,6 @@ export class GuildService {
     private readonly client: Client,
     private readonly mqtt: MqttService,
   ) {}
-
-  public readonly pubSub = new PubSub();
 
   /**
    * Update a guild in the database, if the bot has left the guild, delete it

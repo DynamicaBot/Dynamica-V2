@@ -6,6 +6,8 @@ import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
 import UpdateMode from '@/utils/UpdateMode';
 
+import { PubSubService } from '../pubsub';
+
 import { PrimaryService } from './primary.service';
 
 @Injectable()
@@ -14,6 +16,7 @@ export class PrimaryEvents {
     private readonly db: PrismaService,
     private readonly mqtt: MqttService,
     private readonly primaryService: PrimaryService,
+    private readonly pubSub: PubSubService,
   ) {}
 
   @On('channelDelete')
@@ -35,7 +38,7 @@ export class PrimaryEvents {
         id: channel.id,
       },
     });
-    this.primaryService.pubSub.publish('primaryUpdate', {
+    this.pubSub.publish('primaryUpdate', {
       primaryUpdate: { mode: UpdateMode.Delete, data: deletedPrimary },
     });
 

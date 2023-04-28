@@ -23,16 +23,17 @@ import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
 import UpdateMode from '@/utils/UpdateMode';
 
+import { PubSubService } from '../pubsub';
+
 @Injectable()
 export class SecondaryService {
   private readonly logger = new Logger(SecondaryService.name);
-
-  public readonly pubSub = new PubSub();
 
   public constructor(
     private readonly client: Client,
     private readonly db: PrismaService,
     private readonly mqtt: MqttService,
+    private readonly pubSub: PubSubService,
   ) {}
 
   /**
