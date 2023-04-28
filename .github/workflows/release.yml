@@ -149,6 +149,8 @@ jobs:
           context: .
           file: ./partial.Dockerfile
           target: 'runner'
+          build-args: |
+            VERSION=${{ needs.release.outputs.version }}
           tags: ${{ steps.meta.outputs.tags }}
           push: true
           labels: ${{ steps.meta.outputs.labels }}
@@ -212,6 +214,8 @@ jobs:
           context: .
           file: ./partial.Dockerfile
           target: 'pterodactyl'
+          build-args: |
+            VERSION=${{ needs.release.outputs.version }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: true
