@@ -126,7 +126,7 @@ export class SecondaryEvents {
   public async onPresenceUpdate(
     @Context() [oldPresence, newPresence]: ContextOf<'presenceUpdate'>,
   ) {
-    const channelId = newPresence.member.voice?.channelId;
+    const channelId = newPresence?.member?.voice?.channelId;
 
     if (!channelId) return;
 
