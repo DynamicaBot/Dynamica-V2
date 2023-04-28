@@ -108,12 +108,12 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: build
+          path: dist
       - name: Restore Prisma
         uses: actions/download-artifact@v2
         with:
           name: prisma
-      - name: List
-        run: ls -la
+          path: node_modules/.prisma
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
@@ -167,10 +167,12 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: build
+          path: dist
       - name: Restore Prisma
         uses: actions/download-artifact@v2
         with:
           name: prisma
+          path: node_modules/.prisma
 
       - name: Docker meta
         id: meta
