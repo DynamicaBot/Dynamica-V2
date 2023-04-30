@@ -27,7 +27,7 @@ model Primary {
   generalName String      @default("General ##")
   secondaries Secondary[] @relation("SecondaryOnPrimary")
   guildId     String
-  guild       Guild     @relation(references: [id], fields: [guildId], onDelete: Cascade)
+  guild       Guild       @relation(references: [id], fields: [guildId], onDelete: Cascade)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @default(now()) @updatedAt
 
@@ -46,6 +46,7 @@ model Secondary {
   primary   Primary  @relation(name: "SecondaryOnPrimary", fields: [primaryId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+  lastName  String   @default("")
 
   @@unique([guildId, id])
 }

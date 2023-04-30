@@ -129,6 +129,7 @@ export class SecondaryService {
         id: newDiscordChannel.id,
         emoji,
         creator: userId,
+        lastName: channelName,
         primary: {
           connect: {
             id: primaryId,
@@ -205,17 +206,26 @@ export class SecondaryService {
       },
     });
 
-    const currentName = discordChannel.name;
-
     const newName = await this.formatName(
       databaseChannel.primaryId,
       guildId,
       channelId,
     );
 
-    if (currentName !== newName) {
+    if (databaseChannel.lastName !== newName) {
       await discordChannel.edit({
         name: newName,
+      });
+      await this.db.secondary.update({
+        where: {
+          guildId_id: {
+            guildId,
+            id: channelId,
+          },
+        },
+        data: {
+          lastName: newName,
+        },
       });
     }
 
@@ -275,6 +285,22 @@ export class SecondaryService {
         await discordChannel.delete();
       }
     } else {
+      const memberIds = discordChannel.members.map((member) => member.id);
+
+      if (!memberIds.includes(secondaryChannel.creator)) {
+        await this.db.secondary.update({
+          where: {
+            guildId_id: {
+              guildId,
+              id: channelId,
+            },
+          },
+          data: {
+            creator: memberIds[0],
+          },
+        });
+      }
+
       await this.updateName(guildId, channelId);
     }
   }
