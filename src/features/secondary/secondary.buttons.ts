@@ -212,4 +212,30 @@ export class SecondaryButtons {
       });
     }
   }
+
+  @Button(`secondary/buttons/requestjoin/:channelId`)
+  public async onRequestJoin(
+    @Context() [interaction]: ButtonContext,
+    @ComponentParam('channelId') channelId: string,
+  ) {
+    try {
+      const requestedMember = await this.secondaryService.requestJoin(
+        interaction.guildId,
+        channelId,
+        interaction.user.id,
+      );
+
+      return interaction.reply({
+        content: `Requested to join ${requestedMember.toString()}'s channel`,
+        ephemeral: true,
+      });
+    } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
+      return interaction.reply({
+        embeds: [errorEmbed],
+        ephemeral: true,
+      });
+    }
+  }
 }

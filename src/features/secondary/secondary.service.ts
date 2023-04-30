@@ -821,6 +821,7 @@ export class SecondaryService {
    * @param guildId The guild id
    * @param channelId The channel the user wishes to join
    * @param userId The user id of the user who wishes to join
+   * @returns creator
    */
   public async requestJoin(
     guildId: string,
@@ -1145,6 +1146,9 @@ export class SecondaryService {
           id: channelId,
         },
       },
+      include: {
+        guild: true,
+      },
     });
 
     if (!databaseChannel) {
@@ -1181,6 +1185,15 @@ export class SecondaryService {
       .setLabel('Take Ownership')
       .setStyle(ButtonStyle.Primary);
 
+    const requestJoin = new ButtonBuilder()
+      .setCustomId(`secondary/buttons/requestjoin/${channelId}`)
+      .setEmoji('👋')
+      .setLabel('Request Join')
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(
+        !databaseChannel.guild.allowJoinRequests || !databaseChannel.locked,
+      );
+
     const isLocked = databaseChannel.locked;
 
     return new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -1188,6 +1201,7 @@ export class SecondaryService {
       isLocked ? unlockButton : lockButton,
       settingsButton,
       allyourbaseButton,
+      requestJoin,
     );
   }
 
