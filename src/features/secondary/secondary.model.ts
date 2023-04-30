@@ -29,6 +29,8 @@ export class Secondary implements PrismaSecondary {
   @Field()
   primaryId: string;
   @Field()
+  lastName: string;
+  @Field()
   createdAt: Date;
   @Field()
   updatedAt: Date;
