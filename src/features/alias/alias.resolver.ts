@@ -1,8 +1,6 @@
 import {
   Resolver,
-  Field,
   ID,
-  ObjectType,
   Query,
   Args,
   Subscription,
@@ -14,26 +12,25 @@ import { PrismaService } from '../prisma';
 import { PubSubService } from '../pubsub';
 
 import { Alias, AliasUpdate } from './alias.model';
-import { AliasService } from './alias.service';
 
-@Resolver((of) => Alias)
+@Resolver(() => Alias)
 export class AliasResolver {
   constructor(
     private readonly db: PrismaService,
     private readonly pubSub: PubSubService,
   ) {}
 
-  @Query((returns) => [Alias])
+  @Query(() => [Alias])
   aliases() {
     return this.db.alias.findMany();
   }
 
-  @Subscription((returns) => AliasUpdate)
+  @Subscription(() => AliasUpdate)
   aliasUpdate() {
     return this.pubSub.asyncIterator('aliasUpdate');
   }
 
-  @Query((returns) => Alias)
+  @Query(() => Alias)
   alias(@Args('id', { type: () => ID }) id: number) {
     return this.db.alias.findUnique({
       where: {

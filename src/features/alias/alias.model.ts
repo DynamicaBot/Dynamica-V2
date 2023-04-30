@@ -1,4 +1,4 @@
-import { Field, ObjectType, GraphQLISODateTime, ID } from '@nestjs/graphql';
+import { Field, ObjectType, ID } from '@nestjs/graphql';
 import { Alias as PrismaAlias } from '@prisma/client';
 
 import { UpdateModel } from '@/utils/UpdateModel';
@@ -7,7 +7,7 @@ import { Guild } from '../guild/guild.model';
 
 @ObjectType()
 export class Alias implements PrismaAlias {
-  @Field((type) => ID)
+  @Field(() => ID)
   id: number;
   @Field()
   activity: string;
@@ -19,7 +19,7 @@ export class Alias implements PrismaAlias {
   createdAt: Date;
   @Field()
   updatedAt: Date;
-  @Field((type) => Guild)
+  @Field(() => Guild)
   guild: Guild;
 }
 
