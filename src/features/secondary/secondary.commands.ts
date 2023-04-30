@@ -17,6 +17,7 @@ import createErrorEmbed from '@/utils/createErrorEmbed';
 
 import { AllyourbaseDto } from './dto/AllyourbaseDto';
 import { BitrateDto } from './dto/BitrateDto';
+import { JoinDto } from './dto/JoinDto';
 import { LimitDto } from './dto/LimitDto';
 import { LockDto } from './dto/LockDto';
 import { NameDto } from './dto/NameDto';
@@ -241,6 +242,36 @@ export class SecondaryCommands {
         content: `Channel Ownership Transferred: ${channelMention(
           newChannel.id,
         )}`,
+      });
+    } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
+      return interaction.reply({
+        embeds: [errorEmbed],
+        ephemeral: true,
+      });
+    }
+  }
+
+  @UseInterceptors(SecondaryAutocompleteInterceptor)
+  @SlashCommand({
+    name: 'join',
+    description: 'Join a voice channel',
+    dmPermission: false,
+  })
+  async onJoin(
+    @Context() [interaction]: SlashCommandContext,
+    @Options() { secondary }: JoinDto,
+  ) {
+    try {
+      const creator = await this.secondaryService.requestJoin(
+        interaction.guildId,
+        secondary,
+        interaction.user.id,
+      );
+      return interaction.reply({
+        ephemeral: true,
+        content: `Join request sent to ${creator.toString()}`,
       });
     } catch (error) {
       const errorEmbed = createErrorEmbed(error.message);

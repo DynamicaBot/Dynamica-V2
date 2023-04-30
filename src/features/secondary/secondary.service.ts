@@ -7,6 +7,7 @@ import {
   ButtonStyle,
   ChannelType,
   Client,
+  GuildMember,
   ModalActionRowComponentBuilder,
   ModalBuilder,
   TextInputBuilder,
@@ -815,6 +816,179 @@ export class SecondaryService {
     return channel;
   }
 
+  /**
+   * Request to join a channel
+   * @param guildId The guild id
+   * @param channelId The channel the user wishes to join
+   * @param userId The user id of the user who wishes to join
+   */
+  public async requestJoin(
+    guildId: string,
+    channelId: string,
+    userId: string,
+  ): Promise<GuildMember> {
+    const guildSettings = await this.db.guild.findUnique({
+      where: {
+        id: guildId,
+      },
+    });
+
+    const databaseSecondary = await this.db.secondary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        },
+      },
+    });
+
+    if (!databaseSecondary) {
+      throw new Error('Channel is not a dynamica channel');
+    }
+
+    if (!databaseSecondary.locked) {
+      throw new Error('Channel is not locked');
+    }
+
+    if (!guildSettings) {
+      throw new Error('Guild not found');
+    }
+
+    if (!guildSettings.allowJoinRequests) {
+      throw new Error('Join requests are not allowed');
+    }
+
+    let channel = this.client.channels.cache.get(channelId);
+
+    if (!channel) {
+      channel = await this.client.channels.fetch(channelId);
+    }
+
+    if (channel.isDMBased()) {
+      throw new Error('Channel is a DM');
+    }
+
+    let member = channel.guild.members.cache.get(userId);
+
+    if (!member) {
+      member = await channel.guild.members.fetch(userId);
+    }
+
+    if (member.permissionsIn(channel).has(PermissionFlagsBits.Connect)) {
+      throw new Error('Already in channel');
+    }
+
+    // Send join request to channel creator
+    let creator = channel.guild.members.cache.get(databaseSecondary.creator);
+
+    if (!creator) {
+      creator = await channel.guild.members.fetch(databaseSecondary.creator);
+    }
+
+    const joinRequestComponents =
+      await this.createSecondaryJoinRequestComponents(
+        guildId,
+        channelId,
+        userId,
+      );
+
+    await creator.send({
+      content: `User ${member.user.tag} wants to join your channel ${channel.name} in ${channel.guild.name}`,
+      components: [joinRequestComponents],
+    });
+
+    return creator;
+  }
+
+  /**
+   * Accept a join request
+   * @param channelId The channel that the user has been accepted into
+   * @param userId The user that has been accepted into the channel
+   */
+  public async acceptJoin(
+    channelId: string,
+    userId: string,
+  ): Promise<GuildMember> {
+    let channel = this.client.channels.cache.get(channelId);
+
+    if (!channel) {
+      channel = await this.client.channels.fetch(channelId);
+    }
+
+    if (channel.isDMBased()) {
+      throw new Error('Channel is a DM');
+    }
+
+    let member = channel.guild.members.cache.get(userId);
+
+    if (!member) {
+      member = await channel.guild.members.fetch(userId);
+    }
+
+    if (member.permissionsIn(channel).has(PermissionFlagsBits.Connect)) {
+      throw new Error('Already in channel');
+    }
+
+    if (!channel.manageable || !channel.isVoiceBased()) {
+      throw new Error('Cannot manage channel');
+    }
+
+    await channel.permissionOverwrites.create(member, {
+      Connect: true,
+    });
+
+    if (channel.isTextBased()) {
+      await channel.send({
+        content: `User ${member.user.toString()} has joined the channel`,
+      });
+    }
+
+    return member;
+  }
+
+  /**
+   *
+   * @param channelId The channel that the user has been declined from
+   * @param userId The user that has been declined from the channel
+   * @returns The user that has been declined from the channel
+   */
+  public async declineJoin(
+    channelId: string,
+    userId: string,
+  ): Promise<GuildMember> {
+    let channel = this.client.channels.cache.get(channelId);
+
+    if (!channel) {
+      channel = await this.client.channels.fetch(channelId);
+    }
+
+    if (channel.isDMBased()) {
+      throw new Error('Channel is a DM');
+    }
+
+    let member = channel.guild.members.cache.get(userId);
+
+    if (!member) {
+      member = await channel.guild.members.fetch(userId);
+    }
+
+    if (channel.isTextBased()) {
+      await channel.send({
+        content: `User ${member.user.toString()} has been declined to join the channel`,
+      });
+    }
+
+    return member;
+  }
+
+  /**
+   * Transfer ownership of a channel
+   * @param guildId The guild the command occured in
+   * @param channelId The target channel
+   * @param userId The user who wishes to transfer ownership
+   * @param newOwnerId The new owner of the channel
+   * @returns The updated channel
+   */
   public async transfer(
     guildId: string,
     channelId: string,
@@ -865,6 +1039,12 @@ export class SecondaryService {
     return channel;
   }
 
+  /**
+   * Create a modal to edit a secondary channel
+   * @param guildId the guild id
+   * @param id the id of the secondary channel
+   * @returns the modal builder
+   */
   async createSecondaryModal(
     guildId: string,
     id: string,
@@ -902,6 +1082,13 @@ export class SecondaryService {
       ]);
   }
 
+  /**
+   * Create a select menu for the secondary channel transfer
+   * @param guildId The guild id
+   * @param channelId The channel id
+   * @param userId The user id of the user that wants to edit the channel
+   * @returns UserSelectMenuBuilder
+   */
   async createSecondaryTransferSelect(
     guildId: string,
     channelId: string,
@@ -941,6 +1128,12 @@ export class SecondaryService {
       .setMinValues(1);
   }
 
+  /**
+   * Create the components for the secondary channel settings message
+   * @param guildId The guild id
+   * @param channelId The secondary channel id
+   * @returns The components for the secondary channel settings message
+   */
   async createSecondarySettingsComponents(
     guildId: string,
     channelId: string,
@@ -995,6 +1188,49 @@ export class SecondaryService {
       isLocked ? unlockButton : lockButton,
       settingsButton,
       allyourbaseButton,
+    );
+  }
+
+  /**
+   * Creates the components for the join request sent to the owner of the channel
+   * @param guildId The guild id
+   * @param channelId The channel the user wants to join
+   * @param userId The user that wants to join
+   * @returns The components for the join request
+   */
+  private async createSecondaryJoinRequestComponents(
+    guildId: string,
+    channelId: string,
+    userId: string,
+  ): Promise<ActionRowBuilder<ButtonBuilder>> {
+    const databaseChannel = await this.db.secondary.findUnique({
+      where: {
+        guildId_id: {
+          guildId,
+          id: channelId,
+        },
+      },
+    });
+
+    if (!databaseChannel) {
+      throw new Error('Channel is not a dynamica channel');
+    }
+
+    const joinButton = new ButtonBuilder()
+      .setCustomId(`secondary/buttons/join/${channelId}/${userId}`)
+      .setEmoji('👋')
+      .setLabel('Join')
+      .setStyle(ButtonStyle.Primary);
+
+    const declineButton = new ButtonBuilder()
+      .setCustomId(`secondary/buttons/decline/${channelId}/${userId}`)
+      .setEmoji('👎')
+      .setLabel('Decline')
+      .setStyle(ButtonStyle.Danger);
+
+    return new ActionRowBuilder<ButtonBuilder>().addComponents(
+      joinButton,
+      declineButton,
     );
   }
 }

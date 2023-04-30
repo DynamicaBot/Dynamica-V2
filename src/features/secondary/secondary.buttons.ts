@@ -156,4 +156,60 @@ export class SecondaryButtons {
       });
     }
   }
+
+  /**
+   * Allow a user to join a channel
+   * @param [interaction] The interaction context
+   * @param channelId The channel to accept the request for
+   * @param userId The user who will be accepted
+   */
+  @Button('secondary/buttons/join/:channelId/:userId')
+  public async onJoin(
+    @Context() [interaction]: ButtonContext,
+    @ComponentParam('channelId') channelId: string,
+    @ComponentParam('userId') userId: string,
+  ) {
+    try {
+      const acceptedMember = await this.secondaryService.acceptJoin(
+        channelId,
+        userId,
+      );
+
+      return interaction.reply({
+        content: `Accepted ${acceptedMember.user.username} into channel`,
+      });
+    } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
+      return interaction.reply({
+        embeds: [errorEmbed],
+        ephemeral: true,
+      });
+    }
+  }
+
+  @Button('secondary/buttons/decline/:channelId/:userId')
+  public async onDecline(
+    @Context() [interaction]: ButtonContext,
+    @ComponentParam('channelId') channelId: string,
+    @ComponentParam('userId') userId: string,
+  ) {
+    try {
+      const declinedMember = await this.secondaryService.declineJoin(
+        channelId,
+        userId,
+      );
+
+      return interaction.reply({
+        content: `Declined ${declinedMember.user.username} from joining channel`,
+      });
+    } catch (error) {
+      const errorEmbed = createErrorEmbed(error.message);
+
+      return interaction.reply({
+        embeds: [errorEmbed],
+        ephemeral: true,
+      });
+    }
+  }
 }
