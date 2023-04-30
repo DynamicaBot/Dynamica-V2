@@ -285,6 +285,22 @@ export class SecondaryService {
         await discordChannel.delete();
       }
     } else {
+      const memberIds = discordChannel.members.map((member) => member.id);
+
+      if (!memberIds.includes(secondaryChannel.creator)) {
+        await this.db.secondary.update({
+          where: {
+            guildId_id: {
+              guildId,
+              id: channelId,
+            },
+          },
+          data: {
+            creator: memberIds[0],
+          },
+        });
+      }
+
       await this.updateName(guildId, channelId);
     }
   }
