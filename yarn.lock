@@ -1549,10 +1549,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.1.0.tgz#258805edc37c327cf706e64c6957f241ca4c4c20"
   integrity sha512-O+z53uwx64xY7D6roOi4+jApDGFg0qn6WHcxe5QeqjMaTezBO/mxdfFXIVAVVyNWKx84OmPB3L8kbVYOTeN34A==
 
-"@types/node@18.16.7":
-  version "18.16.7"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.16.7.tgz#86d0ba2541f808cb78d4dc5d3e40242a349d6db8"
-  integrity sha512-MFg7ua/bRtnA1hYE3pVyWxGd/r7aMqjNOdHvlSsXV3n8iaeGKkOaPzpJh6/ovf4bEXWcojkeMJpTsq3mzXW4IQ==
+"@types/node@18.16.8":
+  version "18.16.8"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.16.8.tgz#fcd9bd0a793aba2701caff4aeae7c988d4da6ce5"
+  integrity sha512-p0iAXcfWCOTCBbsExHIDFCfwsqFwBTgETJveKMT+Ci3LY9YqQCI91F5S+TB20+aRCXpcWfvx5Qr5EccnwCm2NA==
 
 "@types/normalize-package-data@^2.4.0", "@types/normalize-package-data@^2.4.1":
   version "2.4.1"
@@ -5491,9 +5491,9 @@ natural-compare@^1.4.0:
   integrity sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==
 
 necord@^5.5.4:
-  version "5.8.0"
-  resolved "https://registry.yarnpkg.com/necord/-/necord-5.8.0.tgz#f2604dfc497292b4812a1f6845ae7ff149cfbd77"
-  integrity sha512-aBsC5wMHAsRcfJFRynNOpl90W8FTa82AmN06vJUeqz4nz1TKt9QZmbj8qFaksKpPmnxXFuYBnpLyn/wUcn2a8g==
+  version "5.8.4"
+  resolved "https://registry.yarnpkg.com/necord/-/necord-5.8.4.tgz#fdbe5d8e00895ae921db3c890eb4dcc0a33e7a14"
+  integrity sha512-R9IxjZYepofbfUvHy+qT3QvKhN/4s6yHGaJUotutdIkQ5ZVGdZzvJ+OYjLZv6UZ/8liXYPurcrq0+h0LIl7oLg==
   dependencies:
     path-to-regexp "6.2.1"
 
