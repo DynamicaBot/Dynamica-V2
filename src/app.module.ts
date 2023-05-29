@@ -25,7 +25,6 @@ import { SecondaryModule } from './features/secondary/secondary.module';
     PubSubModule,
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      // typePaths: ['./**/*.graphql'],
       useFactory: async (configService: ConfigService) => {
         const tempPath = envPaths('dynamica', { suffix: '' }).temp;
         const logger = new Logger(AppModule.name);
@@ -37,13 +36,14 @@ import { SecondaryModule } from './features/secondary/secondary.module';
             'graphql-ws': true,
             'subscriptions-transport-ws': true,
           },
-          playground: false,
           csrfPrevention: false,
           plugins: [
             ApolloServerPluginLandingPageLocalDefault({
               embed: {
                 endpointIsEditable: true,
+                runTelemetry: false,
               },
+              footer: false,
             }),
           ],
         };
