@@ -116,6 +116,9 @@ export class SecondaryService {
       name: channelName,
       parent,
       type: ChannelType.GuildVoice,
+      bitrate: discordPrimary.isVoiceBased()
+        ? discordPrimary.bitrate
+        : undefined,
     });
 
     const emoji: string = emojiList.random({
