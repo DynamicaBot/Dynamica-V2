@@ -1,10 +1,13 @@
+import path from 'path';
+
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ScheduleModule } from '@nestjs/schedule';
 import { IntentsBitField } from 'discord.js';
+import envPaths from 'env-paths';
 import { NecordModule } from 'necord';
 
 import { AppService } from './app.service';
@@ -20,24 +23,32 @@ import { SecondaryModule } from './features/secondary/secondary.module';
 @Module({
   imports: [
     PubSubModule,
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
       // typePaths: ['./**/*.graphql'],
-      autoSchemaFile: 'schema.gql',
-      introspection: true,
-      subscriptions: {
-        'graphql-ws': true,
-        'subscriptions-transport-ws': true,
-      },
-      playground: false,
-      csrfPrevention: false,
-      plugins: [
-        ApolloServerPluginLandingPageLocalDefault({
-          embed: {
-            endpointIsEditable: true,
+      useFactory: async (configService: ConfigService) => {
+        const tempPath = envPaths('dynamica', { suffix: '' }).temp;
+        const logger = new Logger(AppModule.name);
+        logger.log(`Temp path: ${tempPath}`);
+        return {
+          autoSchemaFile: path.join(tempPath, 'schema.gql'),
+          introspection: true,
+          subscriptions: {
+            'graphql-ws': true,
+            'subscriptions-transport-ws': true,
           },
-        }),
-      ],
+          playground: false,
+          csrfPrevention: false,
+          plugins: [
+            ApolloServerPluginLandingPageLocalDefault({
+              embed: {
+                endpointIsEditable: true,
+              },
+            }),
+          ],
+        };
+      },
+      inject: [ConfigService],
     }),
     ConfigModule.forRoot({
       isGlobal: true,
