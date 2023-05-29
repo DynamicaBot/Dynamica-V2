@@ -25,7 +25,7 @@ import { SecondaryModule } from './features/secondary/secondary.module';
     PubSubModule,
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      useFactory: async (configService: ConfigService) => {
+      useFactory: async () => {
         const tempPath = envPaths('dynamica', { suffix: '' }).temp;
         const logger = new Logger(AppModule.name);
         logger.log(`Temp path: ${tempPath}`);
