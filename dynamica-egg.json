@@ -16,7 +16,7 @@
     "startup": "npx prisma migrate deploy;\r\nyarn start",
     "config": {
         "files": "{}",
-        "startup": "{\r\n    \"done\": \"Ready! Logged in as\"\r\n}",
+        "startup": "{\r\n    \"done\": \"Bot logged in as\"\r\n}",
         "logs": "{}",
         "stop": "^^C"
     },
