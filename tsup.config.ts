@@ -14,7 +14,5 @@ export default defineConfig(({ watch }) => ({
   loader: {
     '.graphql': 'text',
   },
-  onSuccess: watch
-    ? 'node --enable-source-maps dist/main --inspect'
-    : undefined,
+  onSuccess: watch ? 'node --enable-source-maps dist/main' : undefined,
 }));
