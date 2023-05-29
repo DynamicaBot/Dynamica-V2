@@ -486,11 +486,6 @@
   resolved "https://registry.yarnpkg.com/@graphql-typed-document-node/core/-/core-3.2.0.tgz#5f3d96ec6b2354ad6d8a28bf216a1d97b5426861"
   integrity sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==
 
-"@graphql-yoga/nestjs@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@graphql-yoga/nestjs/-/nestjs-1.1.1.tgz#a7bea9339fd333eae04f92af1d9fe15179aa947b"
-  integrity sha512-CYuXXtEtba9Gv+LU2S7tydpRXNqLU01swKk+f1aCIUTf94RsvRZBlnZneuFbw7UbTThcCjBdMXDEesQnARQeWA==
-
 "@humanwhocodes/config-array@^0.11.8":
   version "0.11.8"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.8.tgz#03595ac2075a4dc0f191cc2131de14fbd7d410b9"
