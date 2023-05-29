@@ -106,7 +106,7 @@ export class SecondaryService {
     }
 
     const parent =
-      discordPrimary.parent.type === ChannelType.GuildCategory
+      discordPrimary.parent?.type === ChannelType.GuildCategory
         ? discordPrimary.parent
         : undefined;
 
