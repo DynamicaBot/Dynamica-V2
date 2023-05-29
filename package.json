@@ -11,7 +11,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "generate": "prisma generate",
     "dev": "tsup --watch",
-    "start": "node dist/main",
+    "start": "node dist/main --enable-source-maps",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "semantic-release": "semantic-release"
   },
