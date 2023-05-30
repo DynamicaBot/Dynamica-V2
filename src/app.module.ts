@@ -37,6 +37,7 @@ import { SecondaryModule } from './features/secondary/secondary.module';
             'subscriptions-transport-ws': true,
           },
           csrfPrevention: false,
+          playground: false,
           plugins: [
             ApolloServerPluginLandingPageLocalDefault({
               embed: {
