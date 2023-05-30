@@ -138,7 +138,9 @@ export class SecondaryEvents {
 
     if (!databaseSecondary) return;
 
-    const oldActivities = (oldPresence.activities ?? []).filter(
+    const oldPresenceActivity = oldPresence?.activities ?? [];
+
+    const oldActivities = oldPresenceActivity.filter(
       (activity) =>
         activity.type === ActivityType.Playing ||
         activity.type === ActivityType.Competing,

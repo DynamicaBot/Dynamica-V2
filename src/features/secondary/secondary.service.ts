@@ -215,7 +215,7 @@ export class SecondaryService {
       channelId,
     );
 
-    if (databaseChannel.lastName !== newName) {
+    if (databaseChannel.lastName !== newName && discordChannel.manageable) {
       await discordChannel.edit({
         name: newName,
       });
