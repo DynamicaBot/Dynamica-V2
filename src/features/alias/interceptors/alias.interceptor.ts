@@ -14,6 +14,10 @@ export class AliasAutocompleteInterceptor extends AutocompleteInterceptor {
   ) {
     const { value } = interaction.options.getFocused(true);
 
+    if (!value) {
+      return interaction.respond([]);
+    }
+
     if (!(interaction.member instanceof GuildMember)) {
       return interaction.respond([
         {

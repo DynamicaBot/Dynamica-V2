@@ -42,20 +42,20 @@ export class InfoCommands {
       .addFields(
         {
           name: 'Allow Join Requests',
-          value: fieldToDiscordEmbed(guildInfo.allowJoinRequests),
+          value: fieldToDiscordEmbed(Boolean(guildInfo.allowJoinRequests)),
         },
         {
           name: 'Primary Channels',
-          value: guildInfo.primaryChannels.length
-            ? guildInfo.primaryChannels
+          value: guildInfo.primaries.length
+            ? guildInfo.primaries
                 .map((channel) => channelMention(channel.id))
                 .join('\n')
             : inlineCode(`None`),
         },
         {
           name: 'Secondary Channels',
-          value: guildInfo.secondaryChannels.length
-            ? guildInfo.secondaryChannels
+          value: guildInfo.secondaries.length
+            ? guildInfo.secondaries
                 .map((channel) => channelMention(channel.id))
                 .join(', ')
             : inlineCode(`None`),
@@ -86,7 +86,7 @@ export class InfoCommands {
         { name: 'Creator', value: userMention(primaryInfo.creator) },
         {
           name: 'Created At',
-          value: fieldToDiscordEmbed(primaryInfo.createdAt),
+          value: fieldToDiscordEmbed(new Date(primaryInfo.createdAt)),
         },
         {
           name: 'General Template',
@@ -143,11 +143,11 @@ export class InfoCommands {
         },
         {
           name: 'Created At',
-          value: fieldToDiscordEmbed(secondaryInfo.createdAt),
+          value: fieldToDiscordEmbed(new Date(secondaryInfo.createdAt)),
         },
         {
           name: 'Locked',
-          value: fieldToDiscordEmbed(secondaryInfo.locked),
+          value: fieldToDiscordEmbed(Boolean(secondaryInfo.locked)),
         },
       );
     return interaction.reply({ embeds: [embed], ephemeral: true });

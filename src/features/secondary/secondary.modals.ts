@@ -9,10 +9,7 @@ import { SecondaryService } from './secondary.service';
 
 @Injectable()
 export class SecondaryModals {
-  constructor(
-    private readonly db: PrismaService,
-    private readonly secondaryService: SecondaryService,
-  ) {}
+  constructor(private readonly secondaryService: SecondaryService) {}
 
   @Modal('secondary/modals/:id')
   public async onSecondaryModal(

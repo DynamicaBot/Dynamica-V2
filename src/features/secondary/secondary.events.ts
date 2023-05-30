@@ -7,6 +7,7 @@ import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
 import UpdateMode from '@/utils/UpdateMode';
 
+import { KyselyService } from '../kysely';
 import { PubSubService } from '../pubsub';
 
 import { SecondaryService } from './secondary.service';
@@ -14,7 +15,7 @@ import { SecondaryService } from './secondary.service';
 @Injectable()
 export class SecondaryEvents {
   constructor(
-    private readonly db: PrismaService,
+    private readonly kysely: KyselyService,
     private readonly secondaryService: SecondaryService,
     private readonly mqtt: MqttService,
     private readonly pubSub: PubSubService,
@@ -33,11 +34,11 @@ export class SecondaryEvents {
     }
 
     const oldSecondary = oldVoiceState.channelId
-      ? await this.db.secondary.findUnique({
-          where: {
-            id: oldVoiceState.channelId,
-          },
-        })
+      ? await this.kysely
+          .selectFrom('Secondary')
+          .where('id', '=', oldVoiceState.channelId)
+          .selectAll()
+          .executeTakeFirst()
       : undefined;
 
     if (oldSecondary) {
@@ -47,19 +48,19 @@ export class SecondaryEvents {
     }
 
     const newSecondary = newVoiceState.channelId
-      ? await this.db.secondary.findUnique({
-          where: {
-            id: newVoiceState.channelId,
-          },
-        })
+      ? await this.kysely
+          .selectFrom('Secondary')
+          .where('id', '=', newVoiceState.channelId)
+          .selectAll()
+          .executeTakeFirst()
       : undefined;
 
     const oldPrimary = oldVoiceState.channelId
-      ? await this.db.primary.findUnique({
-          where: {
-            id: oldVoiceState.channelId,
-          },
-        })
+      ? await this.kysely
+          .selectFrom('Primary')
+          .where('id', '=', oldVoiceState.channelId)
+          .selectAll()
+          .executeTakeFirst()
       : undefined;
 
     if (newSecondary && newSecondary.primaryId !== oldPrimary?.id) {
@@ -69,11 +70,11 @@ export class SecondaryEvents {
     }
 
     const newPrimary = newVoiceState.channelId
-      ? await this.db.primary.findUnique({
-          where: {
-            id: newVoiceState.channelId,
-          },
-        })
+      ? await this.kysely
+          .selectFrom('Primary')
+          .where('id', '=', newVoiceState.channelId)
+          .selectAll()
+          .executeTakeFirst()
       : undefined;
 
     if (newPrimary) {
@@ -93,22 +94,28 @@ export class SecondaryEvents {
   ) {
     if (channel.isDMBased()) return;
 
-    const databaseChannel = await this.db.secondary.findUnique({
-      where: {
-        id: channel.id,
-      },
-    });
+    const databaseChannel = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channel.id)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseChannel) return;
 
-    const deletedSecondary = await this.db.secondary.delete({
-      where: {
-        id: databaseChannel.id,
-      },
-    });
+    const deletedSecondary = await this.kysely
+      .deleteFrom('Secondary')
+      .where('id', '=', channel.id)
+      .returningAll()
+      .executeTakeFirst();
 
-    const secondaryCount = await this.db.secondary.count();
-    const primaryCount = await this.db.primary.count();
+    const { secondaryCount } = await this.kysely
+      .selectFrom('Secondary')
+      .select((cb) => cb.fn.countAll<number>().as('secondaryCount'))
+      .executeTakeFirst();
+    const { primaryCount } = await this.kysely
+      .selectFrom('Primary')
+      .select((cb) => cb.fn.countAll<number>().as('primaryCount'))
+      .executeTakeFirst();
 
     this.pubSub.publish('secondaryUpdate', {
       secondaryUpdate: {
@@ -130,11 +137,11 @@ export class SecondaryEvents {
 
     if (!channelId) return;
 
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        id: channelId,
-      },
-    });
+    const databaseSecondary = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseSecondary) return;
 

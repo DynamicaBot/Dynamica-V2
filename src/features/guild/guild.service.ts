@@ -4,10 +4,12 @@ import { Client } from 'discord.js';
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 
+import { KyselyService } from '../kysely';
+
 @Injectable()
 export class GuildService {
   public constructor(
-    private readonly db: PrismaService,
+    private readonly kysely: KyselyService,
     private readonly client: Client,
     private readonly mqtt: MqttService,
   ) {}
@@ -23,11 +25,11 @@ export class GuildService {
       try {
         guild = await this.client.guilds.fetch(id);
       } catch (error) {
-        await this.db.guild.delete({
-          where: {
-            id,
-          },
-        });
+        await this.kysely
+          .deleteFrom('Guild')
+          .where('id', '=', id)
+          .returningAll()
+          .execute();
       }
     }
   }
@@ -36,7 +38,7 @@ export class GuildService {
    * Cleanup guilds that the bot has left
    */
   public async cleanup() {
-    const guilds = await this.db.guild.findMany();
+    const guilds = await this.kysely.selectFrom('Guild').selectAll().execute();
     await Promise.all(guilds.map(({ id }) => this.update(id)));
   }
 
@@ -46,39 +48,55 @@ export class GuildService {
    * @returns The updated guild
    */
   public async allowjoin(guildId: string) {
-    const guild = await this.db.guild.findUnique({
-      where: {
-        id: guildId,
-      },
-    });
+    const guild = await this.kysely
+      .selectFrom('Guild')
+      .where('id', '=', guildId)
+      .select('allowJoinRequests')
+      .executeTakeFirst();
 
-    const newGuild = await this.db.guild.update({
-      where: {
-        id: guildId,
-      },
-      data: {
-        allowJoinRequests: !guild.allowJoinRequests,
-      },
-    });
+    const newGuild = await this.kysely
+      .insertInto('Guild')
+      .values({
+        allowJoinRequests: Number(!guild.allowJoinRequests),
+      })
+      .onConflict((cb) =>
+        cb.column('id').doUpdateSet((eb) => ({
+          allowJoinRequests: eb.ref('excluded.allowJoinRequests'),
+        })),
+      )
+      .returningAll()
+      .executeTakeFirst();
 
     return newGuild;
   }
 
   public async info(guildId: string) {
-    const guild = await this.db.guild.findUnique({
-      where: {
-        id: guildId,
-      },
-      include: {
-        primaryChannels: true,
-        secondaryChannels: true,
-      },
-    });
+    const guildDetails = await this.kysely
+      .selectFrom('Guild')
+      .selectAll()
+      .where('id', '=', guildId)
+      .executeTakeFirst();
 
-    if (!guild) {
+    if (!guildDetails) {
       throw new Error('Guild not found');
     }
 
-    return guild;
+    const guildSecondaries = await this.kysely
+      .selectFrom('Secondary')
+      .selectAll()
+      .where('guildId', '=', guildId)
+      .execute();
+
+    const guildPrimaries = await this.kysely
+      .selectFrom('Primary')
+      .selectAll()
+      .where('guildId', '=', guildId)
+      .execute();
+
+    return {
+      ...guildDetails,
+      secondaries: guildSecondaries,
+      primaries: guildPrimaries,
+    } as const;
   }
 }

@@ -6,6 +6,7 @@ import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
 import UpdateMode from '@/utils/UpdateMode';
 
+import { KyselyService } from '../kysely';
 import { PubSubService } from '../pubsub';
 
 import { PrimaryService } from './primary.service';
@@ -13,10 +14,10 @@ import { PrimaryService } from './primary.service';
 @Injectable()
 export class PrimaryEvents {
   constructor(
-    private readonly db: PrismaService,
     private readonly mqtt: MqttService,
     private readonly primaryService: PrimaryService,
     private readonly pubSub: PubSubService,
+    private readonly kysely: KyselyService,
   ) {}
 
   @On('channelDelete')
@@ -25,25 +26,31 @@ export class PrimaryEvents {
   ) {
     if (channel.isDMBased()) return;
 
-    const databasePrimary = await this.db.primary.findUnique({
-      where: {
-        id: channel.id,
-      },
-    });
+    const databasePrimary = await this.kysely
+      .selectFrom('Primary')
+      .where('id', '=', channel.id)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databasePrimary) return;
 
-    const deletedPrimary = await this.db.primary.delete({
-      where: {
-        id: channel.id,
-      },
-    });
+    const deletedPrimary = await this.kysely
+      .deleteFrom('Primary')
+      .where('id', '=', channel.id)
+      .returningAll()
+      .executeTakeFirst();
     this.pubSub.publish('primaryUpdate', {
       primaryUpdate: { mode: UpdateMode.Delete, data: deletedPrimary },
     });
 
-    const primaryCount = await this.db.primary.count();
-    const secondaryCount = await this.db.secondary.count();
+    const { primaryCount } = await this.kysely
+      .selectFrom('Primary')
+      .select((cb) => cb.fn.countAll<number>().as('primaryCount'))
+      .executeTakeFirst();
+    const { secondaryCount } = await this.kysely
+      .selectFrom('Secondary')
+      .select((cb) => cb.fn.countAll<number>().as('secondaryCount'))
+      .executeTakeFirst();
 
     channel.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 

@@ -16,7 +16,6 @@ import {
   UserSelectMenuBuilder,
 } from 'discord.js';
 import emojiList from 'emoji-random-list';
-import { PubSub } from 'graphql-subscriptions';
 import { romanize } from 'romans';
 
 import { MqttService } from '@/features/mqtt';
@@ -24,6 +23,7 @@ import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
 import UpdateMode from '@/utils/UpdateMode';
 
+import { KyselyService } from '../kysely';
 import { PubSubService } from '../pubsub';
 
 @Injectable()
@@ -32,7 +32,7 @@ export class SecondaryService {
 
   public constructor(
     private readonly client: Client,
-    private readonly db: PrismaService,
+    private readonly kysely: KyselyService,
     private readonly mqtt: MqttService,
     private readonly pubSub: PubSubService,
   ) {}
@@ -75,11 +75,10 @@ export class SecondaryService {
       try {
         discordGuild = await this.client.guilds.fetch(guildId);
       } catch (error) {
-        await this.db.guild.delete({
-          where: {
-            id: guildId,
-          },
-        });
+        await this.kysely
+          .deleteFrom('Guild')
+          .where('id', '=', guildId)
+          .execute();
         return;
       }
     }
@@ -96,11 +95,10 @@ export class SecondaryService {
       try {
         discordPrimary = await discordGuild.channels.fetch(primaryId);
       } catch (error) {
-        await this.db.primary.delete({
-          where: {
-            id: primaryId,
-          },
-        });
+        await this.kysely
+          .deleteFrom('Primary')
+          .where('id', '=', primaryId)
+          .execute();
         return;
       }
     }
@@ -127,24 +125,18 @@ export class SecondaryService {
       group: 'smileys-and-emotion,animals-and-nature,food-and-drink',
     })[0];
 
-    const newDatabaseChannel = await this.db.secondary.create({
-      data: {
+    const newDatabaseChannel = await this.kysely
+      .insertInto('Secondary')
+      .values({
         id: newDiscordChannel.id,
         emoji,
         creator: userId,
         lastName: channelName,
-        primary: {
-          connect: {
-            id: primaryId,
-          },
-        },
-        guild: {
-          connect: {
-            id: guildId,
-          },
-        },
-      },
-    });
+        primaryId,
+        guildId,
+      })
+      .returningAll()
+      .executeTakeFirst();
 
     await discordGuildMember.voice.setChannel(newDiscordChannel);
 
@@ -159,8 +151,14 @@ export class SecondaryService {
       components: [channelSettingsComponents],
     });
 
-    const secondaryCount = await this.db.secondary.count();
-    const primaryCount = await this.db.primary.count();
+    const { secondaryCount } = await this.kysely
+      .selectFrom('Secondary')
+      .select((cb) => cb.fn.countAll<number>().as('secondaryCount'))
+      .executeTakeFirst();
+    const { primaryCount } = await this.kysely
+      .selectFrom('Primary')
+      .select((cb) => cb.fn.countAll<number>().as('primaryCount'))
+      .executeTakeFirst();
 
     await this.pubSub.publish('secondaryUpdate', {
       secondaryUpdate: {
@@ -187,11 +185,10 @@ export class SecondaryService {
       try {
         discordChannel = await this.client.channels.fetch(channelId);
       } catch (error) {
-        await this.db.secondary.delete({
-          where: {
-            id: channelId,
-          },
-        });
+        await this.kysely
+          .deleteFrom('Secondary')
+          .where('id', '=', channelId)
+          .execute();
         return;
       }
     }
@@ -200,14 +197,12 @@ export class SecondaryService {
       return;
     }
 
-    const databaseChannel = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const databaseChannel = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     const newName = await this.formatName(
       databaseChannel.primaryId,
@@ -219,17 +214,14 @@ export class SecondaryService {
       await discordChannel.edit({
         name: newName,
       });
-      await this.db.secondary.update({
-        where: {
-          guildId_id: {
-            guildId,
-            id: channelId,
-          },
-        },
-        data: {
+      await this.kysely
+        .updateTable('Secondary')
+        .set({
           lastName: newName,
-        },
-      });
+        })
+        .where('id', '=', channelId)
+        .where('guildId', '=', guildId)
+        .execute();
     }
 
     return newName;
@@ -241,14 +233,12 @@ export class SecondaryService {
    * @returns void
    */
   public async update(guildId: string, channelId: string) {
-    const secondaryChannel = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const secondaryChannel = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!secondaryChannel) {
       return;
@@ -260,14 +250,11 @@ export class SecondaryService {
       try {
         discordChannel = await this.client.channels.fetch(channelId);
       } catch (error) {
-        await this.db.secondary.delete({
-          where: {
-            guildId_id: {
-              guildId,
-              id: channelId,
-            },
-          },
-        });
+        await this.kysely
+          .deleteFrom('Secondary')
+          .where('id', '=', channelId)
+          .where('guildId', '=', guildId)
+          .execute();
         return;
       }
     }
@@ -291,17 +278,14 @@ export class SecondaryService {
       const memberIds = discordChannel.members.map((member) => member.id);
 
       if (!memberIds.includes(secondaryChannel.creator)) {
-        await this.db.secondary.update({
-          where: {
-            guildId_id: {
-              guildId,
-              id: channelId,
-            },
-          },
-          data: {
+        await this.kysely
+          .updateTable('Secondary')
+          .where('guildId', '=', guildId)
+          .where('id', '=', channelId)
+          .set({
             creator: memberIds[0],
-          },
-        });
+          })
+          .execute();
       }
 
       await this.updateName(guildId, channelId);
@@ -326,11 +310,11 @@ export class SecondaryService {
       try {
         discordGuild = await this.client.guilds.fetch(guildId);
       } catch (error) {
-        await this.db.guild.delete({
-          where: {
-            id: guildId,
-          },
-        });
+        await this.kysely
+          .deleteFrom('Primary')
+          .where('id', '=', primaryId)
+          .where('guildId', '=', guildId)
+          .execute();
         throw new Error('No access to guild');
       }
     }
@@ -345,23 +329,26 @@ export class SecondaryService {
       );
     }
 
-    const databasePrimary = await this.db.primary.findUniqueOrThrow({
-      where: {
-        id: primaryId,
-      },
-      include: {
-        guild: {
-          include: {
-            aliases: true,
-          },
-        },
-        secondaries: {
-          orderBy: {
-            createdAt: 'asc',
-          },
-        },
-      },
-    });
+    const databasePrimary = await this.kysely
+      .selectFrom('Primary')
+      .where('id', '=', primaryId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
+
+    const aliases = await this.kysely
+      .selectFrom('Alias')
+      .where('guildId', '=', databasePrimary.guildId)
+      .selectAll()
+      .execute();
+
+    const secondaries = await this.kysely
+      .selectFrom('Secondary')
+      .where('primaryId', '=', primaryId)
+      .where('guildId', '=', guildId)
+      .orderBy('createdAt', 'asc')
+      .selectAll()
+      .execute();
 
     if (discordChannel.members instanceof ThreadMemberManager) {
       throw new Error('Thread channel');
@@ -383,8 +370,6 @@ export class SecondaryService {
       ...new Set(filteredActivities.map((activity) => activity.name)),
     ];
 
-    const { aliases } = databasePrimary.guild;
-
     const aliasObject: Record<string, string> = {};
 
     aliases.forEach(({ alias, activity }) => {
@@ -396,11 +381,11 @@ export class SecondaryService {
     );
 
     const databaseSecondary = channelId
-      ? await this.db.secondary.findUnique({
-          where: {
-            id: channelId,
-          },
-        })
+      ? await this.kysely
+          .selectFrom('Secondary')
+          .where('id', '=', channelId)
+          .selectAll()
+          .executeTakeFirst()
       : undefined;
 
     const creator = databaseSecondary
@@ -419,12 +404,12 @@ export class SecondaryService {
 
     const memberCount = channelMembers.length;
 
-    const ownIndex = databasePrimary.secondaries.findIndex(
+    const ownIndex = secondaries.findIndex(
       (secondary) => channelId === secondary.id,
     );
 
     const channelNumber =
-      ownIndex === -1 ? databasePrimary.secondaries.length + 1 : ownIndex + 1;
+      ownIndex === -1 ? secondaries.length + 1 : ownIndex + 1;
 
     const emoji = databaseSecondary?.emoji ?? '❔';
 
@@ -476,7 +461,10 @@ export class SecondaryService {
   }
 
   public async cleanup() {
-    const secondaries = await this.db.secondary.findMany();
+    const secondaries = await this.kysely
+      .selectFrom('Secondary')
+      .selectAll()
+      .execute();
     await Promise.all(
       secondaries.map(({ id: secondaryId, guildId }) =>
         this.update(guildId, secondaryId),
@@ -501,14 +489,12 @@ export class SecondaryService {
       return;
     }
 
-    const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const databaseSecondary = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseSecondary) {
       throw new Error('No secondary channel found');
@@ -534,14 +520,15 @@ export class SecondaryService {
       throw new Error('You do not have permission to do this');
     }
 
-    const updatedSecondary = await this.db.secondary.update({
-      where: {
-        id: channelId,
-      },
-      data: {
+    const updatedSecondary = await this.kysely
+      .updateTable('Secondary')
+      .set({
         creator: userId,
-      },
-    });
+      })
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .returningAll()
+      .executeTakeFirst();
 
     await this.updateName(guildId, updatedSecondary.id);
 
@@ -561,14 +548,12 @@ export class SecondaryService {
     bitrate: number,
     userId: string,
   ) {
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const databaseSecondary = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseSecondary) {
       throw new Error('Channel is not a dynamica channel');
@@ -607,14 +592,12 @@ export class SecondaryService {
     limit: number,
     userId: string,
   ) {
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const databaseSecondary = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseSecondary) {
       throw new Error('Channel is not a dynamica channel');
@@ -652,14 +635,12 @@ export class SecondaryService {
     name: string | null,
     userId: string,
   ) {
-    const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const databaseSecondary = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseSecondary) {
       throw new Error('Channel is not a dynamica channel');
@@ -679,14 +660,11 @@ export class SecondaryService {
       throw new Error('Not the owner of the channel');
     }
 
-    await this.db.secondary.update({
-      where: {
-        id: channelId,
-      },
-      data: {
-        name,
-      },
-    });
+    await this.kysely
+      .updateTable('Secondary')
+      .where('id', '=', channel.id)
+      .set({ name })
+      .execute();
 
     await this.updateName(guildId, channelId);
 
@@ -694,14 +672,12 @@ export class SecondaryService {
   }
 
   public async info(guildId: string, channelId: string) {
-    const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const databaseSecondary = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseSecondary) {
       throw new Error('Channel is not a dynamica channel');
@@ -718,14 +694,12 @@ export class SecondaryService {
    * @returns The updated channel
    */
   public async lock(guildId: string, channelId: string, userId: string) {
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const databaseSecondary = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseSecondary) {
       throw new Error('Channel is not a dynamica channel');
@@ -772,17 +746,15 @@ export class SecondaryService {
       ],
     });
 
-    await this.db.secondary.update({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-      data: {
-        locked: true,
-      },
-    });
+    await this.kysely
+      .updateTable('Secondary')
+      .where('id', '=', channel.id)
+      .where('guildId', '=', channel.guildId)
+      .set({
+        locked: 1,
+      })
+      .returningAll()
+      .execute();
 
     await this.updateName(guildId, channelId);
 
@@ -797,14 +769,12 @@ export class SecondaryService {
    * @returns The updated channel
    */
   public async unlock(guildId: string, channelId: string, userId: string) {
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const databaseSecondary = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseSecondary) {
       throw new Error('Channel is not a dynamica channel');
@@ -828,17 +798,14 @@ export class SecondaryService {
       permissionOverwrites: null,
     });
 
-    await this.db.secondary.update({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-      data: {
-        locked: false,
-      },
-    });
+    await this.kysely
+      .updateTable('Secondary')
+      .where('id', '=', channel.id)
+      .where('guildId', '=', channel.guildId)
+      .set({
+        locked: 0,
+      })
+      .execute();
 
     await this.updateName(guildId, channelId);
 
@@ -857,20 +824,18 @@ export class SecondaryService {
     channelId: string,
     userId: string,
   ): Promise<GuildMember> {
-    const guildSettings = await this.db.guild.findUnique({
-      where: {
-        id: guildId,
-      },
-    });
+    const guildSettings = await this.kysely
+      .selectFrom('Guild')
+      .where('id', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const databaseSecondary = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseSecondary) {
       throw new Error('Channel is not a dynamica channel');
@@ -1025,14 +990,12 @@ export class SecondaryService {
     userId: string,
     newOwnerId: string,
   ) {
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const databaseSecondary = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseSecondary) {
       throw new Error('Channel is not a dynamica channel');
@@ -1052,17 +1015,13 @@ export class SecondaryService {
       throw new Error('Not the owner of the channel');
     }
 
-    await this.db.secondary.update({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-      data: {
+    await this.kysely
+      .updateTable('Secondary')
+      .where('id', '=', channel.id)
+      .set({
         creator: newOwnerId,
-      },
-    });
+      })
+      .execute();
 
     await this.updateName(guildId, channelId);
 
@@ -1079,14 +1038,12 @@ export class SecondaryService {
     guildId: string,
     id: string,
   ): Promise<ModalBuilder> {
-    const secondaryProperties = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id,
-        },
-      },
-    });
+    const secondaryProperties = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', id)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!secondaryProperties) {
       throw new Error('Channel is not a dynamica channel');
@@ -1124,14 +1081,12 @@ export class SecondaryService {
     channelId: string,
     userId: string,
   ): Promise<UserSelectMenuBuilder> {
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const databaseSecondary = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseSecondary) {
       throw new Error('Channel is not a dynamica channel');
@@ -1168,17 +1123,18 @@ export class SecondaryService {
     guildId: string,
     channelId: string,
   ): Promise<ActionRowBuilder<ButtonBuilder>> {
-    const databaseChannel = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-      include: {
-        guild: true,
-      },
-    });
+    const databaseChannel = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
+
+    const databaseGuild = await this.kysely
+      .selectFrom('Guild')
+      .where('id', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseChannel) {
       throw new Error('Channel is not a dynamica channel');
@@ -1219,9 +1175,7 @@ export class SecondaryService {
       .setEmoji('👋')
       .setLabel('Request Join')
       .setStyle(ButtonStyle.Primary)
-      .setDisabled(
-        !databaseChannel.guild.allowJoinRequests || !databaseChannel.locked,
-      );
+      .setDisabled(!databaseGuild.allowJoinRequests || !databaseChannel.locked);
 
     const isLocked = databaseChannel.locked;
 
@@ -1246,14 +1200,12 @@ export class SecondaryService {
     channelId: string,
     userId: string,
   ): Promise<ActionRowBuilder<ButtonBuilder>> {
-    const databaseChannel = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const databaseChannel = await this.kysely
+      .selectFrom('Secondary')
+      .where('id', '=', channelId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databaseChannel) {
       throw new Error('Channel is not a dynamica channel');

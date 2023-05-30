@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { AutocompleteInteraction, CacheType } from 'discord.js';
 import { AutocompleteInterceptor } from 'necord';
 
+import { KyselyService } from '@/features/kysely';
 import { PrismaService } from '@/features/prisma';
 
 @Injectable()
 export class PrimaryAutocompleteInterceptor extends AutocompleteInterceptor {
-  constructor(private readonly db: PrismaService) {
+  constructor(private readonly kysely: KyselyService) {
     super();
   }
 
@@ -19,11 +20,11 @@ export class PrimaryAutocompleteInterceptor extends AutocompleteInterceptor {
       guildChannels = await interaction.guild.channels.fetch();
     }
 
-    const primaries = await this.db.primary.findMany({
-      where: {
-        guildId: interaction.guildId,
-      },
-    });
+    const primaries = await this.kysely
+      .selectFrom('Primary')
+      .where('guildId', '=', interaction.guildId)
+      .selectAll()
+      .execute();
 
     const mappedSecondaries = primaries.map(({ id }) => guildChannels.get(id));
 

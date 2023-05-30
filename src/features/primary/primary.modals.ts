@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { EmbedBuilder } from 'discord.js';
 import { Ctx, Modal, type ModalContext, ModalParam } from 'necord';
 
+import { KyselyService } from '../kysely';
 import { PrismaService } from '../prisma';
 
 import { PrimaryService } from './primary.service';
@@ -9,7 +10,7 @@ import { PrimaryService } from './primary.service';
 @Injectable()
 export class PrimaryModals {
   constructor(
-    private readonly db: PrismaService,
+    private readonly kysely: KyselyService,
     private readonly primaryService: PrimaryService,
   ) {}
 
@@ -18,14 +19,11 @@ export class PrimaryModals {
     @Ctx() [interaction]: ModalContext,
     @ModalParam('id') id: string,
   ) {
-    const primary = this.db.primary.findUnique({
-      where: {
-        guildId_id: {
-          guildId: interaction.guildId,
-          id,
-        },
-      },
-    });
+    const primary = await this.kysely
+      .selectFrom('Primary')
+      .where('id', '=', id)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!primary) {
       throw new Error('Primary not found');
@@ -34,18 +32,15 @@ export class PrimaryModals {
     const newGeneralTemplate = interaction.fields.getTextInputValue('general');
     const newGameTemplate = interaction.fields.getTextInputValue('template');
 
-    const updatedPrimary = await this.db.primary.update({
-      where: {
-        guildId_id: {
-          guildId: interaction.guild.id,
-          id,
-        },
-      },
-      data: {
+    const updatedPrimary = await this.kysely
+      .updateTable('Primary')
+      .set({
         generalName: newGeneralTemplate,
         template: newGameTemplate,
-      },
-    });
+      })
+      .where('id', '=', id)
+      .returningAll()
+      .executeTakeFirst();
 
     const embed = new EmbedBuilder()
       .setTitle('Primary Updated')

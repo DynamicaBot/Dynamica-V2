@@ -16,13 +16,14 @@ import { SecondaryService } from '@/features/secondary';
 import { getPresence } from '@/utils/presence';
 import UpdateMode from '@/utils/UpdateMode';
 
+import { KyselyService } from '../kysely';
 import { PubSubService } from '../pubsub';
 
 @Injectable()
 export class PrimaryService {
   public constructor(
     private readonly client: Client,
-    private readonly db: PrismaService,
+    private readonly kysely: KyselyService,
     private readonly secondaryService: SecondaryService,
     private readonly mqtt: MqttService,
     private readonly pubSub: PubSubService,
@@ -42,11 +43,11 @@ export class PrimaryService {
       try {
         guild = await this.client.guilds.fetch(guildId);
       } catch (error) {
-        await this.db.guild.delete({
-          where: {
-            id: guildId,
-          },
-        });
+        await this.kysely
+          .deleteFrom('Guild')
+          .where('id', '=', guildId)
+          .returningAll()
+          .execute();
         throw new Error('No access to guild');
       }
     }
@@ -57,29 +58,29 @@ export class PrimaryService {
       parent: sectionId,
     });
 
-    const primary = await this.db.primary.create({
-      data: {
+    const primary = await this.kysely
+      .insertInto('Primary')
+      .values({
         id: channelId.id,
         creator,
-        guild: {
-          connectOrCreate: {
-            where: {
-              id: guild.id,
-            },
-            create: {
-              id: guild.id,
-            },
-          },
-        },
-      },
-    });
+        guildId: guild.id,
+      })
+      .returningAll()
+      .executeTakeFirst();
 
     await this.pubSub.publish('primaryUpdate', {
       primaryUpdate: { data: primary, mode: UpdateMode.Create },
     });
 
-    const primaryCount = await this.db.primary.count();
-    const secondaryCount = await this.db.secondary.count();
+    const { primaryCount } = await this.kysely
+      .selectFrom('Primary')
+      .select((eb) => eb.fn.countAll<number>().as('primaryCount'))
+      .executeTakeFirst();
+
+    const { secondaryCount } = await this.kysely
+      .selectFrom('Secondary')
+      .select((eb) => eb.fn.countAll<number>().as('secondaryCount'))
+      .executeTakeFirst();
 
     this.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 
@@ -101,11 +102,11 @@ export class PrimaryService {
       try {
         primary = await this.client.channels.fetch(id);
       } catch (error) {
-        await this.db.primary.delete({
-          where: {
-            id,
-          },
-        });
+        await this.kysely
+          .deleteFrom('Primary')
+          .where('id', '=', id)
+          .where('guildId', '=', guildId)
+          .execute();
         return;
       }
     }
@@ -136,7 +137,10 @@ export class PrimaryService {
    * Cleanup primaries that are no longer in the guild
    */
   public async cleanup() {
-    const primaries = await this.db.primary.findMany();
+    const primaries = await this.kysely
+      .selectFrom('Primary')
+      .selectAll()
+      .execute();
     await Promise.all(
       primaries.map(({ id, guildId }) => this.update(guildId, id)),
     );
@@ -149,23 +153,23 @@ export class PrimaryService {
    * @returns The updated primary
    */
   public async updateSecondaries(guildId: string, primaryId: string) {
-    const databasePrimary = await this.db.primary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: primaryId,
-        },
-      },
-      include: {
-        secondaries: true,
-      },
-    });
+    const databasePrimary = await this.kysely
+      .selectFrom('Primary')
+      .where('id', '=', primaryId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databasePrimary) {
       throw new Error('No primary found');
     }
 
-    const { secondaries } = databasePrimary;
+    const secondaries = await this.kysely
+      .selectFrom('Secondary')
+      .where('primaryId', '=', primaryId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .execute();
 
     await Promise.all(
       secondaries.map(({ id }) => this.secondaryService.update(guildId, id)),
@@ -186,30 +190,24 @@ export class PrimaryService {
     primaryId: string,
     newTemplate: string,
   ) {
-    const databasePrimary = await this.db.primary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: primaryId,
-        },
-      },
-    });
+    const databasePrimary = await this.kysely
+      .selectFrom('Primary')
+      .where('id', '=', primaryId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databasePrimary) {
       throw new Error('No primary found');
     }
 
-    const updatedPrimary = await this.db.primary.update({
-      where: {
-        guildId_id: {
-          guildId,
-          id: primaryId,
-        },
-      },
-      data: {
-        generalName: newTemplate,
-      },
-    });
+    const updatedPrimary = await this.kysely
+      .updateTable('Primary')
+      .where('id', '=', primaryId)
+      .where('guildId', '=', guildId)
+      .set({ generalName: newTemplate })
+      .returningAll()
+      .executeTakeFirst();
 
     await this.updateSecondaries(guildId, primaryId);
 
@@ -228,30 +226,24 @@ export class PrimaryService {
     primaryId: string,
     newTemplate: string,
   ) {
-    const databasePrimary = await this.db.primary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: primaryId,
-        },
-      },
-    });
+    const databasePrimary = await this.kysely
+      .selectFrom('Primary')
+      .where('id', '=', primaryId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databasePrimary) {
       throw new Error('No primary found');
     }
 
-    const updatedPrimary = await this.db.primary.update({
-      where: {
-        guildId_id: {
-          guildId,
-          id: primaryId,
-        },
-      },
-      data: {
-        template: newTemplate,
-      },
-    });
+    const updatedPrimary = await this.kysely
+      .updateTable('Primary')
+      .where('id', '=', primaryId)
+      .where('guildId', '=', guildId)
+      .set({ template: newTemplate })
+      .returningAll()
+      .executeTakeFirst();
 
     await this.updateSecondaries(guildId, primaryId);
 
@@ -265,37 +257,40 @@ export class PrimaryService {
    * @returns The primary info
    */
   public async info(guildId: string, primaryId: string) {
-    const databasePrimary = await this.db.primary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: primaryId,
-        },
-      },
-      include: {
-        secondaries: true,
-      },
-    });
+    const databasePrimary = await this.kysely
+      .selectFrom('Primary')
+      .where('id', '=', primaryId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
+
+    const secondaries = await this.kysely
+      .selectFrom('Secondary')
+      .where('primaryId', '=', primaryId)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .execute();
 
     if (!databasePrimary) {
       throw new Error('No primary found');
     }
 
-    return databasePrimary;
+    return {
+      ...databasePrimary,
+      secondaries,
+    };
   }
 
   public async createPrimaryModal(
     guildId: string,
     id: string,
   ): Promise<ModalBuilder> {
-    const databasePrimary = await this.db.primary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id,
-        },
-      },
-    });
+    const databasePrimary = await this.kysely
+      .selectFrom('Primary')
+      .where('id', '=', id)
+      .where('guildId', '=', guildId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!databasePrimary) {
       throw new Error('No primary found');

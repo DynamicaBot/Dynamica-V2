@@ -14,6 +14,7 @@ import { AppService } from './app.service';
 import { InfoCommands } from './commands/info.command';
 import { AliasModule } from './features/alias/alias.module';
 import { GuildModule } from './features/guild/guild.module';
+import { KyselyModule } from './features/kysely';
 import { MqttModule } from './features/mqtt/mqtt.module';
 import { PrimaryModule } from './features/primary/primary.module';
 import { PrismaModule } from './features/prisma/prisma.module';
@@ -23,34 +24,6 @@ import { SecondaryModule } from './features/secondary/secondary.module';
 @Module({
   imports: [
     PubSubModule,
-    GraphQLModule.forRootAsync<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      useFactory: async () => {
-        const tempPath = envPaths('dynamica', { suffix: '' }).temp;
-        const logger = new Logger(AppModule.name);
-        logger.log(`Temp path: ${tempPath}`);
-        return {
-          autoSchemaFile: path.join(tempPath, 'schema.gql'),
-          introspection: true,
-          subscriptions: {
-            'graphql-ws': true,
-            'subscriptions-transport-ws': true,
-          },
-          csrfPrevention: false,
-          playground: false,
-          plugins: [
-            ApolloServerPluginLandingPageLocalDefault({
-              embed: {
-                endpointIsEditable: true,
-                runTelemetry: false,
-              },
-              footer: false,
-            }),
-          ],
-        };
-      },
-      inject: [ConfigService],
-    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -67,6 +40,7 @@ import { SecondaryModule } from './features/secondary/secondary.module';
     }),
     ScheduleModule.forRoot(),
     PrismaModule,
+    KyselyModule,
     SecondaryModule,
     PrimaryModule,
     GuildModule,

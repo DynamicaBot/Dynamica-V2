@@ -10,6 +10,7 @@ import {
 } from 'necord';
 
 import { GuildService } from './features/guild/guild.service';
+import { KyselyService } from './features/kysely';
 import { MqttService } from './features/mqtt/mqtt.service';
 import { PrimaryService } from './features/primary/primary.service';
 import { PrismaService } from './features/prisma/prisma.service';
@@ -20,7 +21,7 @@ import { getPresence } from './utils/presence';
 export class AppService {
   private readonly logger = new Logger(AppService.name);
   constructor(
-    private readonly db: PrismaService,
+    private readonly kysely: KyselyService,
     private readonly secondaryService: SecondaryService,
     private readonly primaryService: PrimaryService,
     private readonly guildService: GuildService,
@@ -33,10 +34,22 @@ export class AppService {
 
     await this.cleanup();
 
-    const guildCount = await this.db.guild.count();
-    const primaryCount = await this.db.primary.count();
-    const secondaryCount = await this.db.secondary.count();
-    const aliasCount = await this.db.alias.count();
+    const { guildCount } = await this.kysely
+      .selectFrom('Guild')
+      .select((eb) => eb.fn.countAll<number>().as('guildCount'))
+      .executeTakeFirst();
+    const { primaryCount } = await this.kysely
+      .selectFrom('Primary')
+      .select((eb) => eb.fn.countAll<number>().as('primaryCount'))
+      .executeTakeFirst();
+    const { secondaryCount } = await this.kysely
+      .selectFrom('Secondary')
+      .select((eb) => eb.fn.countAll<number>().as('secondaryCount'))
+      .executeTakeFirst();
+    const { aliasCount } = await this.kysely
+      .selectFrom('Alias')
+      .select((eb) => eb.fn.countAll<number>().as('aliasCount'))
+      .executeTakeFirst();
 
     await Promise.all([
       this.mqtt.publish(`dynamica/guilds`, guildCount),
