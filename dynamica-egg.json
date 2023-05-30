@@ -54,6 +54,42 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "string|nullable"
+        },
+        {
+            "name": "Sentry DSN",
+            "description": "The DSN for Sentry.",
+            "env_variable": "SENTRY_DSN",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "string|nullable"
+        },
+        {
+            "name": "MQTT URL",
+            "description": "The URL for the MQTT broker.",
+            "env_variable": "MQTT_URL",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "string|nullable"
+        },
+        {
+            "name": "MQTT Username",
+            "description": "The username for the MQTT broker.",
+            "env_variable": "MQTT_USER",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "string|nullable"
+        },
+        {
+            "name": "MQTT Password",
+            "description": "The password for the MQTT broker.",
+            "env_variable": "MQTT_PASS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "string|nullable"
         }
     ]
 }
