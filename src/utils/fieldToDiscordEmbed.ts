@@ -1,5 +1,6 @@
-import { Primary, Secondary } from '@prisma/client';
 import { channelMention, time } from 'discord.js';
+
+import { Primary, Secondary } from '@/db/types';
 
 export default function fieldToDiscordEmbed(
   value: string | boolean | Date | Array<Secondary | Primary>,
