@@ -3,7 +3,6 @@ import { ActivityType } from 'discord.js';
 import { Context, type ContextOf, On } from 'necord';
 
 import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
 import UpdateMode from '@/utils/UpdateMode';
 

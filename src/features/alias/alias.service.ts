@@ -4,7 +4,6 @@ import { sql } from 'kysely';
 
 import { Alias } from '@/db/types';
 import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
 import UpdateMode from '@/utils/UpdateMode';
 
 import { KyselyService } from '../kysely';

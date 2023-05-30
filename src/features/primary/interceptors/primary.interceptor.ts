@@ -3,7 +3,6 @@ import { AutocompleteInteraction, CacheType } from 'discord.js';
 import { AutocompleteInterceptor } from 'necord';
 
 import { KyselyService } from '@/features/kysely';
-import { PrismaService } from '@/features/prisma';
 
 @Injectable()
 export class PrimaryAutocompleteInterceptor extends AutocompleteInterceptor {

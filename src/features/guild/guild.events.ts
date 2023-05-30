@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Context, type ContextOf, On } from 'necord';
 
 import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
 import UpdateMode from '@/utils/UpdateMode';
 
 import { KyselyService } from '../kysely';

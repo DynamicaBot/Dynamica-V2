@@ -24,6 +24,7 @@ export class KyselyService extends Kysely<DB> {
       dialect: new SqliteDialect({
         database: sqlite(dbUrl),
       }),
+      log: ['error'],
     });
   }
 }

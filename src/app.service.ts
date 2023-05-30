@@ -13,7 +13,6 @@ import { GuildService } from './features/guild/guild.service';
 import { KyselyService } from './features/kysely';
 import { MqttService } from './features/mqtt/mqtt.service';
 import { PrimaryService } from './features/primary/primary.service';
-import { PrismaService } from './features/prisma/prisma.service';
 import { SecondaryService } from './features/secondary/secondary.service';
 import { getPresence } from './utils/presence';
 

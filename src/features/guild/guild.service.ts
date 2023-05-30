@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Client } from 'discord.js';
 
 import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
 
 import { KyselyService } from '../kysely';
 

@@ -3,7 +3,6 @@ import { EmbedBuilder } from 'discord.js';
 import { Ctx, Modal, type ModalContext, ModalParam } from 'necord';
 
 import { KyselyService } from '../kysely';
-import { PrismaService } from '../prisma';
 
 import { PrimaryService } from './primary.service';
 

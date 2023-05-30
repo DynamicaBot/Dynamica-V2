@@ -11,7 +11,6 @@ import {
 import { PubSub } from 'graphql-subscriptions';
 
 import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
 import { SecondaryService } from '@/features/secondary';
 import { getPresence } from '@/utils/presence';
 import UpdateMode from '@/utils/UpdateMode';
