@@ -16,7 +16,7 @@
     "semantic-release": "semantic-release"
   },
   "dependencies": {
-    "@apollo/server": "^4.7.0",
+    "@apollo/server": "^4.7.4",
     "@nestjs/apollo": "^11.0.5",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
