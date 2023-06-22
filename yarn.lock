@@ -1045,9 +1045,9 @@
     config-chain "^1.1.11"
 
 "@prisma/client@^4.12.0":
-  version "4.16.0"
-  resolved "https://registry.yarnpkg.com/@prisma/client/-/client-4.16.0.tgz#1526414d69bb0db5efff0c8b0b99db65b11c6da4"
-  integrity sha512-CBD+5IdZPiavhLkQokvsz1uz4r9ppixaqY/ajybWs4WXNnsDVMBKEqN3BiPzpSo79jiy22VKj/67pqt4VwIg9w==
+  version "4.16.1"
+  resolved "https://registry.yarnpkg.com/@prisma/client/-/client-4.16.1.tgz#030bf59ee51f223bae2a8e7c49827528756cf03a"
+  integrity sha512-CoDHu7Bt+NuDo40ijoeHP79EHtECsPBTy3yte5Yo3op8TqXt/kV0OT5OrsWewKvQGKFMHhYQ+ePed3zzjYdGAw==
   dependencies:
     "@prisma/engines-version" "4.16.0-66.b20ead4d3ab9e78ac112966e242ded703f4a052c"
 
@@ -1056,10 +1056,10 @@
   resolved "https://registry.yarnpkg.com/@prisma/engines-version/-/engines-version-4.16.0-66.b20ead4d3ab9e78ac112966e242ded703f4a052c.tgz#54fd17f9a9080e13e2f75613fd35afb7875e3715"
   integrity sha512-tMWAF/qF00fbUH1HB4Yjmz6bjh7fzkb7Y3NRoUfMlHu6V+O45MGvqwYxqwBjn1BIUXkl3r04W351D4qdJjrgvA==
 
-"@prisma/engines@4.16.0":
-  version "4.16.0"
-  resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-4.16.0.tgz#08725453510cb1eda77c06c63354129352abf7b0"
-  integrity sha512-M6XoMRXnqL0rqZGQS8ZpNiHYG4G1fKBdoqW/oBtHnr1in5UYgerZqal3CXchmd6OBD/770PE9dtjQuqcilZJUA==
+"@prisma/engines@4.16.1":
+  version "4.16.1"
+  resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-4.16.1.tgz#ee487620dc5135fd175ac7494b1c60c9f12c1e4b"
+  integrity sha512-gpZG0kGGxfemgvK/LghHdBIz+crHkZjzszja94xp4oytpsXrgt/Ice82MvPsWMleVIniKuARrowtsIsim0PFJQ==
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
@@ -3956,9 +3956,9 @@ graphql-ws@^5.12.1:
   integrity sha512-itrUTQZP/TgswR4GSSYuwWUzrE/w5GhbwM2GX3ic2U7aw33jgEsayfIlvaj7/GcIvZgNMzsPTrE5hqPuFUiE5g==
 
 graphql@^16.6.0:
-  version "16.7.0"
-  resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.7.0.tgz#717051b8c183fcf8c3ad0a3668aeb5ffd1e9bc33"
-  integrity sha512-kdNG+ZGNf0E4dezSA2N9cRq8UdOMCcz9Wzh1dDSrCzGCz0nj6p8qlE+utY6iqr9y1sh3MZxUb7K794neZ2oT1w==
+  version "16.7.1"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.7.1.tgz#11475b74a7bff2aefd4691df52a0eca0abd9b642"
+  integrity sha512-DRYR9tf+UGU0KOsMcKAlXeFfX89UiiIZ0dRU3mR0yJfu6OjZqUcp68NnFLnqQU5RexygFoDy1EW+ccOYcPfmHg==
 
 handlebars@^4.7.7:
   version "4.7.7"
@@ -6137,11 +6137,11 @@ prettier@^2.3.2:
   integrity sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==
 
 prisma@^4.12.0:
-  version "4.16.0"
-  resolved "https://registry.yarnpkg.com/prisma/-/prisma-4.16.0.tgz#e8cb9b4074640f673c407d7edf17e52f38442291"
-  integrity sha512-kSCwbTm3LCephyGfZMJYqBXpPJXdJStg5xwfzeFmR5C05zfkOURK9pQpJF6uUQvFWm3lI9ZMSNkObmFkAPnB+g==
+  version "4.16.1"
+  resolved "https://registry.yarnpkg.com/prisma/-/prisma-4.16.1.tgz#c6d723a4326138a72489098a6c39a698a670fbbf"
+  integrity sha512-C2Xm7yxHxjFjjscBEW4tmoraPHH/Vyu/A0XABdbaFtoiOZARsxvOM7rwc2iZ0qVxbh0bGBGBWZUSXO/52/nHBQ==
   dependencies:
-    "@prisma/engines" "4.16.0"
+    "@prisma/engines" "4.16.1"
 
 proc-log@^3.0.0:
   version "3.0.0"
