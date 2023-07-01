@@ -47,7 +47,7 @@
     "@nestjs/schematics": "^9.1.0",
     "@swc/core": "^1.3.46",
     "@types/cron": "^2.0.1",
-    "@types/node": "18.16.18",
+    "@types/node": "18.16.19",
     "@types/romans": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
