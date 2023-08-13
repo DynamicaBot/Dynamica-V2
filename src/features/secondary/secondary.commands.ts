@@ -3,7 +3,6 @@ import {
   PermissionFlagsBits,
   channelMention,
   codeBlock,
-  inlineCode,
   userMention,
 } from 'discord.js';
 import {
