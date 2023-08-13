@@ -215,9 +215,15 @@ export class SecondaryService {
       channelId,
     );
 
-    if (databaseChannel.lastName !== newName && discordChannel.manageable) {
+    // Limit the length of newName to 100 characters
+    const limitedNewName = newName.substring(0, 99) + '…';
+
+    if (
+      databaseChannel.lastName !== limitedNewName &&
+      discordChannel.manageable
+    ) {
       await discordChannel.edit({
-        name: newName,
+        name: limitedNewName,
       });
       await this.db.secondary.update({
         where: {
@@ -227,12 +233,12 @@ export class SecondaryService {
           },
         },
         data: {
-          lastName: newName,
+          lastName: limitedNewName,
         },
       });
     }
 
-    return newName;
+    return limitedNewName;
   }
 
   /**
