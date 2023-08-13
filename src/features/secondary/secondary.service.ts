@@ -219,15 +219,9 @@ export class SecondaryService {
       channelId,
     );
 
-    // Limit the length of newName to 100 characters
-    const limitedNewName = newName.substring(0, 99) + '…';
-
-    if (
-      databaseChannel.lastName !== limitedNewName &&
-      discordChannel.manageable
-    ) {
+    if (databaseChannel.lastName !== newName && discordChannel.manageable) {
       await discordChannel.edit({
-        name: limitedNewName,
+        name: newName,
       });
       await this.db.secondary.update({
         where: {
@@ -237,12 +231,12 @@ export class SecondaryService {
           },
         },
         data: {
-          lastName: limitedNewName,
+          lastName: newName,
         },
       });
     }
 
-    return limitedNewName;
+    return newName;
   }
 
   /**
@@ -469,7 +463,7 @@ export class SecondaryService {
       'Zulu',
     ];
 
-    return `${locked ? '🔒 ' : ''}${channelNameTemplate
+    const formattedString = `${locked ? '🔒 ' : ''}${channelNameTemplate
       .replace(/###/g, channelNumber.toString().padStart(3, '0')) // 001
       .replace(/##/g, `#${channelNumber}`) // #1
       .replace(/\$#/g, channelNumber.toString()) // 1
@@ -483,6 +477,12 @@ export class SecondaryService {
         /<<(.+)\/(.+)>>/g,
         memberCount === 1 ? plurals[1] : plurals[2],
       )}`; // Plurals
+
+    if (formattedString.length > 100) {
+      return formattedString.slice(0, 99) + '…';
+    }
+
+    return formattedString;
   }
 
   public async cleanup() {
