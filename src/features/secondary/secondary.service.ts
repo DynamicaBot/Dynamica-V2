@@ -154,10 +154,16 @@ export class SecondaryService {
         newDiscordChannel.id,
       );
 
-    await newDiscordChannel.send({
-      content: `Edit the channel settings here`,
-      components: [channelSettingsComponents],
-    });
+    if (
+      newDiscordChannel
+        .permissionsFor(this.client.user)
+        .has(PermissionFlagsBits.SendMessages)
+    ) {
+      await newDiscordChannel.send({
+        content: `Edit the channel settings here`,
+        components: [channelSettingsComponents],
+      });
+    }
 
     const secondaryCount = await this.db.secondary.count();
     const primaryCount = await this.db.primary.count();
