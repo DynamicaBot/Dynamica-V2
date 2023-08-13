@@ -7,7 +7,6 @@ import {
   ButtonStyle,
   ChannelType,
   Client,
-  DiscordAPIError,
   GuildMember,
   ModalActionRowComponentBuilder,
   ModalBuilder,
@@ -221,33 +220,20 @@ export class SecondaryService {
     );
 
     if (databaseChannel.lastName !== newName && discordChannel.manageable) {
-      try {
-        await discordChannel.edit({
-          name: newName,
-        });
-        await this.db.secondary.update({
-          where: {
-            guildId_id: {
-              guildId,
-              id: channelId,
-            },
+      await discordChannel.edit({
+        name: newName,
+      });
+      await this.db.secondary.update({
+        where: {
+          guildId_id: {
+            guildId,
+            id: channelId,
           },
-          data: {
-            lastName: newName,
-          },
-        });
-      } catch (error) {
-        if (error instanceof DiscordAPIError && error.code === 10003) {
-          await this.db.secondary.delete({
-            where: {
-              guildId_id: {
-                guildId,
-                id: channelId,
-              },
-            },
-          });
-        }
-      }
+        },
+        data: {
+          lastName: newName,
+        },
+      });
     }
 
     return newName;
