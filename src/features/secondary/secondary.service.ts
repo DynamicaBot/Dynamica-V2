@@ -16,15 +16,11 @@ import {
   UserSelectMenuBuilder,
 } from 'discord.js';
 import emojiList from 'emoji-random-list';
-import { PubSub } from 'graphql-subscriptions';
 import { romanize } from 'romans';
 
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
-import UpdateMode from '@/utils/UpdateMode';
-
-import { PubSubService } from '../pubsub';
 
 @Injectable()
 export class SecondaryService {
@@ -34,7 +30,6 @@ export class SecondaryService {
     private readonly client: Client,
     private readonly db: PrismaService,
     private readonly mqtt: MqttService,
-    private readonly pubSub: PubSubService,
   ) {}
 
   /**
@@ -168,12 +163,6 @@ export class SecondaryService {
     const secondaryCount = await this.db.secondary.count();
     const primaryCount = await this.db.primary.count();
 
-    await this.pubSub.publish('secondaryUpdate', {
-      secondaryUpdate: {
-        mode: UpdateMode.Create,
-        data: newDatabaseChannel,
-      },
-    });
     this.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 
     this.mqtt.publish('dynamica/secondaries', secondaryCount.toString());
