@@ -1,13 +1,7 @@
-import path from 'path';
-
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { GraphQLModule } from '@nestjs/graphql';
 import { ScheduleModule } from '@nestjs/schedule';
 import { IntentsBitField } from 'discord.js';
-import envPaths from 'env-paths';
 import { NecordModule } from 'necord';
 
 import { AppService } from './app.service';
@@ -23,34 +17,6 @@ import { SecondaryModule } from './features/secondary/secondary.module';
 @Module({
   imports: [
     PubSubModule,
-    GraphQLModule.forRootAsync<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      useFactory: async () => {
-        const tempPath = envPaths('dynamica', { suffix: '' }).temp;
-        const logger = new Logger(AppModule.name);
-        logger.log(`Temp path: ${tempPath}`);
-        return {
-          autoSchemaFile: path.join(tempPath, 'schema.gql'),
-          introspection: true,
-          subscriptions: {
-            'graphql-ws': true,
-            'subscriptions-transport-ws': true,
-          },
-          csrfPrevention: false,
-          playground: false,
-          plugins: [
-            ApolloServerPluginLandingPageLocalDefault({
-              embed: {
-                endpointIsEditable: true,
-                runTelemetry: false,
-              },
-              footer: false,
-            }),
-          ],
-        };
-      },
-      inject: [ConfigService],
-    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
