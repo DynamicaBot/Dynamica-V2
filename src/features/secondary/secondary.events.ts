@@ -5,9 +5,6 @@ import { Context, type ContextOf, On } from 'necord';
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
-import UpdateMode from '@/utils/UpdateMode';
-
-import { PubSubService } from '../pubsub';
 
 import { SecondaryService } from './secondary.service';
 
@@ -17,7 +14,6 @@ export class SecondaryEvents {
     private readonly db: PrismaService,
     private readonly secondaryService: SecondaryService,
     private readonly mqtt: MqttService,
-    private readonly pubSub: PubSubService,
   ) {}
 
   @On('voiceStateUpdate')
@@ -101,7 +97,7 @@ export class SecondaryEvents {
 
     if (!databaseChannel) return;
 
-    const deletedSecondary = await this.db.secondary.delete({
+    await this.db.secondary.delete({
       where: {
         id: databaseChannel.id,
       },
@@ -109,13 +105,6 @@ export class SecondaryEvents {
 
     const secondaryCount = await this.db.secondary.count();
     const primaryCount = await this.db.primary.count();
-
-    this.pubSub.publish('secondaryUpdate', {
-      secondaryUpdate: {
-        mode: UpdateMode.Delete,
-        data: deletedSecondary,
-      },
-    });
 
     channel.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 

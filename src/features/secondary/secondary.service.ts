@@ -16,15 +16,11 @@ import {
   UserSelectMenuBuilder,
 } from 'discord.js';
 import emojiList from 'emoji-random-list';
-import { PubSub } from 'graphql-subscriptions';
 import { romanize } from 'romans';
 
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
-import UpdateMode from '@/utils/UpdateMode';
-
-import { PubSubService } from '../pubsub';
 
 @Injectable()
 export class SecondaryService {
@@ -34,7 +30,6 @@ export class SecondaryService {
     private readonly client: Client,
     private readonly db: PrismaService,
     private readonly mqtt: MqttService,
-    private readonly pubSub: PubSubService,
   ) {}
 
   /**
@@ -154,20 +149,20 @@ export class SecondaryService {
         newDiscordChannel.id,
       );
 
-    await newDiscordChannel.send({
-      content: `Edit the channel settings here`,
-      components: [channelSettingsComponents],
-    });
+    if (
+      newDiscordChannel
+        .permissionsFor(this.client.user)
+        .has(PermissionFlagsBits.SendMessages)
+    ) {
+      await newDiscordChannel.send({
+        content: `Edit the channel settings here`,
+        components: [channelSettingsComponents],
+      });
+    }
 
     const secondaryCount = await this.db.secondary.count();
     const primaryCount = await this.db.primary.count();
 
-    await this.pubSub.publish('secondaryUpdate', {
-      secondaryUpdate: {
-        mode: UpdateMode.Create,
-        data: newDatabaseChannel,
-      },
-    });
     this.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 
     this.mqtt.publish('dynamica/secondaries', secondaryCount.toString());
@@ -187,11 +182,20 @@ export class SecondaryService {
       try {
         discordChannel = await this.client.channels.fetch(channelId);
       } catch (error) {
-        await this.db.secondary.delete({
+        const secondaryExists = await this.db.secondary.findUnique({
           where: {
             id: channelId,
           },
         });
+
+        if (secondaryExists) {
+          await this.db.secondary.delete({
+            where: {
+              id: channelId,
+            },
+          });
+        }
+
         return;
       }
     }
@@ -215,9 +219,15 @@ export class SecondaryService {
       channelId,
     );
 
-    if (databaseChannel.lastName !== newName && discordChannel.manageable) {
+    // Limit the length of newName to 100 characters
+    const limitedNewName = newName.substring(0, 99) + '…';
+
+    if (
+      databaseChannel.lastName !== limitedNewName &&
+      discordChannel.manageable
+    ) {
       await discordChannel.edit({
-        name: newName,
+        name: limitedNewName,
       });
       await this.db.secondary.update({
         where: {
@@ -227,12 +237,12 @@ export class SecondaryService {
           },
         },
         data: {
-          lastName: newName,
+          lastName: limitedNewName,
         },
       });
     }
 
-    return newName;
+    return limitedNewName;
   }
 
   /**

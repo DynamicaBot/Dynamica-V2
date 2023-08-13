@@ -4,9 +4,6 @@ import { Context, type ContextOf, On } from 'necord';
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
-import UpdateMode from '@/utils/UpdateMode';
-
-import { PubSubService } from '../pubsub';
 
 import { PrimaryService } from './primary.service';
 
@@ -16,7 +13,6 @@ export class PrimaryEvents {
     private readonly db: PrismaService,
     private readonly mqtt: MqttService,
     private readonly primaryService: PrimaryService,
-    private readonly pubSub: PubSubService,
   ) {}
 
   @On('channelDelete')
@@ -33,13 +29,10 @@ export class PrimaryEvents {
 
     if (!databasePrimary) return;
 
-    const deletedPrimary = await this.db.primary.delete({
+    await this.db.primary.delete({
       where: {
         id: channel.id,
       },
-    });
-    this.pubSub.publish('primaryUpdate', {
-      primaryUpdate: { mode: UpdateMode.Delete, data: deletedPrimary },
     });
 
     const primaryCount = await this.db.primary.count();

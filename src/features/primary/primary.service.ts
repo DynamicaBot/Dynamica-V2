@@ -8,15 +8,11 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
-import { PubSub } from 'graphql-subscriptions';
 
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
 import { SecondaryService } from '@/features/secondary';
 import { getPresence } from '@/utils/presence';
-import UpdateMode from '@/utils/UpdateMode';
-
-import { PubSubService } from '../pubsub';
 
 @Injectable()
 export class PrimaryService {
@@ -25,7 +21,6 @@ export class PrimaryService {
     private readonly db: PrismaService,
     private readonly secondaryService: SecondaryService,
     private readonly mqtt: MqttService,
-    private readonly pubSub: PubSubService,
   ) {}
 
   /**
@@ -72,10 +67,6 @@ export class PrimaryService {
           },
         },
       },
-    });
-
-    await this.pubSub.publish('primaryUpdate', {
-      primaryUpdate: { data: primary, mode: UpdateMode.Create },
     });
 
     const primaryCount = await this.db.primary.count();

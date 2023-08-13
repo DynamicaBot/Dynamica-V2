@@ -1,18 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { PubSub } from 'graphql-subscriptions';
 
 import { MqttService } from '@/features/mqtt';
 import { PrismaService } from '@/features/prisma';
-import UpdateMode from '@/utils/UpdateMode';
-
-import { PubSubService } from '../pubsub';
 
 @Injectable()
 export class AliasService {
   constructor(
     private readonly db: PrismaService,
     private readonly mqtt: MqttService,
-    private readonly pubSub: PubSubService,
   ) {}
 
   /**
@@ -37,13 +32,6 @@ export class AliasService {
         guildId,
         activity,
         alias,
-      },
-    });
-
-    this.pubSub.publish('aliasUpdate', {
-      aliasUpdate: {
-        data: upsertedAlias,
-        mode: UpdateMode.Update,
       },
     });
 
@@ -80,13 +68,6 @@ export class AliasService {
           guildId,
           activity,
         },
-      },
-    });
-
-    this.pubSub.publish('aliasUpdate', {
-      aliasUpdate: {
-        data: deletedAlias,
-        mode: UpdateMode.Delete,
       },
     });
 
