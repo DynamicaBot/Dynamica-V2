@@ -187,11 +187,20 @@ export class SecondaryService {
       try {
         discordChannel = await this.client.channels.fetch(channelId);
       } catch (error) {
-        await this.db.secondary.delete({
+        const secondaryExists = await this.db.secondary.findUnique({
           where: {
             id: channelId,
           },
         });
+
+        if (secondaryExists) {
+          await this.db.secondary.delete({
+            where: {
+              id: channelId,
+            },
+          });
+        }
+
         return;
       }
     }
