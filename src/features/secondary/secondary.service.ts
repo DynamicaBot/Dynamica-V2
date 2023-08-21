@@ -415,7 +415,7 @@ export class SecondaryService {
 
     const channelNameTemplate =
       databaseSecondary?.name ??
-      (activities.length
+      (aliasedActivities.length
         ? databasePrimary.template
         : databasePrimary.generalName);
 
