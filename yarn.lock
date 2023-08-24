@@ -4919,9 +4919,9 @@ natural-compare@^1.4.0:
   integrity sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==
 
 necord@^6.0.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/necord/-/necord-6.1.0.tgz#ced8e05704204eab1289b2e8d8ebf45fb797459f"
-  integrity sha512-nvnc6Lr9uLGVhyK3J2X+M7RLJXDZhwHsLchG7TSVS2jE/sfQltJwV/3QKybIjgKDsyxV4lYDOSwQ/RtU7THQ1Q==
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/necord/-/necord-6.1.1.tgz#8ff4a28ea688fcea44c500042ef5892a1ce13d80"
+  integrity sha512-P0SWQcJvn9EoDyFblE8WC/sqdr6Bf2dSenWuCL/8GCzsLeYtAYFUGAaHuTGdkmxR1k9YksoUuErnNEg61C/hNA==
   dependencies:
     path-to-regexp "6.2.1"
 
