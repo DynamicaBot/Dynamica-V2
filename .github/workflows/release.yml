@@ -30,7 +30,7 @@ jobs:
       patch: ${{ steps.semantic.outputs.new_release_patch_version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Semantic Release
@@ -47,7 +47,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Yarn
         uses: actions/setup-node@v3
         with:
@@ -82,7 +82,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Restore Dist
         uses: actions/download-artifact@v3
         with:
@@ -103,7 +103,7 @@ jobs:
     name: 'Build and Publish Image'
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Restore Dist
         uses: actions/download-artifact@v3
@@ -164,7 +164,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Restore Dist
         uses: actions/download-artifact@v3
