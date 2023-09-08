@@ -5084,9 +5084,9 @@ mqtt-packet@^8.2.0:
     process-nextick-args "^2.0.1"
 
 mqtt@^5.0.0:
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/mqtt/-/mqtt-5.0.4.tgz#b8ee0dd53219d19e689105a2de4fdb7011a80f6f"
-  integrity sha512-Ao+DA4QYzIFXTQPIF0WKJfeHM2BV0kbP1xt/POPyJY2dQ02dscUJonh94NG9/aw0Fbk2L8Ex0YxobDSKUyQvcQ==
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/mqtt/-/mqtt-5.0.5.tgz#645819f48d6f3dba7962c28c5392e9b696c7081a"
+  integrity sha512-Ahbzk7nddvYg0aOezbYl/d9o8wcEbZw1NjiH+CmGObxiHsG4HgL7+IaRkph5yxwH679GVMAwtfsyUY2dFBSVSw==
   dependencies:
     "@types/readable-stream" "^4.0.1"
     "@types/ws" "^8.5.5"
@@ -7608,9 +7608,9 @@ write-file-atomic@^5.0.0, write-file-atomic@^5.0.1:
     signal-exit "^4.0.1"
 
 ws@^8.13.0:
-  version "8.13.0"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-8.13.0.tgz#9a9fb92f93cf41512a0735c8f4dd09b8a1211cd0"
-  integrity sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==
+  version "8.14.1"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.14.1.tgz#4b9586b4f70f9e6534c7bb1d3dc0baa8b8cf01e0"
+  integrity sha512-4OOseMUq8AzRBI/7SLMUwO+FEDnguetSk7KMb1sHwvF2w2Wv5Hoj0nlifx8vtGsftE/jWHojPy8sMMzYLJ2G/A==
 
 xtend@^4.0.0, xtend@~4.0.1:
   version "4.0.2"
