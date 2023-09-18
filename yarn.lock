@@ -6395,9 +6395,9 @@ rollup@^3.2.5:
     fsevents "~2.3.2"
 
 romans@^2.0.8:
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/romans/-/romans-2.0.8.tgz#1d488ba16c8d63126aee5a577baf6ccc190a3953"
-  integrity sha512-bEF8h1R7JCY1oYhydhC2i+TkV1Teq+BIfbicZZLIcVBJnZweYN8TwBb+9N8zhCmxFswcJzfLP7CH4pTxXYfCYQ==
+  version "2.0.15"
+  resolved "https://registry.yarnpkg.com/romans/-/romans-2.0.15.tgz#71b0f1f1859c4b1ca9e7ba05428902e9d361a5d1"
+  integrity sha512-/0/Wdz+Q948fkUlBt+JUgkxdYAmlBStLoSIqpBxaEDg9NGORrGaMCu9iYk8eRsiwRe2cLWflJswZP6g9vGIE1w==
 
 run-applescript@^5.0.0:
   version "5.0.0"
