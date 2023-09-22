@@ -1,0 +1,107 @@
+site_name: Dynamica Docs
+copyright: Copyright &copy; Dynamica
+repo_url: https://github.com/DynamicaBot/dynamica-v2
+edit_uri: edit/main/docs/
+site_url: https://dynamica.dev
+
+theme:
+  name: material
+  # custom_dir: overrides
+  logo: assets/dynamica.png
+  favicon: assets/dynamica.png
+  font:
+    code: Fira Code
+  features:
+    - content.code.copy
+    - navigation.instant
+    - navigation.tabs
+    - content.action.edit
+    - navigation.tabs.sticky
+    - navigation.indexes
+    - toc.follow
+    - toc.track
+    - navigation.top
+    - navigation.tracking
+    - navigation.footer
+  palette:
+    # Palette toggle for light mode
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: ProgSoc
+      repo: Docs
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.snippets:
+      url_download: true
+  - pymdownx.tilde
+
+plugins:
+  - search
+  - git-revision-date-localized
+  - tags
+nav:
+  - Getting Started: index.md
+  - Commands:
+      - commands/index.md
+      - commands\alias.md
+      - commands\aliases.md
+      - commands\allyourbase.md
+      - commands\bitrate.md
+      - commands\create.md
+      - commands\general.md
+      - commands\info.md
+      - commands\limit.md
+      - commands\lock.md
+      - commands\name.md
+      - commands\ping.md
+      - commands\template.md
+      - commands\transfer.md
+      - commands\unalias.md
+      - commands\unlock.md
+  - Features: features.md
+  - Formatting: formatting.md
+  - Misc:
+      - Privacy Policy: privacy.md
+      - ToS: tos.md
