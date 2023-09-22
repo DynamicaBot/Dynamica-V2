@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # Terms of Service
 
 By using our Discord bot, you agree to comply with the following Terms of Service:

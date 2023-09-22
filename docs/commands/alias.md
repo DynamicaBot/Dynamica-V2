@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # alias
 
 The alias command allows you to shorten the name of a game in the channel's title. This can be helpful for shortening the names of some games or, if your group has another name they refer to a game by.

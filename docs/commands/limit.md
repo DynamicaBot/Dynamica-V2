@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # limit
 
 Limit the maximum number of people in the channel. Can only be run by the owner, admins and people with the "Dynamica Manager" role.

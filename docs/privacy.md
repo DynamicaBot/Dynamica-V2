@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # Privacy Policy
 
 Privacy Policy for Discord Bot:

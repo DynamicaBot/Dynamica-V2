@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # info
 
 Shows the info of either a user or the current server.

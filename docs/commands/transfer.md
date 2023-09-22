@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # transfer
 
 Transfer ownership to another user.

@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # create
 
 The create command is easily the most important command of Dynamica.

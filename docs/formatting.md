@@ -1,3 +1,8 @@
+---
+hide:
+  - navigation
+---
+
 # Formatting
 
 Formatting appears in a few different commands, namely:

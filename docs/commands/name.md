@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # name
 
 Changes the name of the [`Secondary`](../index.md) channel you're currently in.
