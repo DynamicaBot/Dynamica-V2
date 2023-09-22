@@ -697,9 +697,9 @@
     universal-user-agent "^6.0.0"
 
 "@octokit/openapi-types@^18.0.0":
-  version "18.0.0"
-  resolved "https://registry.yarnpkg.com/@octokit/openapi-types/-/openapi-types-18.0.0.tgz#f43d765b3c7533fd6fb88f3f25df079c24fccf69"
-  integrity sha512-V8GImKs3TeQRxRtXFpG2wl19V7444NIOTDF24AWuIbmNaNYOQMWRbjcGDXV5B+0n887fgDcuMNOmlul+k+oJtw==
+  version "18.1.0"
+  resolved "https://registry.yarnpkg.com/@octokit/openapi-types/-/openapi-types-18.1.0.tgz#9b722d2c49c9b336c58562c9dc5b51cf43c403ae"
+  integrity sha512-LSltV+KiVmz5sNIp/9bi6uuG9FxnzkLaDEFjzWIRQaOcZ0OejzU6i9D4vPFOScU0W4eCX9G5OHqKhSkvUnR10w==
 
 "@octokit/plugin-paginate-rest@^8.0.0":
   version "8.0.0"
@@ -3441,18 +3441,7 @@ glob@7.1.6:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@^10.2.2:
-  version "10.3.4"
-  resolved "https://registry.yarnpkg.com/glob/-/glob-10.3.4.tgz#c85c9c7ab98669102b6defda76d35c5b1ef9766f"
-  integrity sha512-6LFElP3A+i/Q8XQKEvZjkEWEOTgAIALR9AO2rwT8bgPhDd1anmqDJDZ6lLddI4ehxxxR1S5RIqKe1uapMQfYaQ==
-  dependencies:
-    foreground-child "^3.1.0"
-    jackspeak "^2.0.3"
-    minimatch "^9.0.1"
-    minipass "^5.0.0 || ^6.0.2 || ^7.0.0"
-    path-scurry "^1.10.1"
-
-glob@^10.3.3:
+glob@^10.2.2, glob@^10.3.3:
   version "10.3.5"
   resolved "https://registry.yarnpkg.com/glob/-/glob-10.3.5.tgz#4c0e46b5bccd78ac42b06a7eaaeb9ee34062968e"
   integrity sha512-bYUpUD7XDEHI4Q2O5a7PXGvyw4deKR70kHiDxzQbe925wbZknhOzUt2xBgTkYL6RBcVeXYuD9iNYeqoWbBZQnA==
@@ -4624,10 +4613,10 @@ marked-terminal@^6.0.0:
     node-emoji "^2.1.0"
     supports-hyperlinks "^3.0.0"
 
-marked@^5.0.0:
-  version "5.1.2"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-5.1.2.tgz#62b5ccfc75adf72ca3b64b2879b551d89e77677f"
-  integrity sha512-ahRPGXJpjMjwSOlBoTMZAK7ATXkli5qCPxZ21TG44rx1KEo44bii4ekgTDQPNRQ4Kh7JMb9Ub1PVk1NxRSsorg==
+marked@^9.0.0:
+  version "9.0.3"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-9.0.3.tgz#95be5e8cba93f2c2ca1d6503794c4f02d81c97d9"
+  integrity sha512-pI/k4nzBG1PEq1J3XFEHxVvjicfjl8rgaMaqclouGSMPhk7Q3Ejb2ZRxx/ZQOcQ1909HzVoWCFYq6oLgtL4BpQ==
 
 media-typer@0.3.0:
   version "0.3.0"
@@ -6052,9 +6041,9 @@ schema-utils@^3.1.1, schema-utils@^3.2.0:
     ajv-keywords "^3.5.2"
 
 semantic-release@^22.0.0:
-  version "22.0.3"
-  resolved "https://registry.yarnpkg.com/semantic-release/-/semantic-release-22.0.3.tgz#fc688dc4f420b39eee0bb0487f3f1065225d3ffc"
-  integrity sha512-0QoGxPPxAtAjrcsvd7ooFbGpTl3K0z5b+6ILbcDFmZraN7gaCZo0SF61yt1aQJZoFf1Bt5BpU1XZoTj51hGjTQ==
+  version "22.0.4"
+  resolved "https://registry.yarnpkg.com/semantic-release/-/semantic-release-22.0.4.tgz#6a9262dd8a192ee3aff3142a0408d7eaade7b63a"
+  integrity sha512-0tRK9Kv0UQzYF51gK2aBXYnCv7w4pLP7nFHVaumMT6TTSGoV46vAx2qY0tkpm89m4Ce7S0skZGRZ1ndpFpOSNw==
   dependencies:
     "@semantic-release/commit-analyzer" "^11.0.0"
     "@semantic-release/error" "^4.0.0"
@@ -6073,7 +6062,7 @@ semantic-release@^22.0.0:
     hook-std "^3.0.0"
     hosted-git-info "^7.0.0"
     lodash-es "^4.17.21"
-    marked "^5.0.0"
+    marked "^9.0.0"
     marked-terminal "^6.0.0"
     micromatch "^4.0.2"
     p-each-series "^3.0.0"
@@ -6323,9 +6312,9 @@ spdx-expression-parse@^3.0.0:
     spdx-license-ids "^3.0.0"
 
 spdx-license-ids@^3.0.0:
-  version "3.0.13"
-  resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.13.tgz#7189a474c46f8d47c7b0da4b987bb45e908bd2d5"
-  integrity sha512-XkD+zwiqXHikFZm4AX/7JSCXA98U5Db4AFd5XUg/+9UNtnH75+Z9KxtpYiJZx36mUDVOwH83pl7yvCer6ewM3w==
+  version "3.0.15"
+  resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.15.tgz#142460aabaca062bc7cd4cc87b7d50725ed6a4ba"
+  integrity sha512-lpT8hSQp9jAKp9mhtBU4Xjon8LPGBvLIuBiSVhMEtmLecTh2mO0tlqrAMp47tBXzMr13NJMQ2lf7RpQGLJ3HsQ==
 
 split2@^4.0.0, split2@^4.2.0:
   version "4.2.0"
