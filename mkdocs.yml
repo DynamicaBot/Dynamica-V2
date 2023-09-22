@@ -1,0 +1,118 @@
+site_name: Dynamica Docs
+copyright: Copyright &copy; Dynamica
+repo_url: https://github.com/DynamicaBot/dynamica-v2
+edit_uri: edit/main/docs/
+site_url: https://dynamica.dev
+
+extra:
+  social:
+    - icon: fontawesome/brands/discord
+      link: https://discord.progsoc.org
+    - icon: fontawesome/brands/instagram
+      link: https://instagram.com/progsoc_uts
+    - icon: fontawesome/brands/github
+      link: https://github.com/progsoc
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/progsocuts
+
+theme:
+  name: material
+  # custom_dir: overrides
+  logo: assets/dynamica.png
+  favicon: assets/dynamica.png
+  font:
+    code: Fira Code
+  features:
+    - content.code.copy
+    - navigation.instant
+    - navigation.tabs
+    - content.action.edit
+    - navigation.tabs.sticky
+    - navigation.indexes
+    - toc.follow
+    - toc.track
+    - navigation.top
+    - navigation.tracking
+    - navigation.footer
+  palette:
+    # Palette toggle for light mode
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: ProgSoc
+      repo: Docs
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.snippets:
+      url_download: true
+  - pymdownx.tilde
+
+plugins:
+  - search
+  - git-revision-date-localized
+  - tags
+# nav:
+#   - Welcome: index.md
+#   - Projects:
+#       - projects/index.md
+#       - ProgBot: projects/progbot.md
+#       - Voting System: projects/voting-system.md
+#       - Docs: projects/docs.md
+#   - Events:
+#       - events/index.md
+#       - 2023:
+#           - Git Workshop: events/2023/git-workshop.md
+#           - Full Stack Web Development: events/2023/full-stack-web-development.md
+#           - UTS Tech Fest Programming Competition: events/2023/programming-competition.md
+#           - Docker Workshop: events/2023/docker-workshop.md
+#           - Fuzzing Workshop: events/2023/fuzz.md
+#       - 2022:
+#           - Git Workshop: events/2022/git.md
+#           - React: events/2022/react.md
+#           - Rust: events/2022/rust.md
+#           - AGM: events/2022/agm.md
+#   - About:
+#       - What We Do: about/what-we-do.md
+#       - Execs: about/execs.md
+#       - Constitution: about/constitution.md
