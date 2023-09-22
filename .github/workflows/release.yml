@@ -44,8 +44,9 @@ jobs:
     needs: [release]
     if: needs.release.outputs.published == 'true'
     permissions:
-      contents: read
-      packages: write
+      contents: write
+      pages: write
+      id-token: write
     uses: ./.github/workflows/docs.yml
   build:
     name: Build
