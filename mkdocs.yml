@@ -85,21 +85,21 @@ nav:
   - Getting Started: index.md
   - Commands:
       - commands/index.md
-      - commands\alias.md
-      - commands\aliases.md
-      - commands\allyourbase.md
-      - commands\bitrate.md
-      - commands\create.md
-      - commands\general.md
-      - commands\info.md
-      - commands\limit.md
-      - commands\lock.md
-      - commands\name.md
-      - commands\ping.md
-      - commands\template.md
-      - commands\transfer.md
-      - commands\unalias.md
-      - commands\unlock.md
+      - commands/alias.md
+      - commands/aliases.md
+      - commands/allyourbase.md
+      - commands/bitrate.md
+      - commands/create.md
+      - commands/general.md
+      - commands/info.md
+      - commands/limit.md
+      - commands/lock.md
+      - commands/name.md
+      - commands/ping.md
+      - commands/template.md
+      - commands/transfer.md
+      - commands/unalias.md
+      - commands/unlock.md
   - Features: features.md
   - Formatting: formatting.md
   - Misc:
