@@ -64,8 +64,8 @@ markdown_extensions:
   - pymdownx.keys
   - pymdownx.magiclink:
       repo_url_shorthand: true
-      user: ProgSoc
-      repo: Docs
+      user: DynamicaBot
+      repo: Dynamica-v2
   - pymdownx.mark
   - pymdownx.smartsymbols
   - pymdownx.superfences
