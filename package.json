@@ -38,7 +38,7 @@
     "@nestjs/cli": "^10.0.0",
     "@swc/core": "^1.3.46",
     "@types/cron": "^2.0.1",
-    "@types/node": "18.17.18",
+    "@types/node": "18.17.19",
     "@types/romans": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
