@@ -1126,9 +1126,9 @@
   integrity sha512-l5cpE57br4BIjK+9BSkFBOsWtwv6J9bJpC7gdXIzZyI0vuKvNTk0wZZrkQxMGsUAuGW9+WMNWF2IJMD7br2yeQ==
 
 "@types/node@*":
-  version "20.6.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.6.5.tgz#4c6a79adf59a8e8193ac87a0e522605b16587258"
-  integrity sha512-2qGq5LAOTh9izcc0+F+dToFigBWiK1phKPt7rNhOqJSr35y8rlIBjDwGtFSgAI6MGIhjwOVNSQZVdJsZJ2uR1w==
+  version "20.8.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.2.tgz#d76fb80d87d0d8abfe334fc6d292e83e5524efc4"
+  integrity sha512-Vvycsc9FQdwhxE3y3DzeIxuEJbWGDsnrxvMADzTDF/lcdR9/K+AQIeAghTQsHtotg/q0j3WEOYS/jQgSdWue3w==
 
 "@types/node@18.18.3":
   version "18.18.3"
@@ -1146,9 +1146,9 @@
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
 "@types/readable-stream@^4.0.1":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@types/readable-stream/-/readable-stream-4.0.2.tgz#5199cfeef35ea16d0e85076b1c6daa15766634c0"
-  integrity sha512-hhzOsMEISZ+mX1l+01F0duYt9wHEbCGmjARed0PcQoVS5zAdu7u5YbWYuNGhw09M1MgGr3kfsto+ut/MnAdKqA==
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@types/readable-stream/-/readable-stream-4.0.3.tgz#ec70b21c668a836b72ae178656833b45a8998ef7"
+  integrity sha512-Z8BOzyIj3UPpn3j5DmDNKIw4wPN9N8a1d1oyteiprWq+wxdgQNC0UfFAQwWjmjyA7uoj7mvoWgxWWH66zYtm4Q==
   dependencies:
     "@types/node" "*"
     safe-buffer "~5.1.1"
@@ -1169,9 +1169,9 @@
   integrity sha512-d/MUkJYdOeKycmm75Arql4M5+UuXmf4cHdHKsyw1GcvnNgL6s77UkgSgJ8TE/rI5PYsnwYq5jkcWBLuN/MpQ1A==
 
 "@types/ws@^8.5.5":
-  version "8.5.5"
-  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-8.5.5.tgz#af587964aa06682702ee6dcbc7be41a80e4b28eb"
-  integrity sha512-lwhs8hktwxSjf9UaZ9tG5M03PGogvFaH8gUgLNbN9HKIg0dvv6q+gkSuJ8HN4/VbyxkuLzCjlN7GquQ0gUJfIg==
+  version "8.5.6"
+  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-8.5.6.tgz#e9ad51f0ab79b9110c50916c9fcbddc36d373065"
+  integrity sha512-8B5EO9jLVCy+B58PLHvLDuOD8DRVMgQzq8d55SjLCOn9kqGyqOvy27exVaTio1q1nX5zLu8/6N0n2ThSxOM6tg==
   dependencies:
     "@types/node" "*"
 
@@ -4838,9 +4838,9 @@ mqtt-packet@^8.2.0:
     process-nextick-args "^2.0.1"
 
 mqtt@^5.0.0:
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/mqtt/-/mqtt-5.0.5.tgz#645819f48d6f3dba7962c28c5392e9b696c7081a"
-  integrity sha512-Ahbzk7nddvYg0aOezbYl/d9o8wcEbZw1NjiH+CmGObxiHsG4HgL7+IaRkph5yxwH679GVMAwtfsyUY2dFBSVSw==
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/mqtt/-/mqtt-5.1.0.tgz#bf2bf359678cfb47791f2424f41a95e09ebfc9db"
+  integrity sha512-diOpTxlECz1/ld6NNN2T7ZlNqNwGCo8KfROyXMeBX/ZMULdAo6VvWUDXY8Esh5DhMWR/wM+lfSYXv4OHJ8MUiw==
   dependencies:
     "@types/readable-stream" "^4.0.1"
     "@types/ws" "^8.5.5"
