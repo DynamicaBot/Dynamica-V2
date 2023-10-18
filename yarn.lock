@@ -1152,9 +1152,9 @@
     safe-buffer "~5.1.1"
 
 "@types/romans@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@types/romans/-/romans-2.0.0.tgz#62894e2cdfb113c4ca94d573b72b7b753befdd1c"
-  integrity sha512-HebzL/zDbrcpD6meV/QihYSnKjmr5D5+FVIuPEYXzyeHGV8BB588K5H4sMuhnDNH/hQHq9zDOzBLRIrLQyaBnQ==
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@types/romans/-/romans-2.0.1.tgz#4842da250d80297cd8899cfbbea0a81c92c9b3d1"
+  integrity sha512-kJ/NJ2kfDSQGs8Oy2o8UnXpctLuhXp4pTz3tOc2hICnSe7nK4UsTE5hzlhK5VJsIcWF1rJbMlrUCoYyNcsEGbQ==
 
 "@types/semver@^7.5.0":
   version "7.5.3"
@@ -1162,9 +1162,9 @@
   integrity sha512-OxepLK9EuNEIPxWNME+C6WwbRAOOI2o2BaQEGzz5Lu2e4Z5eDnEo+/aVEDMIXywoJitJ7xWd641wrGLZdtwRyw==
 
 "@types/validator@^13.7.10":
-  version "13.11.3"
-  resolved "https://registry.yarnpkg.com/@types/validator/-/validator-13.11.3.tgz#6afba392782b44dd6cfeb390cc06c45833066ad9"
-  integrity sha512-jxjhh33aTYDHnrV1vZ3AvWQHfrGx2f5UxKjaP13l5q04fG+/hCKKm0MfodIoCqxevhbcfBb6ZjynyHuQ/jueGQ==
+  version "13.11.4"
+  resolved "https://registry.yarnpkg.com/@types/validator/-/validator-13.11.4.tgz#a885cd9914407e8bcf1b0bdb77e7ccfbdede30ab"
+  integrity sha512-8Xw3oGofZqJ9ekd4ObbLjb+wLQgda/1hjK5RJXlLA9sQUMUBFSzkfxiWT2tfxjWZ0A/LN4OxQHxDXquyxiWoXg==
 
 "@types/ws@^8.5.5":
   version "8.5.7"
