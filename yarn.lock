@@ -1117,9 +1117,9 @@
     safe-buffer "~5.1.1"
 
 "@types/romans@^2.0.0":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@types/romans/-/romans-2.0.1.tgz#4842da250d80297cd8899cfbbea0a81c92c9b3d1"
-  integrity sha512-kJ/NJ2kfDSQGs8Oy2o8UnXpctLuhXp4pTz3tOc2hICnSe7nK4UsTE5hzlhK5VJsIcWF1rJbMlrUCoYyNcsEGbQ==
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@types/romans/-/romans-2.0.2.tgz#9af83b9d963a5c9c8328c0f594c261ab17fe6f4e"
+  integrity sha512-oQqH1tkj7Dep61r1JSH4LJ61bmW1beGALbpI29M9kFeBTOAVg+ToLiJkVq01o9ML+K0omx7KGTn6JNAoloXSxQ==
 
 "@types/semver@^7.5.0":
   version "7.5.4"
