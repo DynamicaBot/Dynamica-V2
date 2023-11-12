@@ -1,7 +1,9 @@
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
+import { DiscordExceptionFilter } from './filters/DiscordFilter';
+import { SentryFilter } from './filters/SentryFilter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +23,13 @@ async function bootstrap() {
   app.enableCors({
     origin: '*',
   });
+
+  const { httpAdapter } = app.get(HttpAdapterHost);
+
+  app.useGlobalFilters(
+    new SentryFilter(httpAdapter),
+    new DiscordExceptionFilter(),
+  );
   await app.listen(3000);
 }
 bootstrap();
