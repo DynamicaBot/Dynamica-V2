@@ -1,10 +1,8 @@
+PRAGMA foreign_keys=OFF;
+--> statement-breakpoint
 DROP TABLE IF EXISTS `_prisma_migrations`;
 --> statement-breakpoint
-
-ALTER TABLE `Secondary` RENAME TO `Secondary_old`;
---> statement-breakpoint
-
-CREATE TABLE `Secondary` (
+CREATE TABLE `new_Secondary` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text,
 	`creator` text,
@@ -19,8 +17,7 @@ CREATE TABLE `Secondary` (
 	FOREIGN KEY (`guildId`) REFERENCES `Guild`(`id`) ON UPDATE cascade ON DELETE cascade
 );
 --> statement-breakpoint
-
-INSERT INTO `Secondary` (
+INSERT INTO `new_Secondary` (
     `id`,
     `name`,
     `creator`,
@@ -42,14 +39,14 @@ INSERT INTO `Secondary` (
     `createdAt`,
     `updatedAt`,
     `lastName`
-FROM `Secondary_old`;
+FROM `Secondary`;
 --> statement-breakpoint
-
-DROP TABLE `Secondary_old`;
+DROP TABLE `Secondary`;
+--> statement-breakpoint
+ALTER TABLE `new_Secondary` RENAME TO `Secondary`;
 --> statement-breakpoint
 ALTER TABLE `Guild` RENAME TO `Guild_old`;
 --> statement-breakpoint
-
 CREATE TABLE `Guild` (
 	`id` text PRIMARY KEY NOT NULL,
 	`allowJoinRequests` integer DEFAULT false NOT NULL,
@@ -57,7 +54,6 @@ CREATE TABLE `Guild` (
 	`updatedAt` integer DEFAULT (CURRENT_TIMESTAMP) NOT NULL
 );
 --> statement-breakpoint
-
 INSERT INTO `Guild` (
     `id`,
     `allowJoinRequests`,
@@ -70,14 +66,9 @@ INSERT INTO `Guild` (
     `updatedAt`
 FROM `Guild_old`;
 --> statement-breakpoint
-
 DROP TABLE `Guild_old`;
 --> statement-breakpoint
-
-ALTER TABLE `Primary` RENAME TO `Primary_old`;
---> statement-breakpoint
-
-CREATE TABLE `Primary` (
+CREATE TABLE `new_Primary` (
 	`id` text PRIMARY KEY NOT NULL,
 	`creator` text NOT NULL,
 	`template` text DEFAULT '@@game@@ ##' NOT NULL,
@@ -88,8 +79,7 @@ CREATE TABLE `Primary` (
 	FOREIGN KEY (`guildId`) REFERENCES `Guild`(`id`) ON UPDATE cascade ON DELETE cascade
 );
 --> statement-breakpoint
-
-INSERT INTO `Primary` (
+INSERT INTO `new_Primary` (
     `id`,
     `creator`,
     `template`,
@@ -105,15 +95,14 @@ INSERT INTO `Primary` (
     `guildId`,
     `createdAt`,
     `updatedAt`
-FROM `Primary_old`;
+FROM `Primary`;
 --> statement-breakpoint
-
-DROP TABLE `Primary_old`;
+DROP TABLE `Primary`;
 --> statement-breakpoint
-
+ALTER TABLE `new_Primary` RENAME TO `Primary`;
+--> statement-breakpoint
 ALTER TABLE `Alias` RENAME TO `Alias_old`;
 --> statement-breakpoint
-
 CREATE TABLE `Alias` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`activity` text NOT NULL,
@@ -124,7 +113,6 @@ CREATE TABLE `Alias` (
 	FOREIGN KEY (`guildId`) REFERENCES `Guild`(`id`) ON UPDATE cascade ON DELETE cascade
 );
 --> statement-breakpoint
-
 INSERT INTO `Alias` (
     `id`,
     `activity`,
@@ -141,5 +129,8 @@ INSERT INTO `Alias` (
     `updatedAt`
 FROM `Alias_old`;
 --> statement-breakpoint
-
 DROP TABLE `Alias_old`;
+--> statement-breakpoint
+PRAGMA foreign_key_check;
+--> statement-breakpoint
+PRAGMA foreign_keys=ON;

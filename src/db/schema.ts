@@ -108,7 +108,7 @@ export const secondary = sqliteTable(
   {
     id: text('id').primaryKey().notNull(),
     name: text('name'),
-    creator: text('creator').notNull(),
+    owner: text('owner').notNull(),
     emoji: text('emoji')
       .notNull()
       .$defaultFn(() => {

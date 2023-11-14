@@ -1,0 +1,1 @@
+ALTER TABLE `Secondary` RENAME COLUMN `creator` TO `owner`;

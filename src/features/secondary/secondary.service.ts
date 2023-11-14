@@ -283,7 +283,7 @@ export class SecondaryService {
         await this.db
           .update(secondary)
           .set({
-            creator: memberIds[0],
+            owner: memberIds[0],
           })
           .where(
             and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)),
@@ -382,7 +382,7 @@ export class SecondaryService {
     if (channelId) {
       const [databaseSecondary] = await this.db
         .select({
-          creator: secondary.creator,
+          creator: secondary.owner,
           name: secondary.name,
           locked: secondary.locked,
           emoji: secondary.emoji,
@@ -577,7 +577,7 @@ export class SecondaryService {
     const [updatedSecondary] = await this.db
       .update(secondary)
       .set({
-        creator: userId,
+        owner: userId,
       })
       .where(eq(secondary.id, channelId))
       .returning();
@@ -985,7 +985,7 @@ export class SecondaryService {
     await this.db
       .update(secondary)
       .set({
-        creator: newOwnerId,
+        owner: newOwnerId,
       })
       .where(and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)));
 
