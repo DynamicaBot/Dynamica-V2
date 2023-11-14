@@ -178,9 +178,12 @@ export class PrimaryService {
       throw new Error('No primary found');
     }
 
-    const [updatedPrimary] = await this.db.update(primary).set({
-      generalName: newTemplate,
-    });
+    const [updatedPrimary] = await this.db
+      .update(primary)
+      .set({
+        generalName: newTemplate,
+      })
+      .returning();
 
     await this.updateSecondaries(guildId, primaryId);
 

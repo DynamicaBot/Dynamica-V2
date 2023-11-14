@@ -56,7 +56,7 @@ export class AliasService {
         },
         target: alias.activity,
       })
-      .execute();
+      .returning();
 
     const [{ aliasCount }] = await this.db
       .select({

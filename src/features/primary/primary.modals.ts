@@ -69,7 +69,8 @@ export class PrimaryModals {
         generalName: newGeneralTemplate,
         template: newGameTemplate,
       })
-      .where(and(eq(primary.guildId, guildId), eq(primary.id, id)));
+      .where(and(eq(primary.guildId, guildId), eq(primary.id, id)))
+      .returning();
 
     const embed = new EmbedBuilder()
       .setTitle('Primary Updated')

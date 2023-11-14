@@ -68,7 +68,7 @@ export class GuildService {
         allowJoinRequests: !dbGuild.allowJoinRequests,
       })
       .where(eq(guild.id, guildId))
-      .execute();
+      .returning();
 
     return newGuild;
   }
