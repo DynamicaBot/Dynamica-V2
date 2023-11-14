@@ -21,7 +21,11 @@ async function bootstrap() {
     sentry.init({
       dsn,
       release: version,
-      integrations: [new RewriteFrames()],
+      integrations: [
+        new RewriteFrames({
+          prefix: '/',
+        }),
+      ],
     });
   }
 
