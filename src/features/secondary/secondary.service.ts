@@ -155,10 +155,25 @@ export class SecondaryService {
         .permissionsFor(this.client.user)
         .has(PermissionFlagsBits.SendMessages)
     ) {
-      await newDiscordChannel.send({
-        content: `Edit the channel settings here`,
-        components: [channelSettingsComponents],
-      });
+      try {
+        await newDiscordChannel.send({
+          content: `Edit the channel settings here`,
+          components: [channelSettingsComponents],
+        });
+      } catch (error) {
+        if (error instanceof DiscordAPIError) {
+          switch (error.code) {
+            case 10003:
+              // Channel not found
+              this.logger.error(
+                `Unable to send message to channel ${newDiscordChannel.id}, unknown channel`,
+              );
+              break;
+            default:
+              throw error;
+          }
+        }
+      }
     }
 
     const secondaryCount = await this.db.secondary.count();
