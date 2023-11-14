@@ -307,10 +307,8 @@ export class SecondaryService {
       return;
     }
 
-    if (discordChannel.members.size === 0) {
-      if (discordChannel.manageable) {
-        await discordChannel.delete();
-      }
+    if (discordChannel.members.size === 0 && discordChannel.manageable) {
+      await discordChannel.delete();
     } else {
       const memberIds = discordChannel.members.map((member) => member.id);
 

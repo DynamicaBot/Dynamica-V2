@@ -14,6 +14,7 @@ async function bootstrap() {
 
   if (dsn) {
     const sentry = await import('@sentry/node');
+    Error.stackTraceLimit = Infinity;
     sentry.init({
       dsn,
       release: version,
