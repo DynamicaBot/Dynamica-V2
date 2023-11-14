@@ -42,8 +42,17 @@ export class SecondaryCommands {
     @Options() { secondary }: AllyourbaseDto,
   ) {
     try {
+      const guildId = interaction.guildId;
+
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const newChannel = await this.secondaryService.allyourbase(
-        interaction.guildId,
+        guildId,
         secondary,
         interaction.user.id,
       );
@@ -74,8 +83,17 @@ export class SecondaryCommands {
     @Options() { bitrate, secondary }: BitrateDto,
   ) {
     try {
+      const guildId = interaction.guildId;
+
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const channel = await this.secondaryService.bitrate(
-        interaction.guildId,
+        guildId,
         secondary,
         bitrate,
         interaction.user.id,
@@ -106,8 +124,17 @@ export class SecondaryCommands {
     @Options() { secondary, name }: NameDto,
   ) {
     try {
+      const guildId = interaction.guildId;
+
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const newChannel = await this.secondaryService.name(
-        interaction.guildId,
+        guildId,
         secondary,
         name,
         interaction.user.id,
@@ -138,8 +165,17 @@ export class SecondaryCommands {
     @Options() { secondary, limit }: LimitDto,
   ) {
     try {
+      const guildId = interaction.guildId;
+
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const newChannel = await this.secondaryService.limit(
-        interaction.guildId,
+        guildId,
         secondary,
         limit,
         interaction.user.id,
@@ -169,8 +205,17 @@ export class SecondaryCommands {
     @Options() { secondary }: LockDto,
   ) {
     try {
+      const guildId = interaction.guildId;
+
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const newChannel = await this.secondaryService.lock(
-        interaction.guildId,
+        guildId,
         secondary,
         interaction.user.id,
       );
@@ -199,8 +244,17 @@ export class SecondaryCommands {
     @Options() { secondary }: UnlockDto,
   ) {
     try {
+      const guildId = interaction.guildId;
+
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const newChannel = await this.secondaryService.unlock(
-        interaction.guildId,
+        guildId,
         secondary,
         interaction.user.id,
       );
@@ -230,8 +284,17 @@ export class SecondaryCommands {
     @Options() { secondary, user }: TransferDto,
   ) {
     try {
+      const guildId = interaction.guildId;
+
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const newChannel = await this.secondaryService.transfer(
-        interaction.guildId,
+        guildId,
         secondary,
         interaction.user.id,
         user.id,
@@ -263,8 +326,17 @@ export class SecondaryCommands {
     @Options() { secondary }: JoinDto,
   ) {
     try {
+      const guildId = interaction.guildId;
+
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const creator = await this.secondaryService.requestJoin(
-        interaction.guildId,
+        guildId,
         secondary,
         interaction.user.id,
       );

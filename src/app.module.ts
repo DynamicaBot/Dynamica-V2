@@ -10,7 +10,7 @@ import { AliasModule } from './features/alias/alias.module';
 import { GuildModule } from './features/guild/guild.module';
 import { MqttModule } from './features/mqtt/mqtt.module';
 import { PrimaryModule } from './features/primary/primary.module';
-import { PrismaModule } from './features/prisma/prisma.module';
+import { PrismaModule } from './features/drizzle/drizzle.module';
 import { SecondaryModule } from './features/secondary/secondary.module';
 
 @Module({

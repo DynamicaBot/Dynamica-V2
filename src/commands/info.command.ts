@@ -35,7 +35,16 @@ export class InfoCommands {
     dmPermission: false,
   })
   public async onGuild(@Context() [interaction]: SlashCommandContext) {
-    const guildInfo = await this.guildService.info(interaction.guildId);
+    const guildId = interaction.guildId;
+
+    if (!guildId) {
+      return interaction.reply({
+        content: 'This command can only be used in a guild',
+        ephemeral: true,
+      });
+    }
+
+    const guildInfo = await this.guildService.info(guildId);
     const embed = new EmbedBuilder()
       .setColor('Blue')
       .setTitle('Guild Info')
@@ -46,16 +55,16 @@ export class InfoCommands {
         },
         {
           name: 'Primary Channels',
-          value: guildInfo.primaryChannels.length
-            ? guildInfo.primaryChannels
+          value: guildInfo.primaries.length
+            ? guildInfo.primaries
                 .map((channel) => channelMention(channel.id))
                 .join('\n')
             : inlineCode(`None`),
         },
         {
           name: 'Secondary Channels',
-          value: guildInfo.secondaryChannels.length
-            ? guildInfo.secondaryChannels
+          value: guildInfo.secondaries.length
+            ? guildInfo.secondaries
                 .map((channel) => channelMention(channel.id))
                 .join(', ')
             : inlineCode(`None`),
@@ -74,10 +83,16 @@ export class InfoCommands {
     @Context() [interaction]: SlashCommandContext,
     @Options() { primary }: PrimaryInfoDto,
   ) {
-    const primaryInfo = await this.primaryService.info(
-      interaction.guildId,
-      primary,
-    );
+    const guildId = interaction.guildId;
+
+    if (!guildId) {
+      return interaction.reply({
+        content: 'This command can only be used in a guild',
+        ephemeral: true,
+      });
+    }
+
+    const primaryInfo = await this.primaryService.info(guildId, primary);
 
     const embed = new EmbedBuilder()
       .setColor('Blue')
@@ -118,10 +133,16 @@ export class InfoCommands {
     @Context() [interaction]: SlashCommandContext,
     @Options() { secondary }: SecondaryInfoDto,
   ) {
-    const secondaryInfo = await this.secondaryService.info(
-      interaction.guildId,
-      secondary,
-    );
+    const guildId = interaction.guildId;
+
+    if (!guildId) {
+      return interaction.reply({
+        content: 'This command can only be used in a guild',
+        ephemeral: true,
+      });
+    }
+
+    const secondaryInfo = await this.secondaryService.info(guildId, secondary);
 
     const embed = new EmbedBuilder()
       .setColor('Blue')
@@ -129,7 +150,7 @@ export class InfoCommands {
       .addFields(
         {
           name: 'Name Override',
-          value: secondaryInfo.name.length
+          value: secondaryInfo.name
             ? fieldToDiscordEmbed(secondaryInfo.name)
             : inlineCode(`None`),
         },

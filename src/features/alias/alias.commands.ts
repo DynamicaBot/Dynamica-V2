@@ -30,8 +30,17 @@ export class AliasCommands {
     @Options() { activity, alias }: AliasDto,
   ) {
     try {
+      const guildId = interaction.guildId;
+
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const updatedAlias = await this.aliasService.upsertAlias(
-        interaction.guildId,
+        guildId,
         activity,
         alias,
       );
@@ -60,8 +69,17 @@ export class AliasCommands {
     @Options() { activity }: UnaliasDto,
   ) {
     try {
+      const guildId = interaction.guildId;
+
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const deletedAlias = await this.aliasService.deleteAlias(
-        interaction.guildId,
+        guildId,
         activity,
       );
       return interaction.reply({
@@ -84,7 +102,16 @@ export class AliasCommands {
   })
   public async aliases(@Context() [interaction]: SlashCommandContext) {
     try {
-      const aliases = await this.aliasService.listAliases(interaction.guildId);
+      const guildId = interaction.guildId;
+
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
+      const aliases = await this.aliasService.listAliases(guildId);
       const aliasList = aliases
         .map(({ activity, alias }) => `\`${activity}\` -> \`${alias}\``)
         .join('\n');

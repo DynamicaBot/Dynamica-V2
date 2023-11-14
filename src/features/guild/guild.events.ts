@@ -1,39 +1,60 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { eq, sql } from 'drizzle-orm';
 import { Context, type ContextOf, On } from 'necord';
 
+import { guild } from '@/db/schema';
 import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
+
+import { DRIZZLE_TOKEN, type Drizzle } from '../drizzle/drizzle.module';
 
 @Injectable()
 export class GuildEvents {
   constructor(
-    private readonly db: PrismaService,
+    @Inject(DRIZZLE_TOKEN) private readonly db: Drizzle,
     private readonly mqtt: MqttService,
   ) {}
 
   private readonly logger = new Logger(GuildEvents.name);
 
   @On('guildCreate')
-  public async onGuildCreate(@Context() [guild]: ContextOf<'guildCreate'>) {
-    await this.db.guild.create({
-      data: {
-        id: guild.id,
-      },
-    });
-    const guildCount = await this.db.guild.count();
-    this.logger.log(`Joined guild ${guild.name} (${guild.id})`);
+  public async onGuildCreate(
+    @Context() [discordGuild]: ContextOf<'guildCreate'>,
+  ) {
+    // await this.db.guild.create({
+    //   data: {
+    //     id: guild.id,
+    //   },
+    // });
+    await this.db
+      .insert(guild)
+      .values({
+        id: discordGuild.id,
+        allowJoinRequests: false,
+      })
+      .execute();
+
+    const [{ guildCount }] = await this.db
+      .select({
+        guildCount: sql<number>`COUNT(*)`,
+      })
+      .from(guild);
+
+    this.logger.log(`Joined guild ${discordGuild.name} (${guild.id})`);
     await this.mqtt.publish(`dynamica/guilds`, guildCount);
   }
 
   @On('guildDelete')
-  public async onGuildDelete(@Context() [guild]: ContextOf<'guildDelete'>) {
-    await this.db.guild.delete({
-      where: {
-        id: guild.id,
-      },
-    });
-    const guildCount = await this.db.guild.count();
-    this.logger.log(`Left guild ${guild.name} (${guild.id})`);
+  public async onGuildDelete(
+    @Context() [discordGuild]: ContextOf<'guildDelete'>,
+  ) {
+    await this.db.delete(guild).where(eq(guild.id, discordGuild.id));
+    const [{ guildCount }] = await this.db
+      .select({
+        guildCount: sql<number>`COUNT(*)`,
+      })
+      .from(guild);
+
+    this.logger.log(`Left guild ${discordGuild.name} (${guild.id})`);
     await this.mqtt.publish(`dynamica/guilds`, guildCount);
   }
 }

@@ -3,16 +3,11 @@ import { Ctx, Modal, type ModalContext, ModalParam } from 'necord';
 
 import createErrorEmbed from '@/utils/createErrorEmbed';
 
-import { PrismaService } from '../prisma';
-
 import { SecondaryService } from './secondary.service';
 
 @Injectable()
 export class SecondaryModals {
-  constructor(
-    private readonly db: PrismaService,
-    private readonly secondaryService: SecondaryService,
-  ) {}
+  constructor(private readonly secondaryService: SecondaryService) {}
 
   @Modal('secondary/modals/:id')
   public async onSecondaryModal(
@@ -20,10 +15,19 @@ export class SecondaryModals {
     @ModalParam('id') id: string,
   ) {
     try {
+      const guildId = interaction.guildId;
+
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const newName = interaction.fields.getTextInputValue('name');
 
       const updatedSecondary = await this.secondaryService.name(
-        interaction.guildId,
+        guildId,
         id,
         newName.length ? newName : null,
         interaction.user.id,

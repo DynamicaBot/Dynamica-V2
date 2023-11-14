@@ -1,15 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { EmbedBuilder } from 'discord.js';
+import { and, eq } from 'drizzle-orm';
 import { Ctx, Modal, type ModalContext, ModalParam } from 'necord';
 
-import { PrismaService } from '../prisma';
+import { primary } from '@/db/schema';
+
+import { DRIZZLE_TOKEN, type Drizzle } from '../drizzle/drizzle.module';
 
 import { PrimaryService } from './primary.service';
 
 @Injectable()
 export class PrimaryModals {
   constructor(
-    private readonly db: PrismaService,
+    @Inject(DRIZZLE_TOKEN) private readonly db: Drizzle,
     private readonly primaryService: PrimaryService,
   ) {}
 
@@ -18,34 +21,55 @@ export class PrimaryModals {
     @Ctx() [interaction]: ModalContext,
     @ModalParam('id') id: string,
   ) {
-    const primary = this.db.primary.findUnique({
-      where: {
-        guildId_id: {
-          guildId: interaction.guildId,
-          id,
-        },
-      },
-    });
+    const guildId = interaction.guildId;
 
-    if (!primary) {
+    if (!guildId) {
+      return interaction.reply({
+        ephemeral: true,
+        content: 'This command can only be used in a server.',
+      });
+    }
+
+    // const primary = this.db.primary.findUnique({
+    //   where: {
+    //     guildId_id: {
+    //       guildId: interaction.guildId,
+    //       id,
+    //     },
+    //   },
+    // });
+    const [dbPrimary] = await this.db
+      .select({ id: primary.id })
+      .from(primary)
+      .where(and(eq(primary.guildId, guildId), eq(primary.id, id)));
+
+    if (!dbPrimary) {
       throw new Error('Primary not found');
     }
 
     const newGeneralTemplate = interaction.fields.getTextInputValue('general');
     const newGameTemplate = interaction.fields.getTextInputValue('template');
 
-    const updatedPrimary = await this.db.primary.update({
-      where: {
-        guildId_id: {
-          guildId: interaction.guild.id,
-          id,
-        },
-      },
-      data: {
+    // const updatedPrimary = await this.db.primary.update({
+    //   where: {
+    //     guildId_id: {
+    //       guildId: interaction.guild.id,
+    //       id,
+    //     },
+    //   },
+    //   data: {
+    //     generalName: newGeneralTemplate,
+    //     template: newGameTemplate,
+    //   },
+    // });
+
+    const [updatedPrimary] = await this.db
+      .update(primary)
+      .set({
         generalName: newGeneralTemplate,
         template: newGameTemplate,
-      },
-    });
+      })
+      .where(and(eq(primary.guildId, guildId), eq(primary.id, id)));
 
     const embed = new EmbedBuilder()
       .setTitle('Primary Updated')
@@ -56,7 +80,7 @@ export class PrimaryModals {
         { name: 'Game Template', value: updatedPrimary.generalName },
       );
 
-    await this.primaryService.updateSecondaries(interaction.guildId, id);
+    await this.primaryService.updateSecondaries(guildId, id);
 
     return interaction.reply({
       ephemeral: true,

@@ -20,15 +20,19 @@ export class SecondaryButtons {
     @ComponentParam('id') id: string,
   ) {
     try {
-      await this.secondaryService.unlock(
-        interaction.guildId,
-        id,
-        interaction.user.id,
-      );
+      const guildId = interaction.guildId;
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
+      await this.secondaryService.unlock(guildId, id, interaction.user.id);
 
       const messageComponents =
         await this.secondaryService.createSecondarySettingsComponents(
-          interaction.guildId,
+          guildId,
           id,
         );
 
@@ -51,14 +55,18 @@ export class SecondaryButtons {
     @ComponentParam('id') id: string,
   ) {
     try {
-      await this.secondaryService.lock(
-        interaction.guildId,
-        id,
-        interaction.user.id,
-      );
+      const guildId = interaction.guildId;
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
+      await this.secondaryService.lock(guildId, id, interaction.user.id);
       const messageComponents =
         await this.secondaryService.createSecondarySettingsComponents(
-          interaction.guildId,
+          guildId,
           id,
         );
       return interaction.update({
@@ -80,9 +88,17 @@ export class SecondaryButtons {
     @ComponentParam('id') id: string,
   ) {
     try {
+      const guildId = interaction.guildId;
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const selectComponent =
         await this.secondaryService.createSecondaryTransferSelect(
-          interaction.guildId,
+          guildId,
           id,
           interaction.user.id,
         );
@@ -112,8 +128,16 @@ export class SecondaryButtons {
     @ComponentParam('id') id: string,
   ) {
     try {
+      const guildId = interaction.guildId;
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const modal = await this.secondaryService.createSecondaryModal(
-        interaction.guildId,
+        guildId,
         id,
       );
 
@@ -138,11 +162,15 @@ export class SecondaryButtons {
     @ComponentParam('id') id: string,
   ) {
     try {
-      await this.secondaryService.allyourbase(
-        interaction.guildId,
-        id,
-        interaction.user.id,
-      );
+      const guildId = interaction.guildId;
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
+      await this.secondaryService.allyourbase(guildId, id, interaction.user.id);
 
       return interaction.reply({
         content: `All your base are belong to us ${channelMention(id)}`,
@@ -219,8 +247,16 @@ export class SecondaryButtons {
     @ComponentParam('channelId') channelId: string,
   ) {
     try {
+      const guildId = interaction.guildId;
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const requestedMember = await this.secondaryService.requestJoin(
-        interaction.guildId,
+        guildId,
         channelId,
         interaction.user.id,
       );

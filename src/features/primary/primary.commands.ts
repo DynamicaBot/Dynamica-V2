@@ -28,6 +28,14 @@ export class PrimaryCommands {
     @Options() options: PrimaryCreateDto,
   ) {
     const { guildId } = interaction;
+
+    if (!guildId) {
+      return interaction.reply({
+        content: 'This command can only be used in a guild',
+        ephemeral: true,
+      });
+    }
+
     try {
       const newChannel = await this.primaryService.create(
         interaction.user.id,
@@ -61,8 +69,17 @@ export class PrimaryCommands {
     @Options() { primary }: PrimaryDto,
   ) {
     try {
+      const guildId = interaction.guildId;
+
+      if (!guildId) {
+        return interaction.reply({
+          content: 'This command can only be used in a guild',
+          ephemeral: true,
+        });
+      }
+
       const newChannel = await this.primaryService.createPrimaryModal(
-        interaction.guildId,
+        guildId,
         primary,
       );
       return interaction.showModal(newChannel);
