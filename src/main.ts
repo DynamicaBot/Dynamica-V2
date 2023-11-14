@@ -14,10 +14,14 @@ async function bootstrap() {
 
   if (dsn) {
     const sentry = await import('@sentry/node');
+    const { RewriteFrames } = await import('@sentry/integrations');
+    // const rootEsmFile = fileURLToPath(import.meta.url);
+    // const rootEsmDir = path.dirname(rootEsmFile);
     Error.stackTraceLimit = Infinity;
     sentry.init({
       dsn,
       release: version,
+      integrations: [new RewriteFrames()],
     });
   }
 
