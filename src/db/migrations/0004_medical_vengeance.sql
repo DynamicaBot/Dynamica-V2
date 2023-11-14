@@ -52,4 +52,3 @@ WHERE `emoji` IS NOT NULL;
 --> statement-breakpoint
 
 DROP TABLE `Secondary_old`;
---> statement-breakpoint

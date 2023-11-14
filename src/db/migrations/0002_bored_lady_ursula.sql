@@ -43,4 +43,3 @@ FROM `Secondary_old` WHERE `creator` IS NOT NULL;
 --> statement-breakpoint
 
 DROP TABLE `Secondary_old`;
---> statement-breakpoint

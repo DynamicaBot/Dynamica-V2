@@ -47,7 +47,6 @@ FROM `Secondary_old`;
 
 DROP TABLE `Secondary_old`;
 --> statement-breakpoint
-
 ALTER TABLE `Guild` RENAME TO `Guild_old`;
 --> statement-breakpoint
 
@@ -144,4 +143,3 @@ FROM `Alias_old`;
 --> statement-breakpoint
 
 DROP TABLE `Alias_old`;
---> statement-breakpoint
