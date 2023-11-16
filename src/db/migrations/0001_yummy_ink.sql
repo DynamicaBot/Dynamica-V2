@@ -12,9 +12,7 @@ CREATE TABLE `new_Secondary` (
 	`primaryId` text NOT NULL,
 	`createdAt` integer DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updatedAt` integer DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	`lastName` text DEFAULT '' NOT NULL,
-	FOREIGN KEY (`primaryId`) REFERENCES `Primary`(`id`) ON UPDATE cascade ON DELETE cascade,
-	FOREIGN KEY (`guildId`) REFERENCES `Guild`(`id`) ON UPDATE cascade ON DELETE cascade
+	`lastName` text DEFAULT '' NOT NULL
 );
 --> statement-breakpoint
 INSERT INTO `new_Secondary` (
@@ -75,8 +73,7 @@ CREATE TABLE `new_Primary` (
 	`generalName` text DEFAULT 'General ##' NOT NULL,
 	`guildId` text NOT NULL,
 	`createdAt` integer DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	`updatedAt` integer DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	FOREIGN KEY (`guildId`) REFERENCES `Guild`(`id`) ON UPDATE cascade ON DELETE cascade
+	`updatedAt` integer DEFAULT (CURRENT_TIMESTAMP) NOT NULL
 );
 --> statement-breakpoint
 INSERT INTO `new_Primary` (
@@ -109,8 +106,7 @@ CREATE TABLE `Alias` (
 	`alias` text NOT NULL,
 	`guildId` text NOT NULL,
 	`createdAt` integer DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	`updatedAt` integer DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	FOREIGN KEY (`guildId`) REFERENCES `Guild`(`id`) ON UPDATE cascade ON DELETE cascade
+	`updatedAt` integer DEFAULT (CURRENT_TIMESTAMP) NOT NULL
 );
 --> statement-breakpoint
 INSERT INTO `Alias` (

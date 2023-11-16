@@ -44,6 +44,6 @@ export const DRIZZLE_TOKEN = Symbol('DRIZZLE_TOKEN');
     },
   ],
 })
-export class PrismaModule {}
+export class DrizzleModule {}
 
 export type Drizzle = ReturnType<typeof drizzle>;

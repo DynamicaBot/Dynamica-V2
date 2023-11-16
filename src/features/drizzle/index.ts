@@ -1,1 +1,1 @@
-export { PrismaModule } from './drizzle.module';
+export { DrizzleModule as PrismaModule } from './drizzle.module';
