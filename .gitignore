@@ -37,3 +37,4 @@ lerna-debug.log*
 .env
 
 config/db.sqlite*
+config/dbtest.sqlite

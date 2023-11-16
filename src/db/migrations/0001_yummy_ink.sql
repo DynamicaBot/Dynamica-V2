@@ -66,7 +66,9 @@ FROM `Guild_old`;
 --> statement-breakpoint
 DROP TABLE `Guild_old`;
 --> statement-breakpoint
-CREATE TABLE `new_Primary` (
+ALTER TABLE `Primary` RENAME TO `Primary_old`;
+--> statement-breakpoint
+CREATE TABLE `Primary` (
 	`id` text PRIMARY KEY NOT NULL,
 	`creator` text NOT NULL,
 	`template` text DEFAULT '@@game@@ ##' NOT NULL,
@@ -76,7 +78,7 @@ CREATE TABLE `new_Primary` (
 	`updatedAt` integer DEFAULT (CURRENT_TIMESTAMP) NOT NULL
 );
 --> statement-breakpoint
-INSERT INTO `new_Primary` (
+INSERT INTO `Primary` (
     `id`,
     `creator`,
     `template`,
@@ -92,11 +94,9 @@ INSERT INTO `new_Primary` (
     `guildId`,
     `createdAt`,
     `updatedAt`
-FROM `Primary`;
+FROM `Primary_old`;
 --> statement-breakpoint
-DROP TABLE `Primary`;
---> statement-breakpoint
-ALTER TABLE `new_Primary` RENAME TO `Primary`;
+DROP TABLE `Primary_old`;
 --> statement-breakpoint
 ALTER TABLE `Alias` RENAME TO `Alias_old`;
 --> statement-breakpoint
@@ -126,7 +126,5 @@ INSERT INTO `Alias` (
 FROM `Alias_old`;
 --> statement-breakpoint
 DROP TABLE `Alias_old`;
---> statement-breakpoint
-PRAGMA foreign_key_check;
 --> statement-breakpoint
 PRAGMA foreign_keys=ON;
