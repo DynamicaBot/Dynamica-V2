@@ -1,95 +1,93 @@
 {
-    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
-    "meta": {
-        "version": "PTDL_v1",
-        "update_url": null
+  "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+  "meta": {
+    "version": "PTDL_v1",
+    "update_url": null
+  },
+  "exported_at": "2022-01-08T18:41:56+11:00",
+  "name": "Dynamica",
+  "author": "sebastian.pietschner@gmail.com",
+  "description": null,
+  "features": null,
+  "images": ["ghcr.io/dynamicabot/dynamica-v2:latest-pterodactyl"],
+  "file_denylist": [],
+  "startup": "yarn start",
+  "config": {
+    "files": "{}",
+    "startup": "{\r\n    \"done\": \"Bot logged in as\"\r\n}",
+    "logs": "{}",
+    "stop": "^^C"
+  },
+  "scripts": {
+    "installation": {
+      "script": null,
+      "container": "alpine:3.4",
+      "entrypoint": "ash"
+    }
+  },
+  "variables": [
+    {
+      "name": "Database Path",
+      "description": "The path in which to create the sqlite database.",
+      "env_variable": "DATABASE_URL",
+      "default_value": "file:/home/container/dynamica-v2/db.sqlite",
+      "user_viewable": true,
+      "user_editable": false,
+      "rules": "required|string"
     },
-    "exported_at": "2022-01-08T18:41:56+11:00",
-    "name": "Dynamica",
-    "author": "sebastian.pietschner@gmail.com",
-    "description": null,
-    "features": null,
-    "images": [
-        "ghcr.io/dynamicabot/dynamica-v2:latest-pterodactyl"
-    ],
-    "file_denylist": [],
-    "startup": "npx prisma migrate deploy;\r\nyarn start",
-    "config": {
-        "files": "{}",
-        "startup": "{\r\n    \"done\": \"Bot logged in as\"\r\n}",
-        "logs": "{}",
-        "stop": "^^C"
+    {
+      "name": "Token",
+      "description": "The token for the discord bot.",
+      "env_variable": "TOKEN",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string"
     },
-    "scripts": {
-        "installation": {
-            "script": null,
-            "container": "alpine:3.4",
-            "entrypoint": "ash"
-        }
+    {
+      "name": "Guild ID",
+      "description": "Add only if using the bot in a single guild.",
+      "env_variable": "GUILD_ID",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "string|nullable"
     },
-    "variables": [
-        {
-            "name": "Database Path",
-            "description": "The path in which to create the sqlite database.",
-            "env_variable": "DATABASE_URL",
-            "default_value": "file:/home/container/dynamica-v2/db.sqlite",
-            "user_viewable": true,
-            "user_editable": false,
-            "rules": "required|string"
-        },
-        {
-            "name": "Token",
-            "description": "The token for the discord bot.",
-            "env_variable": "TOKEN",
-            "default_value": "",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|string"
-        },
-        {
-            "name": "Guild ID",
-            "description": "Add only if using the bot in a single guild.",
-            "env_variable": "GUILD_ID",
-            "default_value": "",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "string|nullable"
-        },
-        {
-            "name": "Sentry DSN",
-            "description": "The DSN for Sentry.",
-            "env_variable": "SENTRY_DSN",
-            "default_value": "",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "string|nullable"
-        },
-        {
-            "name": "MQTT URL",
-            "description": "The URL for the MQTT broker.",
-            "env_variable": "MQTT_URL",
-            "default_value": "",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "string|nullable"
-        },
-        {
-            "name": "MQTT Username",
-            "description": "The username for the MQTT broker.",
-            "env_variable": "MQTT_USER",
-            "default_value": "",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "string|nullable"
-        },
-        {
-            "name": "MQTT Password",
-            "description": "The password for the MQTT broker.",
-            "env_variable": "MQTT_PASS",
-            "default_value": "",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "string|nullable"
-        }
-    ]
+    {
+      "name": "Sentry DSN",
+      "description": "The DSN for Sentry.",
+      "env_variable": "SENTRY_DSN",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "string|nullable"
+    },
+    {
+      "name": "MQTT URL",
+      "description": "The URL for the MQTT broker.",
+      "env_variable": "MQTT_URL",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "string|nullable"
+    },
+    {
+      "name": "MQTT Username",
+      "description": "The username for the MQTT broker.",
+      "env_variable": "MQTT_USER",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "string|nullable"
+    },
+    {
+      "name": "MQTT Password",
+      "description": "The password for the MQTT broker.",
+      "env_variable": "MQTT_PASS",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "string|nullable"
+    }
+  ]
 }
