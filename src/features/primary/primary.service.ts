@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   ActionRowBuilder,
   ChannelType,
@@ -8,17 +8,21 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
+import { and, eq, sql } from 'drizzle-orm';
 
+import { primary, secondary } from '@/db/schema';
 import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
 import { SecondaryService } from '@/features/secondary';
 import { getPresence } from '@/utils/presence';
+
+import { DRIZZLE_TOKEN, type Drizzle } from '../drizzle/drizzle.module';
+import { IntentsError } from '../secondary/secondary.service';
 
 @Injectable()
 export class PrimaryService {
   public constructor(
     private readonly client: Client,
-    private readonly db: PrismaService,
+    @Inject(DRIZZLE_TOKEN) private readonly db: Drizzle,
     private readonly secondaryService: SecondaryService,
     private readonly mqtt: MqttService,
   ) {}
@@ -31,20 +35,7 @@ export class PrimaryService {
    * @returns The created primary
    */
   public async create(creator: string, guildId: string, sectionId?: string) {
-    let guild = await this.client.guilds.fetch(guildId);
-
-    if (!guild) {
-      try {
-        guild = await this.client.guilds.fetch(guildId);
-      } catch (error) {
-        await this.db.guild.delete({
-          where: {
-            id: guildId,
-          },
-        });
-        throw new Error('No access to guild');
-      }
-    }
+    const guild = await this.client.guilds.fetch(guildId);
 
     const channelId = await guild.channels.create({
       name: `➕ New Session`,
@@ -52,31 +43,50 @@ export class PrimaryService {
       parent: sectionId,
     });
 
-    const primary = await this.db.primary.create({
-      data: {
-        id: channelId.id,
+    // const primary = await this.db.primary.create({
+    //   data: {
+    //     id: channelId.id,
+    //     creator,
+    //     guild: {
+    //       connectOrCreate: {
+    //         where: {
+    //           id: guild.id,
+    //         },
+    //         create: {
+    //           id: guild.id,
+    //         },
+    //       },
+    //     },
+    //   },
+    // });
+
+    await this.db
+      .insert(primary)
+      .values({
         creator,
-        guild: {
-          connectOrCreate: {
-            where: {
-              id: guild.id,
-            },
-            create: {
-              id: guild.id,
-            },
-          },
-        },
-      },
-    });
+        guildId: guildId,
+        id: channelId.id,
+      })
+      .returning();
 
-    const primaryCount = await this.db.primary.count();
-    const secondaryCount = await this.db.secondary.count();
+    const [{ primaryCount }] = await this.db
+      .select({
+        primaryCount: sql<number>`COUNT(*)`,
+      })
+      .from(primary);
+    const [{ secondaryCount }] = await this.db
+      .select({
+        secondaryCount: sql<number>`COUNT(*)`,
+      })
+      .from(secondary);
 
-    this.client.user.setPresence(getPresence(primaryCount + secondaryCount));
+    if (this.client.user) {
+      this.client.user.setPresence(getPresence(primaryCount + secondaryCount));
+    }
 
     await this.mqtt.publish(`dynamica/primaries`, primaryCount);
 
-    return primary;
+    return channelId;
   }
 
   /**
@@ -86,19 +96,10 @@ export class PrimaryService {
    * @returns The updated primary
    */
   public async update(guildId: string, id: string) {
-    let primary = this.client.channels.cache.get(id);
+    const primary = await this.client.channels.fetch(id);
 
     if (!primary) {
-      try {
-        primary = await this.client.channels.fetch(id);
-      } catch (error) {
-        await this.db.primary.delete({
-          where: {
-            id,
-          },
-        });
-        return;
-      }
+      throw new IntentsError('Client channel');
     }
 
     if (primary.type !== ChannelType.GuildVoice) {
@@ -109,7 +110,7 @@ export class PrimaryService {
 
     const firstMember = members.first();
 
-    const rest = members.filter((member) => member.id !== firstMember.id);
+    const rest = members.filter((member) => member.id !== firstMember?.id);
 
     if (firstMember) {
       const newChannel = await this.secondaryService.create(
@@ -127,7 +128,9 @@ export class PrimaryService {
    * Cleanup primaries that are no longer in the guild
    */
   public async cleanup() {
-    const primaries = await this.db.primary.findMany();
+    const primaries = await this.db
+      .select({ id: primary.id, guildId: primary.guildId })
+      .from(primary);
     await Promise.all(
       primaries.map(({ id, guildId }) => this.update(guildId, id)),
     );
@@ -140,29 +143,18 @@ export class PrimaryService {
    * @returns The updated primary
    */
   public async updateSecondaries(guildId: string, primaryId: string) {
-    const databasePrimary = await this.db.primary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: primaryId,
-        },
-      },
-      include: {
-        secondaries: true,
-      },
-    });
-
-    if (!databasePrimary) {
-      throw new Error('No primary found');
-    }
-
-    const { secondaries } = databasePrimary;
+    const databaseSecondaries = await this.db
+      .select({ id: secondary.id, guildId: secondary.guildId })
+      .from(secondary)
+      .where(eq(secondary.primaryId, primaryId));
 
     await Promise.all(
-      secondaries.map(({ id }) => this.secondaryService.update(guildId, id)),
+      databaseSecondaries.map(({ id }) =>
+        this.secondaryService.update(guildId, id),
+      ),
     );
 
-    return databasePrimary;
+    return databaseSecondaries;
   }
 
   /**
@@ -177,30 +169,21 @@ export class PrimaryService {
     primaryId: string,
     newTemplate: string,
   ) {
-    const databasePrimary = await this.db.primary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: primaryId,
-        },
-      },
-    });
+    const databasePrimary = await this.db
+      .select()
+      .from(primary)
+      .where(and(eq(primary.guildId, guildId), eq(primary.id, primaryId)));
 
     if (!databasePrimary) {
       throw new Error('No primary found');
     }
 
-    const updatedPrimary = await this.db.primary.update({
-      where: {
-        guildId_id: {
-          guildId,
-          id: primaryId,
-        },
-      },
-      data: {
+    const [updatedPrimary] = await this.db
+      .update(primary)
+      .set({
         generalName: newTemplate,
-      },
-    });
+      })
+      .returning();
 
     await this.updateSecondaries(guildId, primaryId);
 
@@ -219,30 +202,21 @@ export class PrimaryService {
     primaryId: string,
     newTemplate: string,
   ) {
-    const databasePrimary = await this.db.primary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: primaryId,
-        },
-      },
-    });
+    const [databasePrimary] = await this.db
+      .select()
+      .from(primary)
+      .where(and(eq(primary.guildId, guildId), eq(primary.id, primaryId)));
 
     if (!databasePrimary) {
       throw new Error('No primary found');
     }
 
-    const updatedPrimary = await this.db.primary.update({
-      where: {
-        guildId_id: {
-          guildId,
-          id: primaryId,
-        },
-      },
-      data: {
+    const updatedPrimary = await this.db
+      .update(primary)
+      .set({
         template: newTemplate,
-      },
-    });
+      })
+      .where(and(eq(primary.guildId, guildId), eq(primary.id, primaryId)));
 
     await this.updateSecondaries(guildId, primaryId);
 
@@ -256,37 +230,31 @@ export class PrimaryService {
    * @returns The primary info
    */
   public async info(guildId: string, primaryId: string) {
-    const databasePrimary = await this.db.primary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: primaryId,
-        },
-      },
-      include: {
-        secondaries: true,
-      },
-    });
+    const [databasePrimary] = await this.db
+      .select()
+      .from(primary)
+      .where(and(eq(primary.guildId, guildId), eq(primary.id, primaryId)));
+
+    const secondaries = await this.db
+      .select({ id: secondary.id })
+      .from(secondary)
+      .where(eq(secondary.primaryId, primaryId));
 
     if (!databasePrimary) {
       throw new Error('No primary found');
     }
 
-    return databasePrimary;
+    return { ...databasePrimary, secondaries };
   }
 
   public async createPrimaryModal(
     guildId: string,
     id: string,
   ): Promise<ModalBuilder> {
-    const databasePrimary = await this.db.primary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id,
-        },
-      },
-    });
+    const [databasePrimary] = await this.db
+      .select()
+      .from(primary)
+      .where(and(eq(primary.guildId, guildId), eq(primary.id, id)));
 
     if (!databasePrimary) {
       throw new Error('No primary found');

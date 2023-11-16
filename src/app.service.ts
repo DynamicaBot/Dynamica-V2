@@ -1,5 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { OAuth2Scopes, PermissionFlagsBits } from 'discord.js';
+import { sql } from 'drizzle-orm';
 import {
   Context,
   type ContextOf,
@@ -9,10 +11,11 @@ import {
   type SlashCommandContext,
 } from 'necord';
 
+import { alias, guild, primary, secondary } from './db/schema';
+import { DRIZZLE_TOKEN, type Drizzle } from './features/drizzle/drizzle.module';
 import { GuildService } from './features/guild/guild.service';
 import { MqttService } from './features/mqtt/mqtt.service';
 import { PrimaryService } from './features/primary/primary.service';
-import { PrismaService } from './features/prisma/prisma.service';
 import { SecondaryService } from './features/secondary/secondary.service';
 import { getPresence } from './utils/presence';
 
@@ -20,7 +23,7 @@ import { getPresence } from './utils/presence';
 export class AppService {
   private readonly logger = new Logger(AppService.name);
   constructor(
-    private readonly db: PrismaService,
+    @Inject(DRIZZLE_TOKEN) private readonly db: Drizzle,
     private readonly secondaryService: SecondaryService,
     private readonly primaryService: PrimaryService,
     private readonly guildService: GuildService,
@@ -31,12 +34,37 @@ export class AppService {
   public async onReady(@Context() [client]: ContextOf<'ready'>) {
     this.logger.log(`Bot logged in as ${client.user.tag}`);
 
+    const inviteLink = client.generateInvite({
+      scopes: [OAuth2Scopes.Bot],
+      permissions: [PermissionFlagsBits.Administrator],
+    });
+
+    this.logger.log(`Invite link: ${inviteLink}`);
+
     await this.cleanup();
 
-    const guildCount = await this.db.guild.count();
-    const primaryCount = await this.db.primary.count();
-    const secondaryCount = await this.db.secondary.count();
-    const aliasCount = await this.db.alias.count();
+    const [{ guildCount }] = await this.db
+      .select({
+        guildCount: sql<number>`COUNT(*)`,
+      })
+      .from(guild);
+    const [{ primaryCount }] = await this.db
+      .select({
+        primaryCount: sql<number>`COUNT(*)`,
+      })
+      .from(primary);
+
+    const [{ secondaryCount }] = await this.db
+      .select({
+        secondaryCount: sql<number>`COUNT(*)`,
+      })
+      .from(secondary);
+
+    const [{ aliasCount }] = await this.db
+      .select({
+        aliasCount: sql<number>`COUNT(*)`,
+      })
+      .from(alias);
 
     await Promise.all([
       this.mqtt.publish(`dynamica/guilds`, guildCount),

@@ -1,20 +1,62 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ActivityType } from 'discord.js';
+import { eq, sql } from 'drizzle-orm';
 import { Context, type ContextOf, On } from 'necord';
 
+import { primary, secondary } from '@/db/schema';
 import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
 
-import { SecondaryService } from './secondary.service';
+import { DRIZZLE_TOKEN, type Drizzle } from '../drizzle/drizzle.module';
+
+import { IntentsError, SecondaryService } from './secondary.service';
 
 @Injectable()
 export class SecondaryEvents {
   constructor(
-    private readonly db: PrismaService,
+    @Inject(DRIZZLE_TOKEN) private readonly db: Drizzle,
     private readonly secondaryService: SecondaryService,
     private readonly mqtt: MqttService,
   ) {}
+
+  private async isChannelSecondary(channelId?: string | null): Promise<
+    | {
+        id: string;
+        guildId: string;
+        primaryId: string;
+      }
+    | undefined
+  > {
+    if (!channelId) return undefined;
+
+    const [databaseSecondary] = await this.db
+      .select({
+        id: secondary.id,
+        guildId: secondary.guildId,
+        primaryId: secondary.primaryId,
+      })
+      .from(secondary)
+      .where(eq(secondary.id, channelId));
+
+    return databaseSecondary;
+  }
+
+  private async isChannelPrimary(channelId?: string | null): Promise<
+    | {
+        id: string;
+        guildId: string;
+      }
+    | undefined
+  > {
+    if (!channelId) return undefined;
+
+    const [databasePrimary] = await this.db
+      .select({ id: primary.id, guildId: primary.guildId })
+      .from(primary)
+      .where(eq(primary.id, channelId));
+
+    return databasePrimary;
+  }
 
   @On('voiceStateUpdate')
   public async onVoiceStateUpdate(
@@ -28,13 +70,7 @@ export class SecondaryEvents {
       return;
     }
 
-    const oldSecondary = oldVoiceState.channelId
-      ? await this.db.secondary.findUnique({
-          where: {
-            id: oldVoiceState.channelId,
-          },
-        })
-      : undefined;
+    const oldSecondary = await this.isChannelSecondary(oldVoiceState.channelId);
 
     if (oldSecondary) {
       // Left a secondary channel
@@ -42,21 +78,9 @@ export class SecondaryEvents {
       await this.secondaryService.update(oldSecondary.guildId, channelId);
     }
 
-    const newSecondary = newVoiceState.channelId
-      ? await this.db.secondary.findUnique({
-          where: {
-            id: newVoiceState.channelId,
-          },
-        })
-      : undefined;
+    const newSecondary = await this.isChannelSecondary(newVoiceState.channelId);
 
-    const oldPrimary = oldVoiceState.channelId
-      ? await this.db.primary.findUnique({
-          where: {
-            id: oldVoiceState.channelId,
-          },
-        })
-      : undefined;
+    const oldPrimary = await this.isChannelPrimary(oldVoiceState.channelId);
 
     if (newSecondary && newSecondary.primaryId !== oldPrimary?.id) {
       // Joined a secondary channel but not from it's primary (prevents double counting) on create
@@ -64,17 +88,16 @@ export class SecondaryEvents {
       await this.secondaryService.update(newSecondary.guildId, channelId);
     }
 
-    const newPrimary = newVoiceState.channelId
-      ? await this.db.primary.findUnique({
-          where: {
-            id: newVoiceState.channelId,
-          },
-        })
-      : undefined;
+    const newPrimary = await this.isChannelPrimary(newVoiceState.channelId);
 
     if (newPrimary) {
       // Joined a primary channel
       const channelId = newPrimary.id;
+
+      const newStateMember = newVoiceState.member;
+
+      if (!newStateMember) throw new IntentsError('Guild member');
+
       await this.secondaryService.create(
         newVoiceState.guild.id,
         channelId,
@@ -89,22 +112,22 @@ export class SecondaryEvents {
   ) {
     if (channel.isDMBased()) return;
 
-    const databaseChannel = await this.db.secondary.findUnique({
-      where: {
-        id: channel.id,
-      },
-    });
+    const databaseChannel = await this.isChannelSecondary(channel.id);
 
     if (!databaseChannel) return;
 
-    await this.db.secondary.delete({
-      where: {
-        id: databaseChannel.id,
-      },
-    });
+    await this.db.delete(secondary).where(eq(secondary.id, channel.id));
 
-    const secondaryCount = await this.db.secondary.count();
-    const primaryCount = await this.db.primary.count();
+    const [{ secondaryCount }] = await this.db
+      .select({
+        secondaryCount: sql<number>`COUNT(*)`,
+      })
+      .from(secondary);
+    const [{ primaryCount }] = await this.db
+      .select({
+        primaryCount: sql<number>`COUNT(*)`,
+      })
+      .from(primary);
 
     channel.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 
@@ -116,14 +139,11 @@ export class SecondaryEvents {
     @Context() [oldPresence, newPresence]: ContextOf<'presenceUpdate'>,
   ) {
     const channelId = newPresence?.member?.voice?.channelId;
+    const guildId = newPresence?.guild?.id || oldPresence?.guild?.id;
 
-    if (!channelId) return;
+    if (!channelId || !guildId) return;
 
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        id: channelId,
-      },
-    });
+    const databaseSecondary = await this.isChannelSecondary(channelId);
 
     if (!databaseSecondary) return;
 
@@ -154,6 +174,6 @@ export class SecondaryEvents {
 
     if (isSameActivities) return;
 
-    this.secondaryService.updateName(newPresence.guild.id, channelId);
+    this.secondaryService.updateName(guildId, channelId);
   }
 }

@@ -15,16 +15,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Yarn
+      - uses: pnpm/action-setup@v2
+        name: Install PNPM
+        with:
+          version: 8
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
-          cache: 'yarn'
+          node-version: 20
+          cache: 'pnpm'
       - name: Install Dependancies
-        run: yarn install --frozen-lockfile
-      - name: Generate
-        run: yarn generate
+        run: pnpm install --frozen-lockfile
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/problem-matchers/eslint-stylish.json"
       - name: Lint
-        run: yarn lint --format stylish
+        run: pnpm lint --format stylish

@@ -7,10 +7,10 @@ import { NecordModule } from 'necord';
 import { AppService } from './app.service';
 import { InfoCommands } from './commands/info.command';
 import { AliasModule } from './features/alias/alias.module';
+import { DrizzleModule } from './features/drizzle/drizzle.module';
 import { GuildModule } from './features/guild/guild.module';
 import { MqttModule } from './features/mqtt/mqtt.module';
 import { PrimaryModule } from './features/primary/primary.module';
-import { PrismaModule } from './features/prisma/prisma.module';
 import { SecondaryModule } from './features/secondary/secondary.module';
 
 @Module({
@@ -30,7 +30,7 @@ import { SecondaryModule } from './features/secondary/secondary.module';
       inject: [ConfigService],
     }),
     ScheduleModule.forRoot(),
-    PrismaModule,
+    DrizzleModule,
     SecondaryModule,
     PrimaryModule,
     GuildModule,

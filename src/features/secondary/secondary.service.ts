@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OverwriteType, PermissionFlagsBits } from 'discord-api-types/v10';
 import {
   ActionRowBuilder,
@@ -16,12 +16,15 @@ import {
   ThreadMemberManager,
   UserSelectMenuBuilder,
 } from 'discord.js';
+import { and, eq, sql } from 'drizzle-orm';
 import emojiList from 'emoji-random-list';
 import { romanize } from 'romans';
 
+import { alias, guild, primary, secondary } from '@/db/schema';
 import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
+
+import { DRIZZLE_TOKEN, type Drizzle } from '../drizzle/drizzle.module';
 
 @Injectable()
 export class SecondaryService {
@@ -29,7 +32,7 @@ export class SecondaryService {
 
   public constructor(
     private readonly client: Client,
-    private readonly db: PrismaService,
+    @Inject(DRIZZLE_TOKEN) private readonly db: Drizzle,
     private readonly mqtt: MqttService,
   ) {}
 
@@ -46,11 +49,7 @@ export class SecondaryService {
       discordGuild = await this.client.guilds.fetch(guildId);
     }
 
-    let discordChannel = discordGuild.channels.cache.get(id);
-
-    if (!discordChannel) {
-      discordChannel = await discordGuild.channels.fetch(id);
-    }
+    const discordChannel = await discordGuild.channels.fetch(id);
 
     if (discordChannel && discordChannel.manageable) {
       await discordChannel.delete();
@@ -62,43 +61,18 @@ export class SecondaryService {
    * @param guildId The guild ID
    * @param primaryId The primary channel ID
    * @param userId The user ID
+   * @todo Handle missing channels
    * @returns The newly created secondary channel
    */
   public async create(guildId: string, primaryId: string, userId: string) {
-    let discordGuild = this.client.guilds.cache.get(guildId);
+    const discordGuild = await this.client.guilds.fetch(guildId);
 
-    if (!discordGuild) {
-      try {
-        discordGuild = await this.client.guilds.fetch(guildId);
-      } catch (error) {
-        await this.db.guild.delete({
-          where: {
-            id: guildId,
-          },
-        });
-        return;
-      }
-    }
+    const discordGuildMember = await discordGuild.members.fetch(userId);
 
-    let discordGuildMember = discordGuild.members.cache.get(userId);
+    const discordPrimary = await discordGuild.channels.fetch(primaryId);
 
-    if (!discordGuildMember) {
-      discordGuildMember = await discordGuild.members.fetch(userId);
-    }
-
-    let discordPrimary = discordGuild.channels.cache.get(primaryId);
-
-    if (!discordPrimary) {
-      try {
-        discordPrimary = await discordGuild.channels.fetch(primaryId);
-      } catch (error) {
-        await this.db.primary.delete({
-          where: {
-            id: primaryId,
-          },
-        });
-        return;
-      }
+    if (discordPrimary === null) {
+      throw new Error('Intents error, cannot fetch guild channel');
     }
 
     const parent =
@@ -123,24 +97,37 @@ export class SecondaryService {
       group: 'smileys-and-emotion,animals-and-nature,food-and-drink',
     })[0];
 
-    const newDatabaseChannel = await this.db.secondary.create({
-      data: {
+    // const newDatabaseChannel = await this.db.secondary.create({
+    //   data: {
+    //     id: newDiscordChannel.id,
+    //     emoji,
+    //     creator: userId,
+    //     lastName: channelName,
+    //     primary: {
+    //       connect: {
+    //         id: primaryId,
+    //       },
+    //     },
+    //     guild: {
+    //       connect: {
+    //         id: guildId,
+    //       },
+    //     },
+    //   },
+    // });
+
+    const [newDatabaseChannel] = await this.db
+      .insert(secondary)
+      .values({
         id: newDiscordChannel.id,
         emoji,
-        creator: userId,
+        owner: userId,
         lastName: channelName,
-        primary: {
-          connect: {
-            id: primaryId,
-          },
-        },
-        guild: {
-          connect: {
-            id: guildId,
-          },
-        },
-      },
-    });
+        primaryId,
+        guildId,
+        locked: false,
+      })
+      .returning();
 
     await discordGuildMember.voice.setChannel(newDiscordChannel);
 
@@ -150,11 +137,20 @@ export class SecondaryService {
         newDiscordChannel.id,
       );
 
-    if (
-      newDiscordChannel
-        .permissionsFor(this.client.user)
-        .has(PermissionFlagsBits.SendMessages)
-    ) {
+    const clientUser = this.client.user;
+
+    if (clientUser === null) {
+      throw new Error('Client user not found');
+    }
+
+    const newDiscordChannelPermissions =
+      newDiscordChannel.permissionsFor(clientUser);
+
+    if (!newDiscordChannelPermissions) {
+      throw new Error('Unable to access permissions');
+    }
+
+    if (newDiscordChannelPermissions.has(PermissionFlagsBits.SendMessages)) {
       try {
         await newDiscordChannel.send({
           content: `Edit the channel settings here`,
@@ -176,10 +172,18 @@ export class SecondaryService {
       }
     }
 
-    const secondaryCount = await this.db.secondary.count();
-    const primaryCount = await this.db.primary.count();
+    const [{ secondaryCount }] = await this.db
+      .select({
+        secondaryCount: sql<number>`COUNT(*)`,
+      })
+      .from(secondary);
+    const [{ primaryCount }] = await this.db
+      .select({
+        primaryCount: sql<number>`COUNT(*)`,
+      })
+      .from(primary);
 
-    this.client.user.setPresence(getPresence(primaryCount + secondaryCount));
+    clientUser.setPresence(getPresence(primaryCount + secondaryCount));
 
     this.mqtt.publish('dynamica/secondaries', secondaryCount.toString());
 
@@ -190,44 +194,23 @@ export class SecondaryService {
    * Update the name of a secondary channel
    * @param channelId The Id of the channel to update the name of
    * @returns The new name of the channel
+   * @throws {DiscordAPIError}
    */
   public async updateName(guildId: string, channelId: string) {
-    let discordChannel = this.client.channels.cache.get(channelId);
+    const discordChannel = await this.client.channels.fetch(channelId);
 
-    if (!discordChannel) {
-      try {
-        discordChannel = await this.client.channels.fetch(channelId);
-      } catch (error) {
-        const secondaryExists = await this.db.secondary.findUnique({
-          where: {
-            id: channelId,
-          },
-        });
-
-        if (secondaryExists) {
-          await this.db.secondary.delete({
-            where: {
-              id: channelId,
-            },
-          });
-        }
-
-        return;
-      }
+    if (discordChannel === null) {
+      throw new Error('Intents error, cannot fetch guild channel');
     }
 
     if (discordChannel.isDMBased()) {
       return;
     }
 
-    const databaseChannel = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const [databaseChannel] = await this.db
+      .select()
+      .from(secondary)
+      .where(and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)));
 
     const newName = await this.formatName(
       databaseChannel.primaryId,
@@ -236,39 +219,17 @@ export class SecondaryService {
     );
 
     if (databaseChannel.lastName !== newName && discordChannel.manageable) {
-      try {
-        await discordChannel.edit({
-          name: newName,
-        });
-        await this.db.secondary.update({
-          where: {
-            guildId_id: {
-              guildId,
-              id: channelId,
-            },
-          },
-          data: {
-            lastName: newName,
-          },
-        });
-      } catch (error) {
-        if (error instanceof DiscordAPIError && error.code === 10003) {
-          // Channel not found, delete from database
-          this.logger.error(
-            `Channel ${channelId} not found, deleting from database`,
-          );
-          await this.db.secondary.delete({
-            where: {
-              guildId_id: {
-                guildId,
-                id: channelId,
-              },
-            },
-          });
-        } else {
-          throw error;
-        }
-      }
+      await discordChannel.edit({
+        name: newName,
+      });
+      await this.db
+        .update(secondary)
+        .set({
+          lastName: newName,
+        })
+        .where(
+          and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)),
+        );
     }
 
     return newName;
@@ -277,38 +238,29 @@ export class SecondaryService {
   /**
    * Updates a secondary channel (delete if empty, update name if not)
    * @param channelId The secondary channel id
+   * @param guildId The guild id
+   * @param forceFetch Whether to force fetch the channel
    * @returns void
+   * @throws {Error}
+   * @throws {NameUpdateError}
+   * @throws {DiscordAPIError}
    */
-  public async update(guildId: string, channelId: string) {
-    const secondaryChannel = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+  public async update(guildId: string, channelId: string, forceFetch = false) {
+    const [secondaryChannel] = await this.db
+      .select()
+      .from(secondary)
+      .where(and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)));
 
     if (!secondaryChannel) {
       return;
     }
 
-    let discordChannel = this.client.channels.cache.get(channelId);
+    const discordChannel = await this.client.channels.fetch(channelId, {
+      force: forceFetch,
+    });
 
-    if (!discordChannel) {
-      try {
-        discordChannel = await this.client.channels.fetch(channelId);
-      } catch (error) {
-        await this.db.secondary.delete({
-          where: {
-            guildId_id: {
-              guildId,
-              id: channelId,
-            },
-          },
-        });
-        return;
-      }
+    if (discordChannel === null) {
+      throw new IntentsError('Guild channel');
     }
 
     if (
@@ -327,21 +279,23 @@ export class SecondaryService {
     } else {
       const memberIds = discordChannel.members.map((member) => member.id);
 
-      if (!memberIds.includes(secondaryChannel.creator)) {
-        await this.db.secondary.update({
-          where: {
-            guildId_id: {
-              guildId,
-              id: channelId,
-            },
-          },
-          data: {
-            creator: memberIds[0],
-          },
-        });
+      if (!memberIds.includes(secondaryChannel.owner)) {
+        await this.db
+          .update(secondary)
+          .set({
+            owner: memberIds[0],
+          })
+          .where(
+            and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)),
+          );
       }
 
-      await this.updateName(guildId, channelId);
+      try {
+        await this.updateName(guildId, channelId);
+      } catch (error) {
+        this.logger.error(`Failed to update channel name`, error);
+        throw new NameUpdateError();
+      }
     }
   }
 
@@ -357,48 +311,33 @@ export class SecondaryService {
     guildId: string,
     channelId?: string,
   ) {
-    let discordGuild = this.client.guilds.cache.get(guildId);
+    const discordGuild = await this.client.guilds.fetch(guildId);
 
-    if (!discordGuild) {
-      try {
-        discordGuild = await this.client.guilds.fetch(guildId);
-      } catch (error) {
-        await this.db.guild.delete({
-          where: {
-            id: guildId,
-          },
-        });
-        throw new Error('No access to guild');
-      }
-    }
-
-    let discordChannel = discordGuild.channels.cache.get(
+    const discordChannel = await discordGuild.channels.fetch(
       channelId ?? primaryId,
     );
 
-    if (!discordChannel) {
-      discordChannel = await discordGuild.channels.fetch(
-        channelId ?? primaryId,
-      );
+    if (discordChannel === null) {
+      throw new IntentsError('Guild channel');
     }
 
-    const databasePrimary = await this.db.primary.findUniqueOrThrow({
-      where: {
-        id: primaryId,
-      },
-      include: {
-        guild: {
-          include: {
-            aliases: true,
-          },
-        },
-        secondaries: {
-          orderBy: {
-            createdAt: 'asc',
-          },
-        },
-      },
-    });
+    // const databasePrimary = await this.db.primary.findUniqueOrThrow({
+    //   where: {
+    //     id: primaryId,
+    //   },
+    //   include: {
+    //     guild: {
+    //       include: {
+    //         aliases: true,
+    //       },
+    //     },
+    //     secondaries: {
+    //       orderBy: {
+    //         createdAt: 'asc',
+    //       },
+    //     },
+    //   },
+    // });
 
     if (discordChannel.members instanceof ThreadMemberManager) {
       throw new Error('Thread channel');
@@ -420,7 +359,10 @@ export class SecondaryService {
       ...new Set(filteredActivities.map((activity) => activity.name)),
     ];
 
-    const { aliases } = databasePrimary.guild;
+    const aliases = await this.db
+      .select()
+      .from(alias)
+      .where(eq(alias.guildId, guildId));
 
     const aliasObject: Record<string, string> = {};
 
@@ -432,38 +374,72 @@ export class SecondaryService {
       (activity) => aliasObject[activity] ?? activity,
     );
 
-    const databaseSecondary = channelId
-      ? await this.db.secondary.findUnique({
-          where: {
-            id: channelId,
-          },
-        })
-      : undefined;
+    let creatorId: string | undefined;
+    let secondaryNameOverride: string | undefined;
+    let secondaryLocked: boolean | undefined;
+    let secondaryEmoji: string | undefined;
 
-    const creator = databaseSecondary
-      ? discordChannel.members.get(databaseSecondary.creator)
+    if (channelId) {
+      const [databaseSecondary] = await this.db
+        .select({
+          creator: secondary.owner,
+          name: secondary.name,
+          locked: secondary.locked,
+          emoji: secondary.emoji,
+        })
+        .from(secondary)
+        .where(eq(secondary.id, channelId));
+
+      if (databaseSecondary) {
+        creatorId = databaseSecondary.creator;
+
+        secondaryLocked = databaseSecondary.locked;
+
+        secondaryEmoji = databaseSecondary.emoji;
+
+        if (databaseSecondary.name)
+          secondaryNameOverride = databaseSecondary.name;
+      }
+    }
+
+    const creator = creatorId
+      ? discordChannel.members.get(creatorId)
       : discordChannel.members.at(0);
 
     const creatorName = creator?.displayName ?? 'Unknown';
 
-    const channelNameTemplate =
-      databaseSecondary?.name ??
-      (aliasedActivities.length
-        ? databasePrimary.template
-        : databasePrimary.generalName);
+    const [primaryConfig] = await this.db
+      .select()
+      .from(primary)
+      .where(eq(primary.id, primaryId));
 
-    const locked = databaseSecondary?.locked ?? false;
+    if (!primaryConfig) {
+      throw new Error('Primary channel not found');
+    }
+
+    const channelNameTemplate =
+      secondaryNameOverride ??
+      (aliasedActivities.length
+        ? primaryConfig.template
+        : primaryConfig.generalName);
+
+    const locked = !!secondaryLocked;
 
     const memberCount = channelMembers.length;
 
-    const ownIndex = databasePrimary.secondaries.findIndex(
+    const existingSecondaryConfigs = await this.db
+      .select()
+      .from(secondary)
+      .where(eq(secondary.primaryId, primaryId));
+
+    const ownIndex = existingSecondaryConfigs.findIndex(
       (secondary) => channelId === secondary.id,
     );
 
     const channelNumber =
-      ownIndex === -1 ? databasePrimary.secondaries.length + 1 : ownIndex + 1;
+      ownIndex === -1 ? existingSecondaryConfigs.length + 1 : ownIndex + 1;
 
-    const emoji = databaseSecondary?.emoji ?? '❔';
+    const emoji = secondaryEmoji ?? '❔';
 
     const plurals = channelNameTemplate.split(/<<(.+)\/(.+)>>/g);
 
@@ -519,53 +495,54 @@ export class SecondaryService {
   }
 
   public async cleanup() {
-    const secondaries = await this.db.secondary.findMany();
-    await Promise.all(
-      secondaries.map(({ id: secondaryId, guildId }) =>
-        this.update(guildId, secondaryId),
-      ),
-    );
+    const secondaryChannels = await this.db
+      .select({
+        guildId: secondary.guildId,
+        id: secondary.id,
+      })
+      .from(secondary);
+
+    secondaryChannels.forEach(async ({ id, guildId }) => {
+      try {
+        await this.client.channels.fetch(id, { force: true });
+      } catch (error) {
+        if (error instanceof DiscordAPIError && error.code === 10003) {
+          this.db
+            .delete(secondary)
+            .where(and(eq(secondary.id, id), eq(secondary.guildId, guildId)));
+        } else {
+          this.logger.error('Failed to fetch channel', error);
+          // throw error;
+        }
+      }
+    });
   }
 
-  /**
-   * Updates the owner of the secondary channel
-   * @param channelId The channel to take ownership of
-   * @param userId The user to take ownership of the channel
-   * @returns The updated secondary channel
-   */
-  public async allyourbase(guildId: string, channelId: string, userId: string) {
-    let channel = this.client.channels.cache.get(channelId);
+  private async checkChannelControl(
+    guildId: string,
+    channelId: string,
+    userId: string,
+  ) {
+    const channel = await this.client.channels.fetch(channelId);
 
     if (!channel) {
-      channel = await this.client.channels.fetch(channelId);
+      throw new IntentsError('Client channel');
     }
 
-    if (channel.type === ChannelType.DM) {
-      return;
+    if (!channel.isVoiceBased()) {
+      throw new Error('Channel is not a voice channel');
     }
 
-    const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const [databaseSecondary] = await this.db
+      .select()
+      .from(secondary)
+      .where(and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)));
 
     if (!databaseSecondary) {
       throw new Error('No secondary channel found');
     }
 
-    if (databaseSecondary.creator === userId) {
-      throw new Error('You already own this channel');
-    }
-
-    let discordGuild = this.client.guilds.cache.get(guildId);
-
-    if (!discordGuild) {
-      discordGuild = await this.client.guilds.fetch(guildId);
-    }
+    const discordGuild = await this.client.guilds.fetch(guildId);
 
     const discordMember = await discordGuild.members.fetch(userId);
 
@@ -577,14 +554,33 @@ export class SecondaryService {
       throw new Error('You do not have permission to do this');
     }
 
-    const updatedSecondary = await this.db.secondary.update({
-      where: {
-        id: channelId,
-      },
-      data: {
-        creator: userId,
-      },
-    });
+    return { databaseChannel: databaseSecondary, discordChannel: channel };
+  }
+
+  /**
+   * Updates the owner of the secondary channel
+   * @param channelId The channel to take ownership of
+   * @param userId The user to take ownership of the channel
+   * @returns The updated secondary channel
+   */
+  public async allyourbase(guildId: string, channelId: string, userId: string) {
+    const { databaseChannel } = await this.checkChannelControl(
+      guildId,
+      channelId,
+      userId,
+    );
+
+    if (databaseChannel.owner === userId) {
+      throw new Error('You already own this channel');
+    }
+
+    const [updatedSecondary] = await this.db
+      .update(secondary)
+      .set({
+        owner: userId,
+      })
+      .where(eq(secondary.id, channelId))
+      .returning();
 
     await this.updateName(guildId, updatedSecondary.id);
 
@@ -604,36 +600,15 @@ export class SecondaryService {
     bitrate: number,
     userId: string,
   ) {
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const { discordChannel } = await this.checkChannelControl(
+      guildId,
+      channelId,
+      userId,
+    );
 
-    if (!databaseSecondary) {
-      throw new Error('Channel is not a dynamica channel');
-    }
+    await discordChannel.edit({ bitrate });
 
-    let channel = this.client.channels.cache.get(channelId);
-
-    if (!channel) {
-      channel = await this.client.channels.fetch(channelId);
-    }
-
-    if (channel.isDMBased()) {
-      throw new Error('Channel is a DM');
-    }
-
-    if (databaseSecondary.creator !== userId) {
-      throw new Error('Not the owner of the channel');
-    }
-
-    await channel.edit({ bitrate });
-
-    return channel;
+    return discordChannel;
   }
 
   /**
@@ -650,36 +625,15 @@ export class SecondaryService {
     limit: number,
     userId: string,
   ) {
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const { discordChannel } = await this.checkChannelControl(
+      guildId,
+      channelId,
+      userId,
+    );
 
-    if (!databaseSecondary) {
-      throw new Error('Channel is not a dynamica channel');
-    }
+    await discordChannel.edit({ userLimit: limit });
 
-    let channel = this.client.channels.cache.get(channelId);
-
-    if (!channel) {
-      channel = await this.client.channels.fetch(channelId);
-    }
-
-    if (channel.isDMBased()) {
-      throw new Error('Channel is a DM');
-    }
-
-    if (databaseSecondary.creator !== userId) {
-      throw new Error('Not the owner of the channel');
-    }
-
-    await channel.edit({ userLimit: limit });
-
-    return channel;
+    return discordChannel;
   }
 
   /**
@@ -695,56 +649,38 @@ export class SecondaryService {
     name: string | null,
     userId: string,
   ) {
-    const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const { discordChannel } = await this.checkChannelControl(
+      guildId,
+      channelId,
+      userId,
+    );
 
-    if (!databaseSecondary) {
-      throw new Error('Channel is not a dynamica channel');
-    }
+    // await this.db.secondary.update({
+    //   where: {
+    //     id: channelId,
+    //   },
+    //   data: {
+    //     name,
+    //   },
+    // });
 
-    let channel = this.client.channels.cache.get(channelId);
-
-    if (!channel) {
-      channel = await this.client.channels.fetch(channelId);
-    }
-
-    if (channel.isDMBased()) {
-      throw new Error('Channel is a DM');
-    }
-
-    if (databaseSecondary.creator !== userId) {
-      throw new Error('Not the owner of the channel');
-    }
-
-    await this.db.secondary.update({
-      where: {
-        id: channelId,
-      },
-      data: {
+    await this.db
+      .update(secondary)
+      .set({
         name,
-      },
-    });
+      })
+      .where(eq(secondary.id, channelId));
 
     await this.updateName(guildId, channelId);
 
-    return channel;
+    return discordChannel;
   }
 
   public async info(guildId: string, channelId: string) {
-    const databaseSecondary = await this.db.secondary.findUniqueOrThrow({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const [databaseSecondary] = await this.db
+      .select()
+      .from(secondary)
+      .where(and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)));
 
     if (!databaseSecondary) {
       throw new Error('Channel is not a dynamica channel');
@@ -761,46 +697,21 @@ export class SecondaryService {
    * @returns The updated channel
    */
   public async lock(guildId: string, channelId: string, userId: string) {
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const { discordChannel } = await this.checkChannelControl(
+      guildId,
+      channelId,
+      userId,
+    );
 
-    if (!databaseSecondary) {
-      throw new Error('Channel is not a dynamica channel');
-    }
+    const everyoneRole = discordChannel.guild.roles.everyone;
 
-    let channel = this.client.channels.cache.get(channelId);
-
-    if (!channel) {
-      channel = await this.client.channels.fetch(channelId);
-    }
-
-    if (!channel) {
-      throw new Error('Channel not found');
-    }
-
-    if (channel.isDMBased()) {
-      throw new Error('Channel is a DM');
-    }
-
-    if (databaseSecondary.creator !== userId) {
-      throw new Error('Not the owner of the channel');
-    }
-
-    const everyoneRole = channel.guild.roles.everyone;
-
-    if (channel.members instanceof ThreadMemberManager) {
+    if (discordChannel.members instanceof ThreadMemberManager) {
       throw new Error('Channel is a thread');
     }
 
-    const currentMembersOfChannel = [...channel.members.values()];
+    const currentMembersOfChannel = [...discordChannel.members.values()];
 
-    await channel.edit({
+    await discordChannel.edit({
       permissionOverwrites: [
         ...currentMembersOfChannel.map((member) => ({
           id: member.id,
@@ -815,21 +726,28 @@ export class SecondaryService {
       ],
     });
 
-    await this.db.secondary.update({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-      data: {
+    // await this.db.secondary.update({
+    //   where: {
+    //     guildId_id: {
+    //       guildId,
+    //       id: channelId,
+    //     },
+    //   },
+    //   data: {
+    //     locked: true,
+    //   },
+    // });
+
+    await this.db
+      .update(secondary)
+      .set({
         locked: true,
-      },
-    });
+      })
+      .where(and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)));
 
     await this.updateName(guildId, channelId);
 
-    return channel;
+    return discordChannel;
   }
 
   /**
@@ -840,52 +758,35 @@ export class SecondaryService {
    * @returns The updated channel
    */
   public async unlock(guildId: string, channelId: string, userId: string) {
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
+    const { discordChannel } = await this.checkChannelControl(
+      guildId,
+      channelId,
+      userId,
+    );
+
+    await discordChannel.edit({
+      permissionOverwrites: [],
     });
 
-    if (!databaseSecondary) {
-      throw new Error('Channel is not a dynamica channel');
-    }
+    // await this.db.secondary.update({
+    //   where: {
+    //     guildId_id: {
+    //       guildId,
+    //       id: channelId,
+    //     },
+    //   },
+    //   data: {
+    //     locked: false,
+    //   },
+    // });
 
-    let channel = this.client.channels.cache.get(channelId);
-
-    if (!channel) {
-      channel = await this.client.channels.fetch(channelId);
-    }
-
-    if (channel.isDMBased()) {
-      throw new Error('Channel is a DM');
-    }
-
-    if (databaseSecondary.creator !== userId) {
-      throw new Error('Not the owner of the channel');
-    }
-
-    await channel.edit({
-      permissionOverwrites: null,
-    });
-
-    await this.db.secondary.update({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-      data: {
-        locked: false,
-      },
+    await this.db.update(secondary).set({
+      locked: false,
     });
 
     await this.updateName(guildId, channelId);
 
-    return channel;
+    return discordChannel;
   }
 
   /**
@@ -900,20 +801,15 @@ export class SecondaryService {
     channelId: string,
     userId: string,
   ): Promise<GuildMember> {
-    const guildSettings = await this.db.guild.findUnique({
-      where: {
-        id: guildId,
-      },
-    });
+    const [guildSettings] = await this.db
+      .select()
+      .from(guild)
+      .where(eq(guild.id, guildId));
 
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const [databaseSecondary] = await this.db
+      .select()
+      .from(secondary)
+      .where(and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)));
 
     if (!databaseSecondary) {
       throw new Error('Channel is not a dynamica channel');
@@ -931,10 +827,10 @@ export class SecondaryService {
       throw new Error('Join requests are not allowed');
     }
 
-    let channel = this.client.channels.cache.get(channelId);
+    const channel = await this.client.channels.fetch(channelId);
 
     if (!channel) {
-      channel = await this.client.channels.fetch(channelId);
+      throw new IntentsError('Client channel');
     }
 
     if (channel.isDMBased()) {
@@ -952,10 +848,10 @@ export class SecondaryService {
     }
 
     // Send join request to channel creator
-    let creator = channel.guild.members.cache.get(databaseSecondary.creator);
+    let creator = channel.guild.members.cache.get(databaseSecondary.owner);
 
     if (!creator) {
-      creator = await channel.guild.members.fetch(databaseSecondary.creator);
+      creator = await channel.guild.members.fetch(databaseSecondary.owner);
     }
 
     const joinRequestComponents =
@@ -982,10 +878,10 @@ export class SecondaryService {
     channelId: string,
     userId: string,
   ): Promise<GuildMember> {
-    let channel = this.client.channels.cache.get(channelId);
+    const channel = await this.client.channels.fetch(channelId);
 
     if (!channel) {
-      channel = await this.client.channels.fetch(channelId);
+      throw new IntentsError('Client channel');
     }
 
     if (channel.isDMBased()) {
@@ -1029,10 +925,10 @@ export class SecondaryService {
     channelId: string,
     userId: string,
   ): Promise<GuildMember> {
-    let channel = this.client.channels.cache.get(channelId);
+    const channel = await this.client.channels.fetch(channelId);
 
     if (!channel) {
-      channel = await this.client.channels.fetch(channelId);
+      throw new IntentsError('Client channel');
     }
 
     if (channel.isDMBased()) {
@@ -1068,48 +964,34 @@ export class SecondaryService {
     userId: string,
     newOwnerId: string,
   ) {
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const { discordChannel } = await this.checkChannelControl(
+      guildId,
+      channelId,
+      userId,
+    );
 
-    if (!databaseSecondary) {
-      throw new Error('Channel is not a dynamica channel');
-    }
+    // await this.db.secondary.update({
+    //   where: {
+    //     guildId_id: {
+    //       guildId,
+    //       id: channelId,
+    //     },
+    //   },
+    //   data: {
+    //     creator: newOwnerId,
+    //   },
+    // });
 
-    let channel = this.client.channels.cache.get(channelId);
-
-    if (!channel) {
-      channel = await this.client.channels.fetch(channelId);
-    }
-
-    if (channel.isDMBased()) {
-      throw new Error('Channel is a DM');
-    }
-
-    if (databaseSecondary.creator !== userId) {
-      throw new Error('Not the owner of the channel');
-    }
-
-    await this.db.secondary.update({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-      data: {
-        creator: newOwnerId,
-      },
-    });
+    await this.db
+      .update(secondary)
+      .set({
+        owner: newOwnerId,
+      })
+      .where(and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)));
 
     await this.updateName(guildId, channelId);
 
-    return channel;
+    return discordChannel;
   }
 
   /**
@@ -1122,14 +1004,19 @@ export class SecondaryService {
     guildId: string,
     id: string,
   ): Promise<ModalBuilder> {
-    const secondaryProperties = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id,
-        },
-      },
-    });
+    // const secondaryProperties = await this.db.secondary.findUnique({
+    //   where: {
+    //     guildId_id: {
+    //       guildId,
+    //       id,
+    //     },
+    //   },
+    // });
+
+    const [secondaryProperties] = await this.db
+      .select()
+      .from(secondary)
+      .where(and(eq(secondary.id, id), eq(secondary.guildId, guildId)));
 
     if (!secondaryProperties) {
       throw new Error('Channel is not a dynamica channel');
@@ -1167,30 +1054,26 @@ export class SecondaryService {
     channelId: string,
     userId: string,
   ): Promise<UserSelectMenuBuilder> {
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    const [databaseSecondary] = await this.db
+      .select()
+      .from(secondary)
+      .where(and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)));
 
     if (!databaseSecondary) {
       throw new Error('Channel is not a dynamica channel');
     }
 
-    let channel = this.client.channels.cache.get(channelId);
+    const channel = await this.client.channels.fetch(channelId);
 
     if (!channel) {
-      channel = await this.client.channels.fetch(channelId);
+      throw new IntentsError('Client channel');
     }
 
     if (channel.isDMBased()) {
       throw new Error('Channel is a DM');
     }
 
-    if (databaseSecondary.creator !== userId) {
+    if (databaseSecondary.owner !== userId) {
       throw new Error('Not the owner of the channel');
     }
 
@@ -1211,20 +1094,33 @@ export class SecondaryService {
     guildId: string,
     channelId: string,
   ): Promise<ActionRowBuilder<ButtonBuilder>> {
-    const databaseChannel = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-      include: {
-        guild: true,
-      },
-    });
+    // const databaseChannel = await this.db.secondary.findUnique({
+    //   where: {
+    //     guildId_id: {
+    //       guildId,
+    //       id: channelId,
+    //     },
+    //   },
+    //   include: {
+    //     guild: true,
+    //   },
+    // });
+
+    const [databaseChannel] = await this.db
+      .select({
+        locked: secondary.locked,
+        joinRequestsEnabled: guild.allowJoinRequests,
+      })
+      .from(secondary)
+      .where(and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)))
+      .leftJoin(guild, eq(secondary.guildId, guild.id));
 
     if (!databaseChannel) {
       throw new Error('Channel is not a dynamica channel');
+    }
+
+    if (databaseChannel.joinRequestsEnabled === null) {
+      throw new Error('Guild not found');
     }
 
     const lockButton = new ButtonBuilder()
@@ -1263,7 +1159,7 @@ export class SecondaryService {
       .setLabel('Request Join')
       .setStyle(ButtonStyle.Primary)
       .setDisabled(
-        !databaseChannel.guild.allowJoinRequests || !databaseChannel.locked,
+        !databaseChannel.joinRequestsEnabled || !databaseChannel.locked,
       );
 
     const isLocked = databaseChannel.locked;
@@ -1289,14 +1185,19 @@ export class SecondaryService {
     channelId: string,
     userId: string,
   ): Promise<ActionRowBuilder<ButtonBuilder>> {
-    const databaseChannel = await this.db.secondary.findUnique({
-      where: {
-        guildId_id: {
-          guildId,
-          id: channelId,
-        },
-      },
-    });
+    // const databaseChannel = await this.db.secondary.findUnique({
+    //   where: {
+    //     guildId_id: {
+    //       guildId,
+    //       id: channelId,
+    //     },
+    //   },
+    // });
+
+    const [databaseChannel] = await this.db
+      .select()
+      .from(secondary)
+      .where(and(eq(secondary.id, channelId), eq(secondary.guildId, guildId)));
 
     if (!databaseChannel) {
       throw new Error('Channel is not a dynamica channel');
@@ -1318,5 +1219,17 @@ export class SecondaryService {
       joinButton,
       declineButton,
     );
+  }
+}
+
+export class NameUpdateError extends Error {
+  constructor() {
+    super('Failed to update channel name');
+  }
+}
+
+export class IntentsError extends Error {
+  constructor(intentName: string) {
+    super(`Intents error, cannot fetch ${intentName}`);
   }
 }
