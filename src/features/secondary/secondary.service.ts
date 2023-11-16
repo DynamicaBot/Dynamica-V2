@@ -121,7 +121,7 @@ export class SecondaryService {
       .values({
         id: newDiscordChannel.id,
         emoji,
-        creator: userId,
+        owner: userId,
         lastName: channelName,
         primaryId,
         guildId,
@@ -279,7 +279,7 @@ export class SecondaryService {
     } else {
       const memberIds = discordChannel.members.map((member) => member.id);
 
-      if (!memberIds.includes(secondaryChannel.creator)) {
+      if (!memberIds.includes(secondaryChannel.owner)) {
         await this.db
           .update(secondary)
           .set({
@@ -570,7 +570,7 @@ export class SecondaryService {
       userId,
     );
 
-    if (databaseChannel.creator === userId) {
+    if (databaseChannel.owner === userId) {
       throw new Error('You already own this channel');
     }
 
@@ -848,10 +848,10 @@ export class SecondaryService {
     }
 
     // Send join request to channel creator
-    let creator = channel.guild.members.cache.get(databaseSecondary.creator);
+    let creator = channel.guild.members.cache.get(databaseSecondary.owner);
 
     if (!creator) {
-      creator = await channel.guild.members.fetch(databaseSecondary.creator);
+      creator = await channel.guild.members.fetch(databaseSecondary.owner);
     }
 
     const joinRequestComponents =
@@ -1073,7 +1073,7 @@ export class SecondaryService {
       throw new Error('Channel is a DM');
     }
 
-    if (databaseSecondary.creator !== userId) {
+    if (databaseSecondary.owner !== userId) {
       throw new Error('Not the owner of the channel');
     }
 

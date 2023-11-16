@@ -160,7 +160,7 @@ export class InfoCommands {
         },
         {
           name: 'Creator',
-          value: userMention(secondaryInfo.creator),
+          value: userMention(secondaryInfo.owner),
         },
         {
           name: 'Created At',

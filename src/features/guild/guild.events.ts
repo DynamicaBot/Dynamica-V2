@@ -54,7 +54,7 @@ export class GuildEvents {
       })
       .from(guild);
 
-    this.logger.log(`Left guild ${discordGuild.name} (${guild.id})`);
+    this.logger.log(`Left guild ${discordGuild.name} (${discordGuild.id})`);
     await this.mqtt.publish(`dynamica/guilds`, guildCount);
   }
 }
