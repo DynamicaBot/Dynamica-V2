@@ -1,5 +1,6 @@
-import { primary } from '@/db/schema';
 import { channelMention, time } from 'discord.js';
+
+import { primary } from '@/db/schema';
 
 type Primary = typeof primary.$inferSelect;
 type Secondary = typeof primary.$inferSelect;

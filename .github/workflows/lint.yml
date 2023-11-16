@@ -26,8 +26,6 @@ jobs:
           cache: 'pnpm'
       - name: Install Dependancies
         run: pnpm install --frozen-lockfile
-      - name: Generate
-        run: pnpm prisma generate
       - name: Add Problem Matcher
         run: echo "::add-matcher::.github/problem-matchers/eslint-stylish.json"
       - name: Lint
