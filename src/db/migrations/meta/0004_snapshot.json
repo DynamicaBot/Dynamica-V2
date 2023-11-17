@@ -6,8 +6,8 @@
   },
   "dialect": "sqlite",
   "enums": {},
-  "id": "b020b68f-d68d-4afb-a70f-be9075ff18ed",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "42cb077f-6106-49c4-b823-3ac5817e92fa",
+  "prevId": "426ea2ce-ae27-482c-8361-e284973c0c7d",
   "tables": {
     "Alias": {
       "columns": {
@@ -25,14 +25,6 @@
           "primaryKey": false,
           "type": "text"
         },
-        "createdAt": {
-          "autoincrement": false,
-          "default": "(CURRENT_TIMESTAMP)",
-          "name": "createdAt",
-          "notNull": true,
-          "primaryKey": false,
-          "type": "numeric"
-        },
         "guildId": {
           "autoincrement": false,
           "name": "guildId",
@@ -46,14 +38,6 @@
           "notNull": true,
           "primaryKey": true,
           "type": "integer"
-        },
-        "updatedAt": {
-          "autoincrement": false,
-          "default": "(CURRENT_TIMESTAMP)",
-          "name": "updatedAt",
-          "notNull": true,
-          "primaryKey": false,
-          "type": "numeric"
         }
       },
       "compositePrimaryKeys": {},
@@ -82,19 +66,10 @@
       "columns": {
         "allowJoinRequests": {
           "autoincrement": false,
-          "default": false,
           "name": "allowJoinRequests",
           "notNull": true,
           "primaryKey": false,
-          "type": "numeric"
-        },
-        "createdAt": {
-          "autoincrement": false,
-          "default": "(CURRENT_TIMESTAMP)",
-          "name": "createdAt",
-          "notNull": true,
-          "primaryKey": false,
-          "type": "numeric"
+          "type": "integer"
         },
         "id": {
           "autoincrement": false,
@@ -102,14 +77,6 @@
           "notNull": true,
           "primaryKey": true,
           "type": "text"
-        },
-        "updatedAt": {
-          "autoincrement": false,
-          "default": "(CURRENT_TIMESTAMP)",
-          "name": "updatedAt",
-          "notNull": true,
-          "primaryKey": false,
-          "type": "numeric"
         }
       },
       "compositePrimaryKeys": {},
@@ -126,14 +93,6 @@
     },
     "Primary": {
       "columns": {
-        "createdAt": {
-          "autoincrement": false,
-          "default": "(CURRENT_TIMESTAMP)",
-          "name": "createdAt",
-          "notNull": true,
-          "primaryKey": false,
-          "type": "numeric"
-        },
         "creator": {
           "autoincrement": false,
           "name": "creator",
@@ -170,14 +129,6 @@
           "notNull": true,
           "primaryKey": false,
           "type": "text"
-        },
-        "updatedAt": {
-          "autoincrement": false,
-          "default": "(CURRENT_TIMESTAMP)",
-          "name": "updatedAt",
-          "notNull": true,
-          "primaryKey": false,
-          "type": "numeric"
         }
       },
       "compositePrimaryKeys": {},
