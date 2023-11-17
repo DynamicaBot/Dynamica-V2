@@ -12,36 +12,8 @@
     {
       "idx": 1,
       "version": "5",
-      "when": 1699935844682,
-      "tag": "0001_yummy_ink",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1699940886188,
-      "tag": "0002_bored_lady_ursula",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1699943030320,
-      "tag": "0003_sleepy_peter_parker",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1699954978996,
-      "tag": "0004_medical_vengeance",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1699956779270,
-      "tag": "0005_whole_spencer_smythe",
+      "when": 1700179007563,
+      "tag": "0001_clever_silhouette",
       "breakpoints": true
     }
   ]

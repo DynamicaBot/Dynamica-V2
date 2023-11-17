@@ -1,4 +1,4 @@
-import { relations, sql } from 'drizzle-orm';
+import { relations } from 'drizzle-orm';
 import {
   sqliteTable,
   text,
@@ -14,12 +14,6 @@ export const guild = sqliteTable(
     allowJoinRequests: integer('allowJoinRequests', {
       mode: 'boolean',
     }).notNull(),
-    createdAt: integer('createdAt', { mode: 'timestamp' })
-      .default(sql`(CURRENT_TIMESTAMP)`)
-      .notNull(),
-    updatedAt: integer('updatedAt', { mode: 'timestamp' })
-      .default(sql`(CURRENT_TIMESTAMP)`)
-      .notNull(),
   },
   (table) => {
     return {
@@ -43,12 +37,6 @@ export const alias = sqliteTable(
     guildId: text('guildId')
       .notNull()
       .references(() => guild.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
-    createdAt: integer('createdAt', { mode: 'timestamp' })
-      .default(sql`(CURRENT_TIMESTAMP)`)
-      .notNull(),
-    updatedAt: integer('updatedAt', { mode: 'timestamp' })
-      .default(sql`(CURRENT_TIMESTAMP)`)
-      .notNull(),
   },
   (table) => {
     return {
@@ -77,12 +65,6 @@ export const primary = sqliteTable(
     guildId: text('guildId')
       .notNull()
       .references(() => guild.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
-    createdAt: integer('createdAt', { mode: 'timestamp' })
-      .default(sql`(CURRENT_TIMESTAMP)`)
-      .notNull(),
-    updatedAt: integer('updatedAt', { mode: 'timestamp' })
-      .default(sql`(CURRENT_TIMESTAMP)`)
-      .notNull(),
   },
   (table) => {
     return {
@@ -130,12 +112,6 @@ export const secondary = sqliteTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
-    createdAt: integer('createdAt', { mode: 'timestamp' })
-      .default(sql`(CURRENT_TIMESTAMP)`)
-      .notNull(),
-    updatedAt: integer('updatedAt', { mode: 'timestamp' })
-      .default(sql`(CURRENT_TIMESTAMP)`)
-      .notNull(),
     lastName: text('lastName').default('').notNull(),
   },
   (table) => {
