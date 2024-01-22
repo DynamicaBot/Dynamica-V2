@@ -23,6 +23,7 @@ ARG VERSION
 ENV VERSION=$VERSION
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/dist /app/dist
+RUN apk update && apk add bash
 RUN ls -la /app/dist
 CMD [ "pnpm", "start" ]
 
