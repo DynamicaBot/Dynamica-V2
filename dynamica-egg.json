@@ -21,7 +21,7 @@
   "scripts": {
     "installation": {
       "script": null,
-      "container": "alpine:3.4",
+      "container": "alpine:3.19",
       "entrypoint": "ash"
     }
   },

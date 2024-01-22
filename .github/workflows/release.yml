@@ -112,6 +112,7 @@ jobs:
         id: docker_build
         with:
           context: .
+          platforms: linux/amd64,linux/arm64
           target: 'runner'
           cache-from: type=registry,ref=ghcr.io/dynamicabot/dynamica-v2:latest
           build-args: |
@@ -124,6 +125,7 @@ jobs:
         uses: docker/build-push-action@v5
         id: docker_build_pterodactyl
         with:
+          platforms: linux/amd64,linux/arm64
           context: .
           target: 'pterodactyl'
           build-args: |
@@ -136,6 +138,7 @@ jobs:
         uses: docker/build-push-action@v5
         id: docker_build_dist
         with:
+          platforms: linux/amd64,linux/arm64
           context: .
           target: 'dist'
           push: false
