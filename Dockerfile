@@ -23,6 +23,7 @@ ARG VERSION
 ENV VERSION=$VERSION
 COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
 COPY --from=build /app/dist dist
+COPY --from=build /app/drizzle .
 RUN yarn install --production --frozen-lockfile
 CMD npx prisma migrate deploy && yarn start
 
@@ -37,6 +38,7 @@ WORKDIR /app
 RUN yarn install --production --frozen-lockfile
 COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
 COPY --from=build /app/dist dist
+COPY --from=build /app/drizzle .
 RUN adduser -H -D container -s /bin/bash
 ENV  USER=container HOME=/home/container
 USER container
