@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { OAuth2Scopes, PermissionFlagsBits } from 'discord.js';
 import {
   Context,
   type ContextOf,
@@ -30,6 +31,12 @@ export class AppService {
   @Once('ready')
   public async onReady(@Context() [client]: ContextOf<'ready'>) {
     this.logger.log(`Bot logged in as ${client.user.tag}`);
+    const inviteLink = client.generateInvite({
+      scopes: [OAuth2Scopes.ApplicationsCommands, OAuth2Scopes.Bot],
+      permissions: [PermissionFlagsBits.Administrator],
+    });
+
+    this.logger.log(`Invite Link: ${inviteLink}`);
 
     await this.cleanup();
 

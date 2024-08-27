@@ -48,26 +48,50 @@ if (migrated) {
   // Guild
   const prismaGuilds = await prisma.guild.findMany();
   if (prismaGuilds.length) {
-    await db.insert(guildTable).values(prismaGuilds).returning();
+    console.log({ prismaGuilds });
+    const drizzleGuilds = await db
+      .insert(guildTable)
+      .values(prismaGuilds)
+      .onConflictDoNothing()
+      .returning();
+    console.log({ drizzleGuilds });
   }
 
   // Aliases
   const prismaAliases = await prisma.alias.findMany();
   if (prismaAliases.length) {
-    await db.insert(aliasTable).values(prismaAliases).returning();
+    console.log({ prismaAliases });
+    const drizzleAliases = await db
+      .insert(aliasTable)
+      .values(prismaAliases)
+      .onConflictDoNothing()
+      .returning();
+    console.log({ drizzleAliases });
   }
 
   // Primaries
   const prismaPrimaries = await prisma.primary.findMany();
   if (prismaPrimaries.length) {
-    await db.insert(primaryTable).values(prismaPrimaries).returning();
+    console.log({ prismaPrimaries });
+    const drizzlePrimaries = await db
+      .insert(primaryTable)
+      .values(prismaPrimaries)
+      .onConflictDoNothing()
+      .returning();
+    console.log({ drizzlePrimaries });
   }
 
   // Secondaries
   const prismaSecondaries = await prisma.secondary.findMany();
 
   if (prismaSecondaries.length) {
-    await db.insert(secondaryTable).values(prismaSecondaries).returning();
+    console.log({ prismaSecondaries });
+    const drizzleSecondaries = await db
+      .insert(secondaryTable)
+      .values(prismaSecondaries)
+      .onConflictDoNothing()
+      .returning();
+    console.log({ drizzleSecondaries });
   }
 
   await db

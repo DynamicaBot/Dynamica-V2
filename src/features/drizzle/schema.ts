@@ -34,7 +34,9 @@ export const primaryTable = pgTable(
     creator: text('creator').notNull(),
     template: text('template').notNull().default('@@game@@ ##'),
     generalName: text('generalName').notNull().default('General ##'),
-    guildId: text('guildId').notNull(),
+    guildId: text('guildId')
+      .notNull()
+      .references(() => guildTable.id),
     createdAt: timestamp('createdAt', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -65,8 +67,12 @@ export const secondaryTable = pgTable(
     creator: text('creator'),
     emoji: text('emoji'),
     locked: boolean('locked').notNull().default(false),
-    guildId: text('guildId').notNull(),
-    primaryId: text('primaryId').notNull(),
+    guildId: text('guildId')
+      .notNull()
+      .references(() => guildTable.id),
+    primaryId: text('primaryId')
+      .notNull()
+      .references(() => primaryTable.id),
     createdAt: timestamp('createdAt', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -103,7 +109,9 @@ export const aliasTable = pgTable(
     id: serial('id').notNull().primaryKey(),
     activity: text('activity').notNull(),
     alias: text('alias').notNull(),
-    guildId: text('guildId').notNull(),
+    guildId: text('guildId')
+      .notNull()
+      .references(() => guildTable.id),
     createdAt: timestamp('createdAt', { withTimezone: true })
       .notNull()
       .defaultNow(),
