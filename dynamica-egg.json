@@ -38,6 +38,15 @@
             "rules": "required|string"
         },
         {
+            "name": "Postgres URL",
+            "description": "The path in which to create the sqlite database.",
+            "env_variable": "POSTGRES_URL",
+            "default_value": "postgresql://postgres:postgres@localhost:5432/dynamica",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "string"
+        },
+        {
             "name": "Token",
             "description": "The token for the discord bot.",
             "env_variable": "TOKEN",
