@@ -4,6 +4,7 @@ WORKDIR /app
 RUN apk update --no-cache
 RUN apk add --no-cache python3 make gcc g++ bash curl
 COPY package.json yarn.lock tsconfig.json tsup.config.ts prisma ./
+COPY drizzle /app/drizzle
 
 # Runner
 FROM base as runner
