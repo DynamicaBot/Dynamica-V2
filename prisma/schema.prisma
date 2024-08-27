@@ -5,11 +5,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator drizzle {
-  provider = "drizzle-prisma-generator"
-  output   = "./src/features/drizzle/schema.ts"
-}
-
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
