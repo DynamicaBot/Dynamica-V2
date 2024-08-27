@@ -7,6 +7,13 @@ import postgres from 'postgres';
 config();
 
 import * as schema from '../features/drizzle/schema';
+import {
+  migratedTable,
+  primaryTable,
+  guildTable,
+  secondaryTable,
+  aliasTable,
+} from '../features/drizzle/schema';
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -40,19 +47,35 @@ if (migrated) {
 } else {
   // Guild
   const prismaGuilds = await prisma.guild.findMany();
-  await db.insert(schema.guildTable).values(prismaGuilds).returning();
+  if (prismaGuilds.length) {
+    await db.insert(guildTable).values(prismaGuilds).returning();
+  }
 
   // Aliases
   const prismaAliases = await prisma.alias.findMany();
-  await db.insert(schema.aliasTable).values(prismaAliases).returning();
+  if (prismaAliases.length) {
+    await db.insert(aliasTable).values(prismaAliases).returning();
+  }
 
   // Primaries
   const prismaPrimaries = await prisma.primary.findMany();
-  await db.insert(schema.primaryTable).values(prismaPrimaries).returning();
+  if (prismaPrimaries.length) {
+    await db.insert(primaryTable).values(prismaPrimaries).returning();
+  }
 
   // Secondaries
   const prismaSecondaries = await prisma.secondary.findMany();
-  await db.insert(schema.secondaryTable).values(prismaSecondaries).returning();
 
-  await db.insert(schema.migratedTable).values({}).returning();
+  if (prismaSecondaries.length) {
+    await db.insert(secondaryTable).values(prismaSecondaries).returning();
+  }
+
+  await db
+    .insert(migratedTable)
+    .values({
+      createdAt: new Date(),
+    })
+    .returning();
 }
+
+process.exit(0);
