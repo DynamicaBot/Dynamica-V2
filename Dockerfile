@@ -10,6 +10,7 @@ FROM base as build
 WORKDIR /app
 RUN yarn install --frozen-lockfile
 COPY src ./src
+COPY drizzle ./drizzle
 RUN yarn generate
 RUN yarn build
 
