@@ -13,7 +13,7 @@
         "ghcr.io/dynamicabot/dynamica-v2:latest-pterodactyl"
     ],
     "file_denylist": [],
-    "startup": "npx prisma migrate deploy;\r\nyarn start",
+    "startup": "pnpm start",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"Bot logged in as\"\r\n}",

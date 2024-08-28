@@ -23,7 +23,8 @@
 
 ## Table Of Contents
 
-- [About the Project](#about-the-project)
+- [Table Of Contents](#table-of-contents)
+- [About The Project](#about-the-project)
 - [Built With](#built-with)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
@@ -58,7 +59,7 @@ To get a local copy up and running follow these simple example steps.
 This is an example of how to list things you need to use the software and how to install them.
 
 - [NodeJS](https://nodejs.org)
-- [Yarn](https://yarnpkg.com)
+- [PNPM](https://pnpm.io)
 
 ### Installation
 
@@ -86,7 +87,7 @@ This is an example of how to list things you need to use the software and how to
 In order to develop with the bot run:
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 This will start the bot and reload it when you make any changes.
