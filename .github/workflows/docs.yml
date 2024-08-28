@@ -32,7 +32,7 @@ jobs:
       - run: pip install -r mkdocs-requirements.txt
       - run: mkdocs build
       - name: Upload Artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: site/
 
