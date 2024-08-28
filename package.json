@@ -47,7 +47,7 @@
     "drizzle-kit": "^0.24.2",
     "drizzle-prisma-generator": "^0.1.7",
     "prisma": "^5.0.0",
-    "semantic-release": "^22.0.0",
+    "semantic-release": "^24.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.4"
   },
