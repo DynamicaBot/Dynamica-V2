@@ -1,4 +1,4 @@
-import { ExceptionFilter, Catch, ArgumentsHost } from "@nestjs/common";
+import { type ExceptionFilter, Catch, type ArgumentsHost } from "@nestjs/common";
 import * as Sentry from "@sentry/node";
 import { BaseInteraction } from "discord.js";
 import { NecordArgumentsHost } from "necord";

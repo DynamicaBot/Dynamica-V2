@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { Client } from "discord.js";
+import type { Client } from "discord.js";
 
-import { MqttService } from "@/features/mqtt";
-import { PrismaService } from "@/features/prisma";
+import type { MqttService } from "@/features/mqtt";
+import type { PrismaService } from "@/features/prisma";
 
 @Injectable()
 export class GuildService {

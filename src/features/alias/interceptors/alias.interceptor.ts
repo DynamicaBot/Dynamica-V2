@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import {
 	ActivityType,
-	AutocompleteInteraction,
-	CacheType,
+	type AutocompleteInteraction,
+	type CacheType,
 	GuildMember,
 } from "discord.js";
 import { AutocompleteInterceptor } from "necord";

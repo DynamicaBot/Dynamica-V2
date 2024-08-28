@@ -12,7 +12,7 @@ import {
 
 import createErrorEmbed from "@/utils/createErrorEmbed";
 
-import { SecondaryService } from "./secondary.service";
+import type { SecondaryService } from "./secondary.service";
 
 @Injectable()
 export class SecondarySelectors {

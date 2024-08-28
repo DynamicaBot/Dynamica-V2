@@ -1,4 +1,4 @@
-import { Primary, Secondary } from "@prisma/client";
+import type { Primary, Secondary } from "@prisma/client";
 import { channelMention, time } from "discord.js";
 
 export default function fieldToDiscordEmbed(

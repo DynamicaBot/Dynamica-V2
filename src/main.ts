@@ -17,7 +17,7 @@ async function bootstrap() {
 		const { RewriteFrames } = await import("@sentry/integrations");
 		// const rootEsmFile = fileURLToPath(import.meta.url);
 		// const rootEsmDir = path.dirname(rootEsmFile);
-		Error.stackTraceLimit = Infinity;
+		Error.stackTraceLimit = Number.POSITIVE_INFINITY;
 		sentry.init({
 			dsn,
 			release: version,

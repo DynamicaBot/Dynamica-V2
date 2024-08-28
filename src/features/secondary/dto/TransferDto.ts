@@ -1,4 +1,4 @@
-import { User } from "discord.js";
+import type { User } from "discord.js";
 import { StringOption, UserOption } from "necord";
 
 export class TransferDto {

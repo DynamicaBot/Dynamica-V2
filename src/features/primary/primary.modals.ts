@@ -2,9 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { EmbedBuilder } from "discord.js";
 import { Ctx, Modal, type ModalContext, ModalParam } from "necord";
 
-import { PrismaService } from "../prisma";
+import type { PrismaService } from "../prisma";
 
-import { PrimaryService } from "./primary.service";
+import type { PrimaryService } from "./primary.service";
 
 @Injectable()
 export class PrimaryModals {

@@ -3,9 +3,9 @@ import { Ctx, Modal, type ModalContext, ModalParam } from "necord";
 
 import createErrorEmbed from "@/utils/createErrorEmbed";
 
-import { PrismaService } from "../prisma";
+import type { PrismaService } from "../prisma";
 
-import { SecondaryService } from "./secondary.service";
+import type { SecondaryService } from "./secondary.service";
 
 @Injectable()
 export class SecondaryModals {
