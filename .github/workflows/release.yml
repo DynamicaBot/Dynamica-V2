@@ -57,17 +57,20 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Yarn
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 9
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'yarn'
+          cache: 'pnpm'
       - name: Install Dependancies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
       - name: Generate
-        run: yarn generate
+        run: pnpm generate
       - name: Build
-        run: yarn build
+        run: pnpm build
       - name: Upload Build
         uses: actions/upload-artifact@v3
         with:
