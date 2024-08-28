@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'node'
+          cache: 'pnpm'
       - name: Install Dependancies
         run: pnpm install --frozen-lockfile
       - name: Generate
