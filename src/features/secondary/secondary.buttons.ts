@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import {
   ActionRowBuilder,
-  UserSelectMenuBuilder,
+  type UserSelectMenuBuilder,
   channelMention,
 } from 'discord.js';
 import { Button, type ButtonContext, ComponentParam, Context } from 'necord';
 
 import createErrorEmbed from '@/utils/createErrorEmbed';
 
-import { SecondaryService } from './secondary.service';
+import type { SecondaryService } from './secondary.service';
 
 @Injectable()
 export class SecondaryButtons {
@@ -93,7 +93,7 @@ export class SecondaryButtons {
 
       return interaction.reply({
         ephemeral: true,
-        content: `Select a user to transfer ownership to`,
+        content: 'Select a user to transfer ownership to',
         components: [row],
       });
     } catch (error) {
@@ -213,7 +213,7 @@ export class SecondaryButtons {
     }
   }
 
-  @Button(`secondary/buttons/requestjoin/:channelId`)
+  @Button('secondary/buttons/requestjoin/:channelId')
   public async onRequestJoin(
     @Context() [interaction]: ButtonContext,
     @ComponentParam('channelId') channelId: string,

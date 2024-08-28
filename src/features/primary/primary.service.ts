@@ -2,16 +2,16 @@ import { Injectable } from '@nestjs/common';
 import {
   ActionRowBuilder,
   ChannelType,
-  Client,
-  ModalActionRowComponentBuilder,
+  type Client,
+  type ModalActionRowComponentBuilder,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
 
-import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
-import { SecondaryService } from '@/features/secondary';
+import type { MqttService } from '@/features/mqtt';
+import type { PrismaService } from '@/features/prisma';
+import type { SecondaryService } from '@/features/secondary';
 import { getPresence } from '@/utils/presence';
 
 @Injectable()
@@ -47,7 +47,7 @@ export class PrimaryService {
     }
 
     const channelId = await guild.channels.create({
-      name: `➕ New Session`,
+      name: '➕ New Session',
       type: ChannelType.GuildVoice,
       parent: sectionId,
     });
@@ -74,7 +74,7 @@ export class PrimaryService {
 
     this.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 
-    await this.mqtt.publish(`dynamica/primaries`, primaryCount);
+    await this.mqtt.publish('dynamica/primaries', primaryCount);
 
     return primary;
   }

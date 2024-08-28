@@ -10,11 +10,11 @@ import {
   type SlashCommandContext,
 } from 'necord';
 
-import { GuildService } from './features/guild/guild.service';
-import { MqttService } from './features/mqtt/mqtt.service';
-import { PrimaryService } from './features/primary/primary.service';
-import { PrismaService } from './features/prisma/prisma.service';
-import { SecondaryService } from './features/secondary/secondary.service';
+import type { GuildService } from './features/guild/guild.service';
+import type { MqttService } from './features/mqtt/mqtt.service';
+import type { PrimaryService } from './features/primary/primary.service';
+import type { PrismaService } from './features/prisma/prisma.service';
+import type { SecondaryService } from './features/secondary/secondary.service';
 import { getPresence } from './utils/presence';
 
 @Injectable()
@@ -46,11 +46,11 @@ export class AppService {
     const aliasCount = await this.db.alias.count();
 
     await Promise.all([
-      this.mqtt.publish(`dynamica/guilds`, guildCount),
-      this.mqtt.publish(`dynamica/primaries`, primaryCount),
-      this.mqtt.publish(`dynamica/secondaries`, secondaryCount),
-      this.mqtt.publish(`dynamica/aliases`, aliasCount),
-      this.mqtt.publish(`dynamica/presence`, client.readyAt.toISOString()),
+      this.mqtt.publish('dynamica/guilds', guildCount),
+      this.mqtt.publish('dynamica/primaries', primaryCount),
+      this.mqtt.publish('dynamica/secondaries', secondaryCount),
+      this.mqtt.publish('dynamica/aliases', aliasCount),
+      this.mqtt.publish('dynamica/presence', client.readyAt.toISOString()),
     ]);
 
     const totalChannels = primaryCount + secondaryCount;

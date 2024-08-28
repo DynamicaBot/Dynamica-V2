@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { ActivityType } from 'discord.js';
 import { Context, type ContextOf, On } from 'necord';
 
-import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
+import type { MqttService } from '@/features/mqtt';
+import type { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
 
-import { SecondaryService } from './secondary.service';
+import type { SecondaryService } from './secondary.service';
 
 @Injectable()
 export class SecondaryEvents {
@@ -108,7 +108,7 @@ export class SecondaryEvents {
 
     channel.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 
-    this.mqtt.publish(`dynamica/secondaries`, secondaryCount);
+    this.mqtt.publish('dynamica/secondaries', secondaryCount);
   }
 
   @On('presenceUpdate')

@@ -1,78 +1,78 @@
-import { Injectable, UseInterceptors } from '@nestjs/common';
-import { channelMention } from 'discord.js';
+import { Injectable, UseInterceptors } from "@nestjs/common";
+import { channelMention } from "discord.js";
 import {
-  Context,
-  Options,
-  SlashCommand,
-  type SlashCommandContext,
-} from 'necord';
+	Context,
+	Options,
+	SlashCommand,
+	type SlashCommandContext,
+} from "necord";
 
-import createErrorEmbed from '@/utils/createErrorEmbed';
+import createErrorEmbed from "@/utils/createErrorEmbed";
 
-import { PrimaryCreateDto } from './dto/PrimaryCreateDto';
-import { PrimaryDto } from './dto/PrimaryDto';
-import { PrimaryAutocompleteInterceptor } from './interceptors/primary.interceptor';
-import { PrimaryService } from './primary.service';
+import type { PrimaryCreateDto } from "./dto/PrimaryCreateDto";
+import type { PrimaryDto } from "./dto/PrimaryDto";
+import { PrimaryAutocompleteInterceptor } from "./interceptors/primary.interceptor";
+import type { PrimaryService } from "./primary.service";
 
 @Injectable()
 export class PrimaryCommands {
-  constructor(private readonly primaryService: PrimaryService) {}
+	constructor(private readonly primaryService: PrimaryService) {}
 
-  @SlashCommand({
-    name: 'create',
-    description: 'Create a new dynamic channel',
-    defaultMemberPermissions: 'ManageChannels',
-  })
-  public async onCreate(
-    @Context() [interaction]: SlashCommandContext,
-    @Options() options: PrimaryCreateDto,
-  ) {
-    const { guildId } = interaction;
-    try {
-      const newChannel = await this.primaryService.create(
-        interaction.user.id,
-        guildId,
-        options.section?.id,
-      );
-      return interaction.reply({
-        ephemeral: true,
-        content: `New Primary Channel Created: ${channelMention(
-          newChannel.id,
-        )}`,
-      });
-    } catch (error) {
-      const errorEmbed = createErrorEmbed(error.message);
+	@SlashCommand({
+		name: "create",
+		description: "Create a new dynamic channel",
+		defaultMemberPermissions: "ManageChannels",
+	})
+	public async onCreate(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() options: PrimaryCreateDto,
+	) {
+		const { guildId } = interaction;
+		try {
+			const newChannel = await this.primaryService.create(
+				interaction.user.id,
+				guildId,
+				options.section?.id,
+			);
+			return interaction.reply({
+				ephemeral: true,
+				content: `New Primary Channel Created: ${channelMention(
+					newChannel.id,
+				)}`,
+			});
+		} catch (error) {
+			const errorEmbed = createErrorEmbed(error.message);
 
-      return interaction.reply({
-        embeds: [errorEmbed],
-        ephemeral: true,
-      });
-    }
-  }
+			return interaction.reply({
+				embeds: [errorEmbed],
+				ephemeral: true,
+			});
+		}
+	}
 
-  @UseInterceptors(PrimaryAutocompleteInterceptor)
-  @SlashCommand({
-    name: 'primary',
-    description: 'Set the channel settings',
-    defaultMemberPermissions: 'ManageChannels',
-  })
-  public async onSettings(
-    @Context() [interaction]: SlashCommandContext,
-    @Options() { primary }: PrimaryDto,
-  ) {
-    try {
-      const newChannel = await this.primaryService.createPrimaryModal(
-        interaction.guildId,
-        primary,
-      );
-      return interaction.showModal(newChannel);
-    } catch (error) {
-      const errorEmbed = createErrorEmbed(error.message);
+	@UseInterceptors(PrimaryAutocompleteInterceptor)
+	@SlashCommand({
+		name: "primary",
+		description: "Set the channel settings",
+		defaultMemberPermissions: "ManageChannels",
+	})
+	public async onSettings(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { primary }: PrimaryDto,
+	) {
+		try {
+			const newChannel = await this.primaryService.createPrimaryModal(
+				interaction.guildId,
+				primary,
+			);
+			return interaction.showModal(newChannel);
+		} catch (error) {
+			const errorEmbed = createErrorEmbed(error.message);
 
-      return interaction.reply({
-        embeds: [errorEmbed],
-        ephemeral: true,
-      });
-    }
-  }
+			return interaction.reply({
+				embeds: [errorEmbed],
+				ephemeral: true,
+			});
+		}
+	}
 }

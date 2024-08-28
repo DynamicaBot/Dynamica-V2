@@ -6,10 +6,10 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ChannelType,
-  Client,
+  type Client,
   DiscordAPIError,
-  GuildMember,
-  ModalActionRowComponentBuilder,
+  type GuildMember,
+  type ModalActionRowComponentBuilder,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -19,8 +19,8 @@ import {
 import emojiList from 'emoji-random-list';
 import { romanize } from 'romans';
 
-import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
+import type { MqttService } from '@/features/mqtt';
+import type { PrismaService } from '@/features/prisma';
 import { getPresence } from '@/utils/presence';
 
 @Injectable()
@@ -52,7 +52,7 @@ export class SecondaryService {
       discordChannel = await discordGuild.channels.fetch(id);
     }
 
-    if (discordChannel && discordChannel.manageable) {
+    if (discordChannel?.manageable) {
       await discordChannel.delete();
     }
   }
@@ -156,7 +156,7 @@ export class SecondaryService {
         .has(PermissionFlagsBits.SendMessages)
     ) {
       await newDiscordChannel.send({
-        content: `Edit the channel settings here`,
+        content: 'Edit the channel settings here',
         components: [channelSettingsComponents],
       });
     }
@@ -409,9 +409,9 @@ export class SecondaryService {
 
     const aliasObject: Record<string, string> = {};
 
-    aliases.forEach(({ alias, activity }) => {
+    for (const { alias, activity } of aliases) {
       aliasObject[activity] = alias;
-    });
+    }
 
     const aliasedActivities = activityList.map(
       (activity) => aliasObject[activity] ?? activity,
@@ -497,7 +497,7 @@ export class SecondaryService {
       )}`; // Plurals
 
     if (formattedString.length > 100) {
-      return formattedString.slice(0, 99) + '…';
+      return `${formattedString.slice(0, 99)}…`;
     }
 
     return formattedString;

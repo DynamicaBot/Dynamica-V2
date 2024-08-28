@@ -8,16 +8,16 @@ import {
 import { Context, Options, type SlashCommandContext, Subcommand } from 'necord';
 
 import { InfoCommandDecorator } from '@/decorators/info.decorator';
-import { PrimaryInfoDto } from '@/dto/PrimaryInfoDto';
-import { SecondaryInfoDto } from '@/dto/SecondaryInfoDto';
-import { GuildService } from '@/features/guild';
+import type { PrimaryInfoDto } from '@/dto/PrimaryInfoDto';
+import type { SecondaryInfoDto } from '@/dto/SecondaryInfoDto';
+import type { GuildService } from '@/features/guild';
 import {
   PrimaryAutocompleteInterceptor,
-  PrimaryService,
+  type PrimaryService,
 } from '@/features/primary';
 import {
   SecondaryAutocompleteInterceptor,
-  SecondaryService,
+  type SecondaryService,
 } from '@/features/secondary';
 import fieldToDiscordEmbed from '@/utils/fieldToDiscordEmbed';
 
@@ -50,7 +50,7 @@ export class InfoCommands {
             ? guildInfo.primaryChannels
                 .map((channel) => channelMention(channel.id))
                 .join('\n')
-            : inlineCode(`None`),
+            : inlineCode('None'),
         },
         {
           name: 'Secondary Channels',
@@ -58,7 +58,7 @@ export class InfoCommands {
             ? guildInfo.secondaryChannels
                 .map((channel) => channelMention(channel.id))
                 .join(', ')
-            : inlineCode(`None`),
+            : inlineCode('None'),
         },
       );
     return interaction.reply({ embeds: [embed], ephemeral: true });
@@ -102,7 +102,7 @@ export class InfoCommands {
             ? primaryInfo.secondaries
                 .map((channel) => channelMention(channel.id))
                 .join('\n')
-            : inlineCode(`None`),
+            : inlineCode('None'),
         },
       );
     return interaction.reply({ embeds: [embed], ephemeral: true });
@@ -131,7 +131,7 @@ export class InfoCommands {
           name: 'Name Override',
           value: secondaryInfo.name.length
             ? fieldToDiscordEmbed(secondaryInfo.name)
-            : inlineCode(`None`),
+            : inlineCode('None'),
         },
         {
           name: 'Primary',

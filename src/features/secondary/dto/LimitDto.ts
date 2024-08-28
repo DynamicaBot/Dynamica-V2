@@ -1,18 +1,18 @@
-import { NumberOption, StringOption } from 'necord';
+import { NumberOption, StringOption } from "necord";
 
 export class LimitDto {
-  @StringOption({
-    name: 'secondary',
-    description: 'The id of the secondary channel',
-    required: true,
-    autocomplete: true,
-  })
-  secondary: string;
+	@StringOption({
+		name: "secondary",
+		description: "The id of the secondary channel",
+		required: true,
+		autocomplete: true,
+	})
+	secondary: string;
 
-  @NumberOption({
-    name: 'limit',
-    description: 'The limit of users in the secondary channel',
-    required: true,
-  })
-  limit: number;
+	@NumberOption({
+		name: "limit",
+		description: "The limit of users in the secondary channel",
+		required: true,
+	})
+	limit: number;
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
+import type { MqttService } from '@/features/mqtt';
+import type { PrismaService } from '@/features/prisma';
 
 @Injectable()
 export class AliasService {
@@ -37,7 +37,7 @@ export class AliasService {
 
     const aliasCount = await this.db.alias.count();
 
-    await this.mqtt.publish(`dynamica/aliases`, aliasCount);
+    await this.mqtt.publish('dynamica/aliases', aliasCount);
 
     return upsertedAlias;
   }
@@ -73,7 +73,7 @@ export class AliasService {
 
     const aliasCount = await this.db.alias.count();
 
-    await this.mqtt.publish(`dynamica/aliases`, aliasCount);
+    await this.mqtt.publish('dynamica/aliases', aliasCount);
 
     return deletedAlias;
   }

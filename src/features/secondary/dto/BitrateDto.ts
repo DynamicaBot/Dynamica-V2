@@ -5,7 +5,7 @@ const bitrates = [
 ];
 
 const choices = bitrates.map((bitrate) => ({
-  name: `${bitrate / 1000}kbps` + (bitrate === 96000 ? ' (default)' : ``),
+  name: `${bitrate / 1000}kbps${bitrate === 96000 ? ' (default)' : ''}`,
   value: bitrate,
 }));
 

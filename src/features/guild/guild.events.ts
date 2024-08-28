@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Context, type ContextOf, On } from 'necord';
 
-import { MqttService } from '@/features/mqtt';
-import { PrismaService } from '@/features/prisma';
+import type { MqttService } from '@/features/mqtt';
+import type { PrismaService } from '@/features/prisma';
 
 @Injectable()
 export class GuildEvents {
@@ -22,7 +22,7 @@ export class GuildEvents {
     });
     const guildCount = await this.db.guild.count();
     this.logger.log(`Joined guild ${guild.name} (${guild.id})`);
-    await this.mqtt.publish(`dynamica/guilds`, guildCount);
+    await this.mqtt.publish('dynamica/guilds', guildCount);
   }
 
   @On('guildDelete')
@@ -34,6 +34,6 @@ export class GuildEvents {
     });
     const guildCount = await this.db.guild.count();
     this.logger.log(`Left guild ${guild.name} (${guild.id})`);
-    await this.mqtt.publish(`dynamica/guilds`, guildCount);
+    await this.mqtt.publish('dynamica/guilds', guildCount);
   }
 }
