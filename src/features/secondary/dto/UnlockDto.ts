@@ -1,11 +1,11 @@
-import { StringOption } from 'necord';
+import { StringOption } from "necord";
 
 export class UnlockDto {
-  @StringOption({
-    name: 'channel',
-    description: 'The secondary channel to unlock',
-    autocomplete: true,
-    required: true,
-  })
-  secondary: string;
+	@StringOption({
+		name: "channel",
+		description: "The secondary channel to unlock",
+		autocomplete: true,
+		required: true,
+	})
+	secondary: string;
 }

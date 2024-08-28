@@ -1,52 +1,52 @@
-import { Injectable } from '@nestjs/common';
-import { userMention } from 'discord.js';
+import { Injectable } from "@nestjs/common";
+import { userMention } from "discord.js";
 import {
-  Context,
-  type ISelectedMembers,
-  type ISelectedUsers,
-  SelectedMembers,
-  SelectedUsers,
-  UserSelect,
-  type UserSelectContext,
-} from 'necord';
+	Context,
+	type ISelectedMembers,
+	type ISelectedUsers,
+	SelectedMembers,
+	SelectedUsers,
+	UserSelect,
+	type UserSelectContext,
+} from "necord";
 
-import createErrorEmbed from '@/utils/createErrorEmbed';
+import createErrorEmbed from "@/utils/createErrorEmbed";
 
-import { SecondaryService } from './secondary.service';
+import { SecondaryService } from "./secondary.service";
 
 @Injectable()
 export class SecondarySelectors {
-  constructor(private readonly secondaryService: SecondaryService) {}
+	constructor(private readonly secondaryService: SecondaryService) {}
 
-  @UserSelect('secondary/selectors/transfer/:channelId')
-  public async onTransfer(
-    @Context() [interaction]: UserSelectContext,
-    @SelectedUsers() users: ISelectedUsers,
-    @SelectedMembers() members: ISelectedMembers,
-  ) {
-    try {
-      const selectedMember = members.first();
+	@UserSelect("secondary/selectors/transfer/:channelId")
+	public async onTransfer(
+		@Context() [interaction]: UserSelectContext,
+		@SelectedUsers() users: ISelectedUsers,
+		@SelectedMembers() members: ISelectedMembers,
+	) {
+		try {
+			const selectedMember = members.first();
 
-      await this.secondaryService.transfer(
-        interaction.guildId,
-        interaction.channelId,
-        interaction.user.id,
-        selectedMember.user.id,
-      );
+			await this.secondaryService.transfer(
+				interaction.guildId,
+				interaction.channelId,
+				interaction.user.id,
+				selectedMember.user.id,
+			);
 
-      return interaction.update({
-        content: `Channel Transferred to ${userMention(
-          selectedMember.user.id,
-        )}`,
-        components: [],
-      });
-    } catch (error) {
-      const errorEmbed = createErrorEmbed(error.message);
+			return interaction.update({
+				content: `Channel Transferred to ${userMention(
+					selectedMember.user.id,
+				)}`,
+				components: [],
+			});
+		} catch (error) {
+			const errorEmbed = createErrorEmbed(error.message);
 
-      return interaction.reply({
-        embeds: [errorEmbed],
-        ephemeral: true,
-      });
-    }
-  }
+			return interaction.reply({
+				embeds: [errorEmbed],
+				ephemeral: true,
+			});
+		}
+	}
 }

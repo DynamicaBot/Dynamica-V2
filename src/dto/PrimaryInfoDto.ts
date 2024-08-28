@@ -1,11 +1,11 @@
-import { StringOption } from 'necord';
+import { StringOption } from "necord";
 
 export class PrimaryInfoDto {
-  @StringOption({
-    name: 'primary',
-    description: 'The id of the primary channel',
-    required: true,
-    autocomplete: true,
-  })
-  primary: string;
+	@StringOption({
+		name: "primary",
+		description: "The id of the primary channel",
+		required: true,
+		autocomplete: true,
+	})
+	primary: string;
 }
