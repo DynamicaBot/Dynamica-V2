@@ -93,9 +93,6 @@ importers:
       drizzle-prisma-generator:
         specifier: ^0.1.7
         version: 0.1.7
-      prettier:
-        specifier: ^3.0.0
-        version: 3.3.3
       prisma:
         specifier: ^5.0.0
         version: 5.19.0
@@ -2764,11 +2761,6 @@ packages:
   postgres@3.4.4:
     resolution: {integrity: sha512-IbyN+9KslkqcXa8AO9fxpk97PA4pzewvpi2B3Dwy9u4zpV32QicaEdgmF3eSQUzdRk7ttDHQejNgAEr4XoeH4A==}
     engines: {node: '>=12'}
-
-  prettier@3.3.3:
-    resolution: {integrity: sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==}
-    engines: {node: '>=14'}
-    hasBin: true
 
   prisma@5.19.0:
     resolution: {integrity: sha512-Pu7lUKpVyTx8cVwM26dYh8NdvMOkMnJXzE8L6cikFuR4JwyMU5NKofQkWyxJKlTT4fNjmcnibTvklV8oVMrn+g==}
@@ -5890,8 +5882,6 @@ snapshots:
       yaml: 2.5.0
 
   postgres@3.4.4: {}
-
-  prettier@3.3.3: {}
 
   prisma@5.19.0:
     dependencies:
