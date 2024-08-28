@@ -72,12 +72,12 @@ jobs:
       - name: Build
         run: pnpm build
       - name: Upload Build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: dist
       - name: Upload Prisma
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: prisma
           path: node_modules/.prisma
@@ -97,7 +97,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Restore Dist
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: dist
@@ -119,12 +119,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Restore Dist
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: dist
       - name: Restore Prisma
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: prisma
           path: node_modules/.prisma
@@ -180,12 +180,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Restore Dist
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: dist
       - name: Restore Prisma
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: prisma
           path: node_modules/.prisma
