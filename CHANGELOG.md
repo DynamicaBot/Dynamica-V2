@@ -1,5 +1,13 @@
 # dynamica-v2
 
+## 3.0.6
+
+### Patch Changes
+
+- [`e96ade8`](https://github.com/DynamicaBot/Dynamica-V2/commit/e96ade848b067c43fbd6a83d2ab2fd243a25143c) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add latest to workflow
+
+- [`f3706b7`](https://github.com/DynamicaBot/Dynamica-V2/commit/f3706b7948741e6c041f3fa75a24f187aa0088f2) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Sentry Releases
+
 ## 3.0.5
 
 ### Patch Changes
