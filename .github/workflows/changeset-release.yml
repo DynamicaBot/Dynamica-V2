@@ -65,7 +65,6 @@ jobs:
       fail-fast: true
       matrix:
         package: ${{ fromJson(needs.release.outputs.publishedPackages) }}
-        versions: ['default', 'pterodactyl']
     steps:
       - name: Parse Semver
         uses: booxmedialtd/ws-action-parse-semver@v1.4.7
@@ -74,9 +73,8 @@ jobs:
         id: parse-semver
 
       - name: Docker meta
-        id: meta-pterodactyl
+        id: meta
         uses: docker/metadata-action@v5
-        if: ${{ matrix.package.name == 'pterodactyl' }}
         with:
           images: ${{ env.IMAGE }}
           tags: |
@@ -95,16 +93,15 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Image (default)
-        if: ${{ matrix.package.name == 'default' }}
+      - name: Build Image
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64,linux/arm64
           build-args: |
             VERSION=${{ matrix.package.version }}
-          tags: ${{ steps.meta-default.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           push: true
-          labels: ${{ steps.meta-default.outputs.labels }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=ghcr.io/dynamicabot/dynamica-v2:latest
 
   publish-docker-pterodactyl:
@@ -147,7 +144,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Image
-        if: ${{ matrix.package.name == 'pterodactyl' }}
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64,linux/arm64
