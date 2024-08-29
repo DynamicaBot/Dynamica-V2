@@ -137,6 +137,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           target: extract
           outputs: type=local,dest=dist
+          push: false
       - uses: getsentry/action-release@v1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
