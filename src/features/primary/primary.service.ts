@@ -2,16 +2,16 @@ import { Inject, Injectable } from "@nestjs/common";
 import {
 	ActionRowBuilder,
 	ChannelType,
-	type Client,
+	Client,
 	type ModalActionRowComponentBuilder,
 	ModalBuilder,
 	TextInputBuilder,
 	TextInputStyle,
 } from "discord.js";
 
-import type { MqttService } from "@/features/mqtt";
+import { MqttService } from "@/features/mqtt";
 
-import type { SecondaryService } from "@/features/secondary";
+import { SecondaryService } from "@/features/secondary";
 import { getPresence } from "@/utils/presence";
 import { type Drizzle, DRIZZLE_TOKEN } from "../drizzle/drizzle.module";
 import { primaryTable, secondaryTable } from "../drizzle/schema";

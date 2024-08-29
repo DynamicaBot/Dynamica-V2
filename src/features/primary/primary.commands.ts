@@ -12,7 +12,7 @@ import createErrorEmbed from "@/utils/createErrorEmbed";
 import type { PrimaryCreateDto } from "./dto/PrimaryCreateDto";
 import type { PrimaryDto } from "./dto/PrimaryDto";
 import { PrimaryAutocompleteInterceptor } from "./interceptors/primary.interceptor";
-import type { PrimaryService } from "./primary.service";
+import { PrimaryService } from "./primary.service";
 
 @Injectable()
 export class PrimaryCommands {

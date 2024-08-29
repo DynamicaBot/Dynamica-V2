@@ -1,11 +1,11 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Context, type ContextOf, On } from "necord";
 
-import type { MqttService } from "@/features/mqtt";
+import { MqttService } from "@/features/mqtt";
 
 import { getPresence } from "@/utils/presence";
 
-import type { PrimaryService } from "./primary.service";
+import { PrimaryService } from "./primary.service";
 import { type Drizzle, DRIZZLE_TOKEN } from "../drizzle/drizzle.module";
 import { count, eq } from "drizzle-orm";
 import { primaryTable } from "../drizzle/schema";

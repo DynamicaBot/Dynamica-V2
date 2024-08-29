@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { DiscordAPIError, type Client } from "discord.js";
+import { DiscordAPIError, Client } from "discord.js";
 
-import type { MqttService } from "@/features/mqtt";
+import { MqttService } from "@/features/mqtt";
 
 import { type Drizzle, DRIZZLE_TOKEN } from "../drizzle/drizzle.module";
 import { guildTable } from "../drizzle/schema";
@@ -12,7 +12,6 @@ export class GuildService {
 	public constructor(
 		@Inject(DRIZZLE_TOKEN) private readonly db: Drizzle,
 		private readonly client: Client,
-		private readonly mqtt: MqttService,
 	) {}
 
 	private readonly logger = new Logger(GuildService.name);

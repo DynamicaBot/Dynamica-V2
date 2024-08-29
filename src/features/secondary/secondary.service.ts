@@ -6,7 +6,7 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	ChannelType,
-	type Client,
+	Client,
 	DiscordAPIError,
 	type GuildMember,
 	type ModalActionRowComponentBuilder,
@@ -19,7 +19,7 @@ import {
 import emojiList from "emoji-random-list";
 import { romanize } from "romans";
 
-import type { MqttService } from "@/features/mqtt";
+import { MqttService } from "@/features/mqtt";
 
 import { getPresence } from "@/utils/presence";
 import { type Drizzle, DRIZZLE_TOKEN } from "../drizzle/drizzle.module";

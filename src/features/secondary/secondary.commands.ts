@@ -23,7 +23,7 @@ import type { NameDto } from "./dto/NameDto";
 import type { TransferDto } from "./dto/TransferDto";
 import type { UnlockDto } from "./dto/UnlockDto";
 import { SecondaryAutocompleteInterceptor } from "./interceptors/secondary.interceptor";
-import type { SecondaryService } from "./secondary.service";
+import { SecondaryService } from "./secondary.service";
 
 @UseInterceptors(SecondaryAutocompleteInterceptor)
 @Injectable()

@@ -3,7 +3,7 @@ import { Ctx, Modal, type ModalContext, ModalParam } from "necord";
 
 import createErrorEmbed from "@/utils/createErrorEmbed";
 
-import type { SecondaryService } from "./secondary.service";
+import { SecondaryService } from "./secondary.service";
 
 @Injectable()
 export class SecondaryModals {

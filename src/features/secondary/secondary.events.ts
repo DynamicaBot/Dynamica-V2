@@ -2,11 +2,11 @@ import { Inject, Injectable } from "@nestjs/common";
 import { ActivityType } from "discord.js";
 import { Context, type ContextOf, On } from "necord";
 
-import type { MqttService } from "@/features/mqtt";
+import { MqttService } from "@/features/mqtt";
 
 import { getPresence } from "@/utils/presence";
 
-import { IntentsError, type SecondaryService } from "./secondary.service";
+import { IntentsError, SecondaryService } from "./secondary.service";
 import { type Drizzle, DRIZZLE_TOKEN } from "../drizzle/drizzle.module";
 import { count, eq } from "drizzle-orm";
 import { primaryTable, secondaryTable } from "../drizzle/schema";

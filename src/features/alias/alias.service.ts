@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 
-import type { MqttService } from "@/features/mqtt";
+import { MqttService } from "@/features/mqtt";
 
 import { DRIZZLE_TOKEN, type Drizzle } from "../drizzle/drizzle.module";
 import { aliasTable } from "../drizzle/schema";

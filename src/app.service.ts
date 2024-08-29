@@ -10,10 +10,10 @@ import {
 	type SlashCommandContext,
 } from "necord";
 
-import type { GuildService } from "./features/guild/guild.service";
-import type { MqttService } from "./features/mqtt/mqtt.service";
-import type { PrimaryService } from "./features/primary/primary.service";
-import type { SecondaryService } from "./features/secondary/secondary.service";
+import { GuildService } from "./features/guild/guild.service";
+import { MqttService } from "./features/mqtt/mqtt.service";
+import { PrimaryService } from "./features/primary/primary.service";
+import { SecondaryService } from "./features/secondary/secondary.service";
 import { getPresence } from "./utils/presence";
 import {
 	aliasTable,

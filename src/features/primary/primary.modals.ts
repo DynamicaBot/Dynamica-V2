@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { EmbedBuilder } from "discord.js";
 import { Ctx, Modal, type ModalContext, ModalParam } from "necord";
 
-import type { PrimaryService } from "./primary.service";
+import { PrimaryService } from "./primary.service";
 import { type Drizzle, DRIZZLE_TOKEN } from "../drizzle/drizzle.module";
 import { and, eq } from "drizzle-orm";
 import { primaryTable } from "../drizzle/schema";

@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { Context, type ContextOf, On } from "necord";
 
-import type { MqttService } from "@/features/mqtt";
+import { MqttService } from "@/features/mqtt";
 
 import { type Drizzle, DRIZZLE_TOKEN } from "../drizzle/drizzle.module";
 import { guildTable } from "../drizzle/schema";

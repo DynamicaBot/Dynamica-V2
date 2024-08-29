@@ -10,14 +10,14 @@ import { Context, Options, type SlashCommandContext, Subcommand } from "necord";
 import { InfoCommandDecorator } from "@/decorators/info.decorator";
 import type { PrimaryInfoDto } from "@/dto/PrimaryInfoDto";
 import type { SecondaryInfoDto } from "@/dto/SecondaryInfoDto";
-import type { GuildService } from "@/features/guild";
+import { GuildService } from "@/features/guild";
 import {
 	PrimaryAutocompleteInterceptor,
-	type PrimaryService,
+	PrimaryService,
 } from "@/features/primary";
 import {
 	SecondaryAutocompleteInterceptor,
-	type SecondaryService,
+	SecondaryService,
 } from "@/features/secondary";
 import fieldToDiscordEmbed from "@/utils/fieldToDiscordEmbed";
 
