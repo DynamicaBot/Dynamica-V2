@@ -150,7 +150,7 @@ export class SecondaryService {
 			try {
 				await newDiscordChannel.send({
 					content: "Edit the channel settings here",
-					components: [channelSettingsComponents],
+					components: channelSettingsComponents,
 				});
 			} catch (error) {
 				if (error instanceof DiscordAPIError) {
@@ -275,7 +275,11 @@ export class SecondaryService {
 			return;
 		}
 
-		if (discordChannel.members.size === 0 && discordChannel.manageable) {
+		if (
+			discordChannel.members.size === 0 &&
+			discordChannel.manageable &&
+			!secondaryChannel.pinned
+		) {
 			await discordChannel.delete();
 		} else {
 			const memberIds = discordChannel.members.map((member) => member.id);
@@ -287,7 +291,7 @@ export class SecondaryService {
 				await this.db
 					.update(secondaryTable)
 					.set({
-						creator: memberIds[0],
+						creator: memberIds[0] ?? null,
 					})
 					.where(
 						and(
@@ -961,6 +965,50 @@ export class SecondaryService {
 		return discordChannel;
 	}
 
+	public async pin(guildId: string, channelId: string, userId: string) {
+		const { discordChannel } = await this.checkChannelControl(
+			guildId,
+			channelId,
+			userId,
+		);
+
+		await this.db
+			.update(secondaryTable)
+			.set({
+				pinned: true,
+			})
+			.where(
+				and(
+					eq(secondaryTable.id, channelId),
+					eq(secondaryTable.guildId, guildId),
+				),
+			);
+
+		return discordChannel;
+	}
+
+	public async unpin(guildId: string, channelId: string, userId: string) {
+		const { discordChannel } = await this.checkChannelControl(
+			guildId,
+			channelId,
+			userId,
+		);
+
+		await this.db
+			.update(secondaryTable)
+			.set({
+				pinned: false,
+			})
+			.where(
+				and(
+					eq(secondaryTable.id, channelId),
+					eq(secondaryTable.guildId, guildId),
+				),
+			);
+
+		return discordChannel;
+	}
+
 	/**
 	 * Create a modal to edit a secondary channel
 	 * @param guildId the guild id
@@ -1036,7 +1084,7 @@ export class SecondaryService {
 	async createSecondarySettingsComponents(
 		guildId: string,
 		channelId: string,
-	): Promise<ActionRowBuilder<ButtonBuilder>> {
+	): Promise<Array<ActionRowBuilder<ButtonBuilder>>> {
 		const databaseChannel = await this.db.query.secondaryTable.findFirst({
 			where: and(
 				eq(secondaryTable.id, channelId),
@@ -1090,15 +1138,52 @@ export class SecondaryService {
 				!databaseChannel.guild.allowJoinRequests || !databaseChannel.locked,
 			);
 
-		const isLocked = databaseChannel.locked;
+		const pin = new ButtonBuilder()
+			.setCustomId(`secondary/buttons/pin/${channelId}`)
+			.setEmoji("📌")
+			.setLabel("Pin")
+			.setStyle(ButtonStyle.Primary);
 
-		return new ActionRowBuilder<ButtonBuilder>().addComponents(
+		const unpin = new ButtonBuilder()
+			.setCustomId(`secondary/buttons/unpin/${channelId}`)
+			.setEmoji("📌")
+			.setLabel("Unpin")
+			.setStyle(ButtonStyle.Primary);
+
+		const buttons: Array<ButtonBuilder> = [
 			transferButton,
-			isLocked ? unlockButton : lockButton,
 			settingsButton,
 			allyourbaseButton,
-			requestJoin,
-		);
+		];
+
+		if (databaseChannel.guild.allowJoinRequests) {
+			buttons.push(requestJoin);
+		}
+
+		if (!databaseChannel.locked) {
+			buttons.push(lockButton);
+		} else {
+			buttons.push(unlockButton);
+		}
+
+		if (!databaseChannel.pinned) {
+			buttons.push(pin);
+		} else {
+			buttons.push(unpin);
+		}
+
+		// chunk by 5
+		const actionRows: Array<ActionRowBuilder<ButtonBuilder>> = [];
+
+		for (let i = 0; i < buttons.length; i += 5) {
+			actionRows.push(
+				new ActionRowBuilder<ButtonBuilder>().addComponents(
+					...buttons.slice(i, i + 5),
+				),
+			);
+		}
+
+		return actionRows;
 	}
 
 	/**

@@ -36,7 +36,7 @@ export class SecondaryButtons {
 				);
 
 			return interaction.update({
-				components: [messageComponents],
+				components: messageComponents,
 			});
 		} catch (error) {
 			const errorEmbed = createErrorEmbed(error.message);
@@ -68,7 +68,7 @@ export class SecondaryButtons {
 					id,
 				);
 			return interaction.update({
-				components: [messageComponents],
+				components: messageComponents,
 			});
 		} catch (error) {
 			const errorEmbed = createErrorEmbed(error.message);
@@ -272,6 +272,78 @@ export class SecondaryButtons {
 			return interaction.reply({
 				content: `Requested to join ${requestedMember.toString()}'s channel`,
 				ephemeral: true,
+			});
+		} catch (error) {
+			const errorEmbed = createErrorEmbed(error.message);
+
+			return interaction.reply({
+				embeds: [errorEmbed],
+				ephemeral: true,
+			});
+		}
+	}
+
+	@Button("secondary/buttons/pin/:channelId")
+	public async onPin(
+		@Context() [interaction]: ButtonContext,
+		@ComponentParam("channelId") channelId: string,
+	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
+		try {
+			await this.secondaryService.pin(guildId, channelId, interaction.user.id);
+
+			const messageComponents =
+				await this.secondaryService.createSecondarySettingsComponents(
+					guildId,
+					channelId,
+				);
+
+			return interaction.update({
+				components: messageComponents,
+			});
+		} catch (error) {
+			const errorEmbed = createErrorEmbed(error.message);
+
+			return interaction.reply({
+				embeds: [errorEmbed],
+				ephemeral: true,
+			});
+		}
+	}
+
+	@Button("secondary/buttons/unpin/:channelId")
+	public async onUnpin(
+		@Context() [interaction]: ButtonContext,
+		@ComponentParam("channelId") channelId: string,
+	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
+		try {
+			await this.secondaryService.unpin(
+				guildId,
+				channelId,
+				interaction.user.id,
+			);
+
+			const messageComponents =
+				await this.secondaryService.createSecondarySettingsComponents(
+					guildId,
+					channelId,
+				);
+
+			return interaction.update({
+				components: messageComponents,
 			});
 		} catch (error) {
 			const errorEmbed = createErrorEmbed(error.message);

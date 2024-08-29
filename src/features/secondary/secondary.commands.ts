@@ -24,6 +24,8 @@ import type { TransferDto } from "./dto/TransferDto";
 import type { UnlockDto } from "./dto/UnlockDto";
 import { SecondaryAutocompleteInterceptor } from "./interceptors/secondary.interceptor";
 import { SecondaryService } from "./secondary.service";
+import { PinDto } from "./dto/PinDto";
+import { UnpinDto } from "./dto/UnpinDto";
 
 @UseInterceptors(SecondaryAutocompleteInterceptor)
 @Injectable()
@@ -327,6 +329,82 @@ export class SecondaryCommands {
 			return interaction.reply({
 				ephemeral: true,
 				content: `Join request sent to ${creator.toString()}`,
+			});
+		} catch (error) {
+			const errorEmbed = createErrorEmbed(error.message);
+
+			return interaction.reply({
+				embeds: [errorEmbed],
+				ephemeral: true,
+			});
+		}
+	}
+
+	@UseInterceptors(SecondaryAutocompleteInterceptor)
+	@SlashCommand({
+		name: "pin",
+		description: "Pin the channel so it doesn't get deleted",
+		dmPermission: false,
+	})
+	async onPin(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { secondary }: PinDto,
+	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
+
+		try {
+			const newChannel = await this.secondaryService.pin(
+				guildId,
+				secondary,
+				interaction.user.id,
+			);
+			return interaction.reply({
+				ephemeral: true,
+				content: `Channel Pinned: ${channelMention(newChannel.id)}`,
+			});
+		} catch (error) {
+			const errorEmbed = createErrorEmbed(error.message);
+
+			return interaction.reply({
+				embeds: [errorEmbed],
+				ephemeral: true,
+			});
+		}
+	}
+
+	@UseInterceptors(SecondaryAutocompleteInterceptor)
+	@SlashCommand({
+		name: "unpin",
+		description: "Unpin the channel",
+		dmPermission: false,
+	})
+	async onUnpin(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { secondary }: UnpinDto,
+	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
+
+		try {
+			const newChannel = await this.secondaryService.unpin(
+				guildId,
+				secondary,
+				interaction.user.id,
+			);
+			return interaction.reply({
+				ephemeral: true,
+				content: `Channel Unpinned: ${channelMention(newChannel.id)}`,
 			});
 		} catch (error) {
 			const errorEmbed = createErrorEmbed(error.message);
