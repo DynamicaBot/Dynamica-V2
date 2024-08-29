@@ -24,6 +24,8 @@ import type { TransferDto } from "./dto/TransferDto";
 import type { UnlockDto } from "./dto/UnlockDto";
 import { SecondaryAutocompleteInterceptor } from "./interceptors/secondary.interceptor";
 import { SecondaryService } from "./secondary.service";
+import { PinDto } from "./dto/PinDto";
+import { UnpinDto } from "./dto/UnpinDto";
 
 @UseInterceptors(SecondaryAutocompleteInterceptor)
 @Injectable()
@@ -337,6 +339,8 @@ export class SecondaryCommands {
 			});
 		}
 	}
+
+	@UseInterceptors(SecondaryAutocompleteInterceptor)
 	@SlashCommand({
 		name: "pin",
 		description: "Pin the channel so it doesn't get deleted",
@@ -344,7 +348,7 @@ export class SecondaryCommands {
 	})
 	async onPin(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { secondary }: JoinDto,
+		@Options() { secondary }: PinDto,
 	) {
 		const guildId = interaction.guildId;
 		if (!guildId) {
@@ -374,6 +378,7 @@ export class SecondaryCommands {
 		}
 	}
 
+	@UseInterceptors(SecondaryAutocompleteInterceptor)
 	@SlashCommand({
 		name: "unpin",
 		description: "Unpin the channel",
@@ -381,7 +386,7 @@ export class SecondaryCommands {
 	})
 	async onUnpin(
 		@Context() [interaction]: SlashCommandContext,
-		@Options() { secondary }: JoinDto,
+		@Options() { secondary }: UnpinDto,
 	) {
 		const guildId = interaction.guildId;
 		if (!guildId) {
