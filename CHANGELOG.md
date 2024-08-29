@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.0.2
+
+### Patch Changes
+
+- [`bd6cb32`](https://github.com/DynamicaBot/Dynamica-V2/commit/bd6cb32c5fdf299ed5c0c583168a566b30c901d6) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Remove zero fetch depth changeset release
+
 ## 3.0.1
 
 ### Patch Changes
