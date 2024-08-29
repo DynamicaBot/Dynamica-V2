@@ -25,7 +25,5 @@ jobs:
           cache: 'pnpm'
       - name: Install Dependancies
         run: pnpm install --frozen-lockfile
-      - name: Generate
-        run: pnpm generate
       - name: Lint
         run: pnpm lint
