@@ -7,7 +7,6 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
-  REGISTRY: ghcr.io
   IMAGE: ghcr.io/dynamicabot/dynamica-v2
 
 permissions:
@@ -105,7 +104,7 @@ jobs:
       - name: Docker Login
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
