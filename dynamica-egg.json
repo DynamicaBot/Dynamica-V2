@@ -29,22 +29,13 @@
     },
     "variables": [
         {
-            "name": "Database Path",
-            "description": "The path in which to create the sqlite database.",
-            "env_variable": "DATABASE_URL",
-            "default_value": "file:/home/container/dynamica-v2/db.sqlite",
-            "user_viewable": true,
-            "user_editable": false,
-            "rules": "required|string"
-        },
-        {
             "name": "Postgres URL",
             "description": "The path in which to create the sqlite database.",
             "env_variable": "POSTGRES_URL",
             "default_value": "postgresql://postgres:postgres@localhost:5432/dynamica",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "string"
+            "rules": "required|string"
         },
         {
             "name": "Token",

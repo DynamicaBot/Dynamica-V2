@@ -41,7 +41,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 21
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -79,6 +79,7 @@ jobs:
           images: ${{ env.IMAGE }}
           tags: |
             # use custom value instead of git tag
+            type=raw,value=latest
             type=raw,value=${{ matrix.package.version }}
             type=raw,value=${{ steps.parse-semver.outputs.major }}
             type=raw,value=${{ steps.parse-semver.outputs.major }}.${{ steps.parse-semver.outputs.minor }}
@@ -92,6 +93,7 @@ jobs:
             suffix=-pterodactyl,onlatest=true
           tags: |
             # use custom value instead of git tag
+            type=raw,value=latest
             type=raw,value=${{ matrix.package.version }}
             type=raw,value=${{ steps.parse-semver.outputs.major }}
             type=raw,value=${{ steps.parse-semver.outputs.major }}.${{ steps.parse-semver.outputs.minor }}
