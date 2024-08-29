@@ -32,16 +32,6 @@ export class SecondaryModals {
 				interaction.user.id,
 			);
 
-			// const updatedComponents =
-			//   await this.secondaryService.createSecondarySettingsComponents(
-			//     interaction.guildId,
-			//     id,
-			//   );
-
-			// await interaction({
-			//   components: [updatedComponents],
-			// });
-
 			return interaction.reply({
 				ephemeral: true,
 				content: `Channel name updated to ${updatedSecondary.name}`,

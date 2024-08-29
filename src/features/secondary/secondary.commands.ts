@@ -337,4 +337,77 @@ export class SecondaryCommands {
 			});
 		}
 	}
+	@SlashCommand({
+		name: "pin",
+		description: "Pin the channel so it doesn't get deleted",
+		dmPermission: false,
+	})
+	async onPin(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { secondary }: JoinDto,
+	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
+
+		try {
+			const newChannel = await this.secondaryService.pin(
+				guildId,
+				secondary,
+				interaction.user.id,
+			);
+			return interaction.reply({
+				ephemeral: true,
+				content: `Channel Pinned: ${channelMention(newChannel.id)}`,
+			});
+		} catch (error) {
+			const errorEmbed = createErrorEmbed(error.message);
+
+			return interaction.reply({
+				embeds: [errorEmbed],
+				ephemeral: true,
+			});
+		}
+	}
+
+	@SlashCommand({
+		name: "unpin",
+		description: "Unpin the channel",
+		dmPermission: false,
+	})
+	async onUnpin(
+		@Context() [interaction]: SlashCommandContext,
+		@Options() { secondary }: JoinDto,
+	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
+
+		try {
+			const newChannel = await this.secondaryService.unpin(
+				guildId,
+				secondary,
+				interaction.user.id,
+			);
+			return interaction.reply({
+				ephemeral: true,
+				content: `Channel Unpinned: ${channelMention(newChannel.id)}`,
+			});
+		} catch (error) {
+			const errorEmbed = createErrorEmbed(error.message);
+
+			return interaction.reply({
+				embeds: [errorEmbed],
+				ephemeral: true,
+			});
+		}
+	}
 }
