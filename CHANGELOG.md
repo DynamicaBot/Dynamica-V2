@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.0.4
+
+### Patch Changes
+
+- [`38c0309`](https://github.com/DynamicaBot/Dynamica-V2/commit/38c030905868a24afd36a3cd2fa0737f2114d238) Thanks [@sebasptsch](https://github.com/sebasptsch)! - fix release tags
+
 ## 3.0.3
 
 ### Patch Changes
