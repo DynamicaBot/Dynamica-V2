@@ -37,28 +37,18 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
+    "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.7",
     "@nestjs/cli": "^10.0.0",
     "@swc/core": "^1.3.46",
     "@types/node": "20.16.2",
     "@types/romans": "^2.0.0",
     "drizzle-kit": "^0.24.2",
-    "semantic-release": "^24.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.4"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/DynamicaBot/Dynamica-V2.git"
-  },
-  "release": {
-    "branches": [
-      "main"
-    ],
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/github"
-    ]
   }
 }
