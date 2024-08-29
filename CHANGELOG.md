@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.1.1
+
+### Patch Changes
+
+- [`168ce8e`](https://github.com/DynamicaBot/Dynamica-V2/commit/168ce8e25d85c66377b1445abad3aa2528803bb3) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add controller tag
+
 ## 3.1.0
 
 ### Minor Changes
