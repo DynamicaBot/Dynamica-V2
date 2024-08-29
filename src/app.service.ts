@@ -22,7 +22,7 @@ import {
 	secondaryTable,
 } from "./features/drizzle/schema";
 import { type Drizzle, DRIZZLE_TOKEN } from "./features/drizzle/drizzle.module";
-import { sql } from "drizzle-orm";
+import { count, sql } from "drizzle-orm";
 
 @Injectable()
 export class AppService {
@@ -49,24 +49,24 @@ export class AppService {
 
 		const [{ guildCount }] = await this.db
 			.select({
-				guildCount: sql<number>`COUNT(*)`,
+				guildCount: count(),
 			})
 			.from(guildTable);
 		const [{ primaryCount }] = await this.db
 			.select({
-				primaryCount: sql<number>`COUNT(*)`,
+				primaryCount: count(),
 			})
 			.from(primaryTable);
 
 		const [{ secondaryCount }] = await this.db
 			.select({
-				secondaryCount: sql<number>`COUNT(*)`,
+				secondaryCount: count(),
 			})
 			.from(secondaryTable);
 
 		const [{ aliasCount }] = await this.db
 			.select({
-				aliasCount: sql<number>`COUNT(*)`,
+				aliasCount: count(),
 			})
 			.from(aliasTable);
 		await Promise.all([

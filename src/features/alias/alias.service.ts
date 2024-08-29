@@ -59,7 +59,7 @@ export class AliasService {
 
 		const [{ aliasCount }] = await this.db
 			.select({
-				aliasCount: sql<number>`COUNT(*)`,
+				aliasCount: count(),
 			})
 			.from(aliasTable);
 
