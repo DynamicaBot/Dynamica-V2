@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.1.2
+
+### Patch Changes
+
+- [`d161aa5`](https://github.com/DynamicaBot/Dynamica-V2/commit/d161aa5b7f7e5e013a9d4df00bf337d43622845f) Thanks [@sebasptsch](https://github.com/sebasptsch)! - use wget for healthchecks
+
 ## 3.1.1
 
 ### Patch Changes
