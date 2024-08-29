@@ -1,5 +1,8 @@
-import type { Primary, Secondary } from "@prisma/client";
+import type { primaryTable } from "@/features/drizzle/schema";
 import { channelMention, time } from "discord.js";
+
+type Primary = typeof primaryTable.$inferSelect;
+type Secondary = typeof primaryTable.$inferSelect;
 
 export default function fieldToDiscordEmbed(
 	value: string | boolean | Date | Array<Secondary | Primary>,

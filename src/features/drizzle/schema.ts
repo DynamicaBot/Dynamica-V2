@@ -17,8 +17,8 @@ export const migratedTable = pgTable("Migrated", {
 });
 
 export const guildTable = pgTable("Guild", {
-	id: text("id").notNull().primaryKey(),
-	allowJoinRequests: boolean("allowJoinRequests").notNull().default(false),
+	id: text("id").primaryKey(),
+	allowJoinRequests: boolean("allowJoinRequests").notNull(),
 	createdAt: timestamp("createdAt", { withTimezone: true })
 		.notNull()
 		.defaultNow(),
@@ -30,10 +30,10 @@ export const guildTable = pgTable("Guild", {
 export const primaryTable = pgTable(
 	"Primary",
 	{
-		id: text("id").notNull().primaryKey(),
+		id: text("id").primaryKey(),
 		creator: text("creator").notNull(),
-		template: text("template").notNull().default("@@game@@ ##"),
-		generalName: text("generalName").notNull().default("General ##"),
+		template: text("template").notNull(),
+		generalName: text("generalName").notNull(),
 		guildId: text("guildId")
 			.notNull()
 			.references(() => guildTable.id),
@@ -62,7 +62,7 @@ export const primaryTable = pgTable(
 export const secondaryTable = pgTable(
 	"Secondary",
 	{
-		id: text("id").notNull().primaryKey(),
+		id: text("id").primaryKey(),
 		name: text("name"),
 		creator: text("creator"),
 		emoji: text("emoji"),
@@ -106,7 +106,7 @@ export const secondaryTable = pgTable(
 export const aliasTable = pgTable(
 	"Alias",
 	{
-		id: serial("id").notNull().primaryKey(),
+		id: serial("id").primaryKey(),
 		activity: text("activity").notNull(),
 		alias: text("alias").notNull(),
 		guildId: text("guildId")

@@ -1,87 +1,111 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
-import { OAuth2Scopes, PermissionFlagsBits } from 'discord.js';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { Cron } from "@nestjs/schedule";
+import { OAuth2Scopes, PermissionFlagsBits } from "discord.js";
 import {
-  Context,
-  type ContextOf,
-  On,
-  Once,
-  SlashCommand,
-  type SlashCommandContext,
-} from 'necord';
+	Context,
+	type ContextOf,
+	On,
+	Once,
+	SlashCommand,
+	type SlashCommandContext,
+} from "necord";
 
-import type { GuildService } from './features/guild/guild.service';
-import type { MqttService } from './features/mqtt/mqtt.service';
-import type { PrimaryService } from './features/primary/primary.service';
-import type { PrismaService } from './features/prisma/prisma.service';
-import type { SecondaryService } from './features/secondary/secondary.service';
-import { getPresence } from './utils/presence';
+import type { GuildService } from "./features/guild/guild.service";
+import type { MqttService } from "./features/mqtt/mqtt.service";
+import type { PrimaryService } from "./features/primary/primary.service";
+import type { SecondaryService } from "./features/secondary/secondary.service";
+import { getPresence } from "./utils/presence";
+import {
+	aliasTable,
+	guildTable,
+	primaryTable,
+	secondaryTable,
+} from "./features/drizzle/schema";
+import { type Drizzle, DRIZZLE_TOKEN } from "./features/drizzle/drizzle.module";
+import { sql } from "drizzle-orm";
 
 @Injectable()
 export class AppService {
-  private readonly logger = new Logger(AppService.name);
-  constructor(
-    private readonly db: PrismaService,
-    private readonly secondaryService: SecondaryService,
-    private readonly primaryService: PrimaryService,
-    private readonly guildService: GuildService,
-    private readonly mqtt: MqttService,
-  ) {}
+	private readonly logger = new Logger(AppService.name);
+	constructor(
+		@Inject(DRIZZLE_TOKEN) private readonly db: Drizzle,
+		private readonly secondaryService: SecondaryService,
+		private readonly primaryService: PrimaryService,
+		private readonly guildService: GuildService,
+		private readonly mqtt: MqttService,
+	) {}
 
-  @Once('ready')
-  public async onReady(@Context() [client]: ContextOf<'ready'>) {
-    this.logger.log(`Bot logged in as ${client.user.tag}`);
-    const inviteLink = client.generateInvite({
-      scopes: [OAuth2Scopes.ApplicationsCommands, OAuth2Scopes.Bot],
-      permissions: [PermissionFlagsBits.Administrator],
-    });
+	@Once("ready")
+	public async onReady(@Context() [client]: ContextOf<"ready">) {
+		this.logger.log(`Bot logged in as ${client.user.tag}`);
+		const inviteLink = client.generateInvite({
+			scopes: [OAuth2Scopes.ApplicationsCommands, OAuth2Scopes.Bot],
+			permissions: [PermissionFlagsBits.Administrator],
+		});
 
-    this.logger.log(`Invite Link: ${inviteLink}`);
+		this.logger.log(`Invite Link: ${inviteLink}`);
 
-    await this.cleanup();
+		await this.cleanup();
 
-    const guildCount = await this.db.guild.count();
-    const primaryCount = await this.db.primary.count();
-    const secondaryCount = await this.db.secondary.count();
-    const aliasCount = await this.db.alias.count();
+		const [{ guildCount }] = await this.db
+			.select({
+				guildCount: sql<number>`COUNT(*)`,
+			})
+			.from(guildTable);
+		const [{ primaryCount }] = await this.db
+			.select({
+				primaryCount: sql<number>`COUNT(*)`,
+			})
+			.from(primaryTable);
 
-    await Promise.all([
-      this.mqtt.publish('dynamica/guilds', guildCount),
-      this.mqtt.publish('dynamica/primaries', primaryCount),
-      this.mqtt.publish('dynamica/secondaries', secondaryCount),
-      this.mqtt.publish('dynamica/aliases', aliasCount),
-      this.mqtt.publish('dynamica/presence', client.readyAt.toISOString()),
-    ]);
+		const [{ secondaryCount }] = await this.db
+			.select({
+				secondaryCount: sql<number>`COUNT(*)`,
+			})
+			.from(secondaryTable);
 
-    const totalChannels = primaryCount + secondaryCount;
+		const [{ aliasCount }] = await this.db
+			.select({
+				aliasCount: sql<number>`COUNT(*)`,
+			})
+			.from(aliasTable);
+		await Promise.all([
+			this.mqtt.publish("dynamica/guilds", guildCount),
+			this.mqtt.publish("dynamica/primaries", primaryCount),
+			this.mqtt.publish("dynamica/secondaries", secondaryCount),
+			this.mqtt.publish("dynamica/aliases", aliasCount),
+			this.mqtt.publish("dynamica/presence", client.readyAt.toISOString()),
+		]);
 
-    client.user.setPresence(getPresence(totalChannels));
-  }
+		const totalChannels = primaryCount + secondaryCount;
 
-  @On('warn')
-  public onWarn(@Context() [message]: ContextOf<'warn'>) {
-    this.logger.warn(message);
-  }
+		client.user.setPresence(getPresence(totalChannels));
+	}
 
-  @SlashCommand({
-    name: 'ping',
-    description: 'Ping the bot',
-  })
-  public onPing(@Context() [interaction]: SlashCommandContext) {
-    return interaction.reply({
-      content: `Pong from JavaScript! Bot Latency ${Math.round(
-        interaction.client.ws.ping,
-      )}ms.`,
-      ephemeral: true,
-    });
-  }
+	@On("warn")
+	public onWarn(@Context() [message]: ContextOf<"warn">) {
+		this.logger.warn(message);
+	}
 
-  @Cron('0 0 * * *')
-  public async cleanup() {
-    await this.guildService.cleanup();
+	@SlashCommand({
+		name: "ping",
+		description: "Ping the bot",
+	})
+	public onPing(@Context() [interaction]: SlashCommandContext) {
+		return interaction.reply({
+			content: `Pong from JavaScript! Bot Latency ${Math.round(
+				interaction.client.ws.ping,
+			)}ms.`,
+			ephemeral: true,
+		});
+	}
 
-    await this.primaryService.cleanup();
+	@Cron("0 0 * * *")
+	public async cleanup() {
+		await this.guildService.cleanup();
 
-    await this.secondaryService.cleanup();
-  }
+		await this.primaryService.cleanup();
+
+		await this.secondaryService.cleanup();
+	}
 }

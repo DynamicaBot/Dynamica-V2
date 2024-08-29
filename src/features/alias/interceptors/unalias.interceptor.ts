@@ -1,12 +1,14 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import type { AutocompleteInteraction, CacheType } from "discord.js";
 import { AutocompleteInterceptor } from "necord";
 
-import type { PrismaService } from "@/features/prisma";
+import { type Drizzle, DRIZZLE_TOKEN } from "@/features/drizzle/drizzle.module";
+import { aliasTable } from "@/features/drizzle/schema";
+import { and, eq, like } from "drizzle-orm";
 
 @Injectable()
 export class UnaliasAutocompleteInterceptor extends AutocompleteInterceptor {
-	constructor(private readonly db: PrismaService) {
+	constructor(@Inject(DRIZZLE_TOKEN) private readonly db: Drizzle) {
 		super();
 	}
 
@@ -14,25 +16,25 @@ export class UnaliasAutocompleteInterceptor extends AutocompleteInterceptor {
 		interaction: AutocompleteInteraction<CacheType>,
 	) {
 		const { value } = interaction.options.getFocused(true);
-		const aliases = await this.db.alias.findMany({
-			where: {
-				guildId: interaction.guildId,
-				activity: {
-					contains: value,
-				},
-			},
-			select: {
-				activity: true,
-			},
-		});
+		const guildId = interaction.guildId;
 
-		const options = aliases.map(({ activity }) => ({
-			name: activity,
-			value: activity,
-		}));
+		if (!guildId) {
+			return interaction.respond([]);
+		}
 
-		const filteredOptions = options.filter(({ name }) => name.includes(value));
+		const aliases = await this.db
+			.select({
+				name: aliasTable.activity,
+				value: aliasTable.activity,
+			})
+			.from(aliasTable)
+			.where(
+				and(
+					eq(aliasTable.guildId, guildId),
+					like(aliasTable.activity, `%${value}%`),
+				),
+			);
 
-		return interaction.respond(filteredOptions);
+		return interaction.respond(aliases);
 	}
 }

@@ -1,159 +1,181 @@
-import { Injectable } from '@nestjs/common';
-import { ActivityType } from 'discord.js';
-import { Context, type ContextOf, On } from 'necord';
+import { Inject, Injectable } from "@nestjs/common";
+import { ActivityType } from "discord.js";
+import { Context, type ContextOf, On } from "necord";
 
-import type { MqttService } from '@/features/mqtt';
-import type { PrismaService } from '@/features/prisma';
-import { getPresence } from '@/utils/presence';
+import type { MqttService } from "@/features/mqtt";
 
-import type { SecondaryService } from './secondary.service';
+import { getPresence } from "@/utils/presence";
+
+import { IntentsError, type SecondaryService } from "./secondary.service";
+import { type Drizzle, DRIZZLE_TOKEN } from "../drizzle/drizzle.module";
+import { count, eq } from "drizzle-orm";
+import { primaryTable, secondaryTable } from "../drizzle/schema";
 
 @Injectable()
 export class SecondaryEvents {
-  constructor(
-    private readonly db: PrismaService,
-    private readonly secondaryService: SecondaryService,
-    private readonly mqtt: MqttService,
-  ) {}
+	constructor(
+		@Inject(DRIZZLE_TOKEN) private readonly db: Drizzle,
+		private readonly secondaryService: SecondaryService,
+		private readonly mqtt: MqttService,
+	) {}
 
-  @On('voiceStateUpdate')
-  public async onVoiceStateUpdate(
-    @Context() [oldVoiceState, newVoiceState]: ContextOf<'voiceStateUpdate'>,
-  ) {
-    if (!oldVoiceState.channelId && !newVoiceState.channelId) {
-      return;
-    }
+	private async getSecondaryChannel(id?: string | null) {
+		if (!id) return undefined;
 
-    if (oldVoiceState.channelId === newVoiceState.channelId) {
-      return;
-    }
+		const secondaryChannel = await this.db.query.secondaryTable.findFirst({
+			where: eq(secondaryTable.id, id),
+			columns: {
+				id: true,
+				guildId: true,
+				primaryId: true,
+			},
+		});
 
-    const oldSecondary = oldVoiceState.channelId
-      ? await this.db.secondary.findUnique({
-          where: {
-            id: oldVoiceState.channelId,
-          },
-        })
-      : undefined;
+		return secondaryChannel;
+	}
 
-    if (oldSecondary) {
-      // Left a secondary channel
-      const channelId = oldSecondary.id;
-      await this.secondaryService.update(oldSecondary.guildId, channelId);
-    }
+	private async getPrimaryChannel(id?: string | null) {
+		if (!id) return undefined;
 
-    const newSecondary = newVoiceState.channelId
-      ? await this.db.secondary.findUnique({
-          where: {
-            id: newVoiceState.channelId,
-          },
-        })
-      : undefined;
+		const primaryChannel = await this.db.query.primaryTable.findFirst({
+			where: eq(primaryTable.id, id),
+			columns: {
+				id: true,
+				guildId: true,
+			},
+		});
 
-    const oldPrimary = oldVoiceState.channelId
-      ? await this.db.primary.findUnique({
-          where: {
-            id: oldVoiceState.channelId,
-          },
-        })
-      : undefined;
+		return primaryChannel;
+	}
 
-    if (newSecondary && newSecondary.primaryId !== oldPrimary?.id) {
-      // Joined a secondary channel but not from it's primary (prevents double counting) on create
-      const channelId = newSecondary.id;
-      await this.secondaryService.update(newSecondary.guildId, channelId);
-    }
+	@On("voiceStateUpdate")
+	public async onVoiceStateUpdate(
+		@Context() [oldVoiceState, newVoiceState]: ContextOf<"voiceStateUpdate">,
+	) {
+		// If they're not in a channel
+		if (!oldVoiceState.channelId && !newVoiceState.channelId) {
+			return;
+		}
 
-    const newPrimary = newVoiceState.channelId
-      ? await this.db.primary.findUnique({
-          where: {
-            id: newVoiceState.channelId,
-          },
-        })
-      : undefined;
+		// Channel didn't change
+		if (oldVoiceState.channelId === newVoiceState.channelId) {
+			return;
+		}
 
-    if (newPrimary) {
-      // Joined a primary channel
-      const channelId = newPrimary.id;
-      await this.secondaryService.create(
-        newVoiceState.guild.id,
-        channelId,
-        newVoiceState.member.id,
-      );
-    }
-  }
+		const oldSecondary = await this.getSecondaryChannel(
+			oldVoiceState.channelId,
+		);
 
-  @On('channelDelete')
-  public async onChannelDelete(
-    @Context() [channel]: ContextOf<'channelDelete'>,
-  ) {
-    if (channel.isDMBased()) return;
+		// If someone leaves a secondary channel
+		if (oldSecondary) {
+			await this.secondaryService.update(oldSecondary.guildId, oldSecondary.id);
+		}
 
-    const databaseChannel = await this.db.secondary.findUnique({
-      where: {
-        id: channel.id,
-      },
-    });
+		// The channel they joined is a secondary channel
+		const newSecondary = await this.getSecondaryChannel(
+			newVoiceState.channelId,
+		);
 
-    if (!databaseChannel) return;
+		// They used to be in a primary channel
+		const oldPrimary = await this.getPrimaryChannel(oldVoiceState.channelId);
 
-    await this.db.secondary.delete({
-      where: {
-        id: databaseChannel.id,
-      },
-    });
+		// Only update the secondary if they didn't come from it's primary channel
+		if (newSecondary && newSecondary?.primaryId !== oldPrimary?.id) {
+			const channelId = newSecondary.id;
+			await this.secondaryService.update(newSecondary.guildId, channelId);
 
-    const secondaryCount = await this.db.secondary.count();
-    const primaryCount = await this.db.primary.count();
+			return; // They joined a secondary channel, not a primary channel
+		}
 
-    channel.client.user.setPresence(getPresence(primaryCount + secondaryCount));
+		const newPrimary = await this.getPrimaryChannel(newVoiceState.channelId);
 
-    this.mqtt.publish('dynamica/secondaries', secondaryCount);
-  }
+		// Joined a primary channel
+		if (newPrimary) {
+			const channelId = newPrimary.id;
 
-  @On('presenceUpdate')
-  public async onPresenceUpdate(
-    @Context() [oldPresence, newPresence]: ContextOf<'presenceUpdate'>,
-  ) {
-    const channelId = newPresence?.member?.voice?.channelId;
+			const newStateMember = newVoiceState.member;
 
-    if (!channelId) return;
+			if (!newStateMember) throw new IntentsError("Guild member");
 
-    const databaseSecondary = await this.db.secondary.findUnique({
-      where: {
-        id: channelId,
-      },
-    });
+			await this.secondaryService.create(
+				newVoiceState.guild.id,
+				channelId,
+				newVoiceState.member.id,
+			);
+		}
+	}
 
-    if (!databaseSecondary) return;
+	@On("channelDelete")
+	public async onChannelDelete(
+		@Context() [channel]: ContextOf<"channelDelete">,
+	) {
+		if (channel.isDMBased()) return;
 
-    const oldPresenceActivity = oldPresence?.activities ?? [];
+		const databaseChannel = await this.getSecondaryChannel(channel.id);
 
-    const oldActivities = oldPresenceActivity.filter(
-      (activity) =>
-        activity.type === ActivityType.Playing ||
-        activity.type === ActivityType.Competing,
-    );
+		if (!databaseChannel) return;
 
-    const oldActivityList = [
-      ...new Set(oldActivities.map((activity) => activity.name)),
-    ].sort();
+		await this.db
+			.delete(secondaryTable)
+			.where(eq(secondaryTable.id, channel.id));
 
-    const newActivities = (newPresence.activities ?? []).filter(
-      (activity) =>
-        activity.type === ActivityType.Playing ||
-        activity.type === ActivityType.Competing,
-    );
+		const [{ secondaryCount }] = await this.db
+			.select({
+				secondaryCount: count(),
+			})
+			.from(secondaryTable);
+		const [{ primaryCount }] = await this.db
+			.select({
+				primaryCount: count(),
+			})
+			.from(primaryTable);
 
-    const newActivityList = [
-      ...new Set(newActivities.map((activity) => activity.name)),
-    ].sort();
+		channel.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 
-    const isSameActivities =
-      JSON.stringify(oldActivityList) === JSON.stringify(newActivityList);
+		this.mqtt.publish("dynamica/secondaries", secondaryCount);
+	}
 
-    if (isSameActivities) return;
+	@On("presenceUpdate")
+	public async onPresenceUpdate(
+		@Context() [oldPresence, newPresence]: ContextOf<"presenceUpdate">,
+	) {
+		const channelId = newPresence?.member?.voice?.channelId;
+		const guildId = newPresence?.guild?.id || oldPresence?.guild?.id;
+		if (!channelId || !guildId) return;
 
-    this.secondaryService.updateName(newPresence.guild.id, channelId);
-  }
+		const databaseSecondary = await this.getSecondaryChannel(channelId);
+
+		if (!databaseSecondary) return;
+
+		const oldPresenceActivity = oldPresence?.activities ?? [];
+
+		const oldActivities = oldPresenceActivity.filter(
+			(activity) =>
+				activity.type === ActivityType.Playing ||
+				activity.type === ActivityType.Competing,
+		);
+
+		const oldActivityList = [
+			...new Set(oldActivities.map((activity) => activity.name)),
+		].sort();
+
+		const newActivities = (newPresence.activities ?? []).filter(
+			(activity) =>
+				activity.type === ActivityType.Playing ||
+				activity.type === ActivityType.Competing,
+		);
+
+		const newActivityList = [
+			...new Set(newActivities.map((activity) => activity.name)),
+		].sort();
+
+		const isSameActivities =
+			JSON.stringify(oldActivityList) === JSON.stringify(newActivityList);
+
+		if (isSameActivities) return;
+
+		if (newPresence.guild) {
+			this.secondaryService.updateName(newPresence.guild.id, channelId);
+		}
+	}
 }

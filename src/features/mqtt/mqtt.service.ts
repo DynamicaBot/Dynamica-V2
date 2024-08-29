@@ -46,7 +46,7 @@ export class MqttService {
 				return;
 			}
 
-			this.client.once("connect", (err) => {
+			this.client?.once("connect", (err) => {
 				if (err) {
 					this.logger.error("MQTT error", err);
 				}

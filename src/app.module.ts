@@ -10,9 +10,8 @@ import { AliasModule } from "./features/alias/alias.module";
 import { GuildModule } from "./features/guild/guild.module";
 import { MqttModule } from "./features/mqtt/mqtt.module";
 import { PrimaryModule } from "./features/primary/primary.module";
-import { PrismaModule } from "./features/prisma/prisma.module";
 import { SecondaryModule } from "./features/secondary/secondary.module";
-
+import { DrizzleModule } from "./features/drizzle/drizzle.module";
 @Module({
 	imports: [
 		ConfigModule.forRoot({
@@ -30,7 +29,7 @@ import { SecondaryModule } from "./features/secondary/secondary.module";
 			inject: [ConfigService],
 		}),
 		ScheduleModule.forRoot(),
-		PrismaModule,
+		DrizzleModule,
 		SecondaryModule,
 		PrimaryModule,
 		GuildModule,
