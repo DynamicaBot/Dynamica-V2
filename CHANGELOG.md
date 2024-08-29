@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.0.1
+
+### Patch Changes
+
+- [`8b43f34`](https://github.com/DynamicaBot/Dynamica-V2/commit/8b43f34dfe4fe2b7c9ac2c64df9879c380f96703) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Public Changeset
+
 ## 3.0.0
 
 ### Major Changes
