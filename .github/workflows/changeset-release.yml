@@ -128,3 +128,42 @@ jobs:
           push: true
           labels: ${{ steps.meta-pterodactyl.outputs.labels }}
           target: pterodactyl
+      - name: Extract Dist
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            VERSION=${{ matrix.package.version }}
+          tags: ${{ steps.meta.outputs.tags }}
+          target: extract
+          outputs: type=local,dest=dist
+      - uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: "production"
+          sourcemaps: "./dist"
+          version: ${{ matrix.package.version }}
+  sentry:
+    name: Sentry
+    runs-on: ubuntu-latest
+    needs: [publish-docker, release]
+    if: needs.release.outputs.published == 'true'
+
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Restore Dist
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: dist
+
+  docs:
+    uses: ./.github/workflows/docs.yml
+    name: Build Docs
+    needs: release
+    if: needs.release.outputs.published == 'true'

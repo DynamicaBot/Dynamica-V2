@@ -13,6 +13,8 @@ FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
 
+FROM scratch AS extract
+COPY --from=build /app/dist /dist
 
 # Runner
 FROM base as pterodactyl

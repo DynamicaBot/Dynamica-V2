@@ -3,9 +3,6 @@ on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - main
 
 name: Lint
 
@@ -22,7 +19,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'pnpm'
+          cache: "pnpm"
       - name: Install Dependancies
         run: pnpm install --frozen-lockfile
       - name: Lint
