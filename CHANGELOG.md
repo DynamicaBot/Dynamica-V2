@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.1.0
+
+### Minor Changes
+
+- [`6ec358d`](https://github.com/DynamicaBot/Dynamica-V2/commit/6ec358df09d4d31e4672abc2c651d43fc1fba3fa) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Add healthcheck
+
 ## 3.0.7
 
 ### Patch Changes
