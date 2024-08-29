@@ -12,7 +12,7 @@ import createErrorEmbed from "@/utils/createErrorEmbed";
 import type { PrimaryCreateDto } from "./dto/PrimaryCreateDto";
 import type { PrimaryDto } from "./dto/PrimaryDto";
 import { PrimaryAutocompleteInterceptor } from "./interceptors/primary.interceptor";
-import type { PrimaryService } from "./primary.service";
+import { PrimaryService } from "./primary.service";
 
 @Injectable()
 export class PrimaryCommands {
@@ -28,6 +28,14 @@ export class PrimaryCommands {
 		@Options() options: PrimaryCreateDto,
 	) {
 		const { guildId } = interaction;
+
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
+
 		try {
 			const newChannel = await this.primaryService.create(
 				interaction.user.id,
@@ -60,9 +68,18 @@ export class PrimaryCommands {
 		@Context() [interaction]: SlashCommandContext,
 		@Options() { primary }: PrimaryDto,
 	) {
+		const guildId = interaction.guildId;
+
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
+
 		try {
 			const newChannel = await this.primaryService.createPrimaryModal(
-				interaction.guildId,
+				guildId,
 				primary,
 			);
 			return interaction.showModal(newChannel);

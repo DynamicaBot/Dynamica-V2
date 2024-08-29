@@ -1,33 +1,41 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import type { AutocompleteInteraction, CacheType } from "discord.js";
 import { AutocompleteInterceptor } from "necord";
 
-import type { PrismaService } from "@/features/prisma";
+import { type Drizzle, DRIZZLE_TOKEN } from "@/features/drizzle/drizzle.module";
+import { secondaryTable } from "@/features/drizzle/schema";
+import { and, eq, like } from "drizzle-orm";
 
 @Injectable()
 export class SecondaryAutocompleteInterceptor extends AutocompleteInterceptor {
-	constructor(private readonly db: PrismaService) {
+	constructor(@Inject(DRIZZLE_TOKEN) private readonly db: Drizzle) {
 		super();
 	}
 
 	public async transformOptions(
 		interaction: AutocompleteInteraction<CacheType>,
 	) {
-		const { value } = interaction.options.getFocused(true);
-		let guildChannels = interaction.guild.channels.cache;
-		if (!guildChannels) {
-			guildChannels = await interaction.guild.channels.fetch();
+		const guildInteraction = interaction.guild;
+		if (!guildInteraction) {
+			return interaction.respond([]);
 		}
 
-		const secondaries = await this.db.secondary.findMany({
-			where: {
-				guildId: interaction.guildId,
-			},
-		});
+		const { value } = interaction.options.getFocused(true);
+		const guildChannels = await interaction.guild.channels.fetch();
 
-		const mappedSecondaries = secondaries.map(({ id }) =>
-			guildChannels.get(id),
-		);
+		const secondaries = await this.db
+			.select({ id: secondaryTable.id })
+			.from(secondaryTable)
+			.where(
+				and(
+					eq(secondaryTable.guildId, guildInteraction.id),
+					like(secondaryTable.id, `%${value}%`),
+				),
+			);
+
+		const mappedSecondaries = secondaries
+			.map(({ id }) => guildChannels.get(id))
+			.filter(nonNullable);
 
 		const options = mappedSecondaries.map(({ id, name }) => ({
 			name: name,
@@ -38,4 +46,8 @@ export class SecondaryAutocompleteInterceptor extends AutocompleteInterceptor {
 
 		return interaction.respond(filteredOptions);
 	}
+}
+
+function nonNullable<T>(value: T): value is NonNullable<T> {
+	return value !== null && value !== undefined;
 }

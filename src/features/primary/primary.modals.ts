@@ -1,15 +1,16 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { EmbedBuilder } from "discord.js";
 import { Ctx, Modal, type ModalContext, ModalParam } from "necord";
 
-import type { PrismaService } from "../prisma";
-
-import type { PrimaryService } from "./primary.service";
+import { PrimaryService } from "./primary.service";
+import { type Drizzle, DRIZZLE_TOKEN } from "../drizzle/drizzle.module";
+import { and, eq } from "drizzle-orm";
+import { primaryTable } from "../drizzle/schema";
 
 @Injectable()
 export class PrimaryModals {
 	constructor(
-		private readonly db: PrismaService,
+		@Inject(DRIZZLE_TOKEN) private readonly db: Drizzle,
 		private readonly primaryService: PrimaryService,
 	) {}
 
@@ -18,13 +19,17 @@ export class PrimaryModals {
 		@Ctx() [interaction]: ModalContext,
 		@ModalParam("id") id: string,
 	) {
-		const primary = this.db.primary.findUnique({
-			where: {
-				guildId_id: {
-					guildId: interaction.guildId,
-					id,
-				},
-			},
+		const guildId = interaction.guildId;
+
+		if (!guildId) {
+			return interaction.reply({
+				ephemeral: true,
+				content: "This command can only be used in a server.",
+			});
+		}
+
+		const primary = await this.db.query.primaryTable.findFirst({
+			where: and(eq(primaryTable.id, id), eq(primaryTable.guildId, guildId)),
 		});
 
 		if (!primary) {
@@ -34,18 +39,13 @@ export class PrimaryModals {
 		const newGeneralTemplate = interaction.fields.getTextInputValue("general");
 		const newGameTemplate = interaction.fields.getTextInputValue("template");
 
-		const updatedPrimary = await this.db.primary.update({
-			where: {
-				guildId_id: {
-					guildId: interaction.guild.id,
-					id,
-				},
-			},
-			data: {
+		const [updatedPrimary] = await this.db
+			.update(primaryTable)
+			.set({
 				generalName: newGeneralTemplate,
 				template: newGameTemplate,
-			},
-		});
+			})
+			.returning();
 
 		const embed = new EmbedBuilder()
 			.setTitle("Primary Updated")
@@ -56,7 +56,7 @@ export class PrimaryModals {
 				{ name: "Game Template", value: updatedPrimary.generalName },
 			);
 
-		await this.primaryService.updateSecondaries(interaction.guildId, id);
+		await this.primaryService.updateSecondaries(guildId, id);
 
 		return interaction.reply({
 			ephemeral: true,

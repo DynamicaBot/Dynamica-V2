@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { userMention } from "discord.js";
+import { GuildMember, userMention } from "discord.js";
 import {
 	Context,
 	type ISelectedMembers,
@@ -12,7 +12,7 @@ import {
 
 import createErrorEmbed from "@/utils/createErrorEmbed";
 
-import type { SecondaryService } from "./secondary.service";
+import { SecondaryService } from "./secondary.service";
 
 @Injectable()
 export class SecondarySelectors {
@@ -24,11 +24,33 @@ export class SecondarySelectors {
 		@SelectedUsers() users: ISelectedUsers,
 		@SelectedMembers() members: ISelectedMembers,
 	) {
+		const guildId = interaction.guildId;
+
+		if (!guildId) {
+			return interaction.reply({
+				ephemeral: true,
+				content: "This command can only be used in a guild",
+			});
+		}
 		try {
 			const selectedMember = members.first();
 
+			if (!(selectedMember instanceof GuildMember)) {
+				return interaction.reply({
+					ephemeral: true,
+					content: "You must select a member",
+				});
+			}
+
+			if (!selectedMember) {
+				return interaction.reply({
+					ephemeral: true,
+					content: "You must select a member",
+				});
+			}
+
 			await this.secondaryService.transfer(
-				interaction.guildId,
+				guildId,
 				interaction.channelId,
 				interaction.user.id,
 				selectedMember.user.id,

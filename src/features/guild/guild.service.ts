@@ -1,33 +1,34 @@
-import { Injectable } from "@nestjs/common";
-import type { Client } from "discord.js";
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { DiscordAPIError, Client } from "discord.js";
 
-import type { MqttService } from "@/features/mqtt";
-import type { PrismaService } from "@/features/prisma";
+import { MqttService } from "@/features/mqtt";
+
+import { type Drizzle, DRIZZLE_TOKEN } from "../drizzle/drizzle.module";
+import { guildTable } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
 
 @Injectable()
 export class GuildService {
 	public constructor(
-		private readonly db: PrismaService,
+		@Inject(DRIZZLE_TOKEN) private readonly db: Drizzle,
 		private readonly client: Client,
-		private readonly mqtt: MqttService,
 	) {}
+
+	private readonly logger = new Logger(GuildService.name);
 
 	/**
 	 * Update a guild in the database, if the bot has left the guild, delete it
 	 * @param id The guild id to update
 	 */
 	public async update(id: string) {
-		let guild = this.client.guilds.cache.get(id);
-
-		if (!guild) {
-			try {
-				guild = await this.client.guilds.fetch(id);
-			} catch (error) {
-				await this.db.guild.delete({
-					where: {
-						id,
-					},
-				});
+		try {
+			await this.client.guilds.fetch(id);
+		} catch (error) {
+			if (error instanceof DiscordAPIError && error.code === 10004) {
+				this.db.delete(guildTable).where(eq(guildTable.id, id));
+			} else {
+				this.logger.error("Failed to fetch channel", error);
+				// throw error;
 			}
 		}
 	}
@@ -36,8 +37,8 @@ export class GuildService {
 	 * Cleanup guilds that the bot has left
 	 */
 	public async cleanup() {
-		const guilds = await this.db.guild.findMany();
-		await Promise.all(guilds.map(({ id }) => this.update(id)));
+		const guilds = await this.db.select({ id: guildTable.id }).from(guildTable);
+		await Promise.allSettled(guilds.map(({ id }) => this.update(id)));
 	}
 
 	/**
@@ -46,30 +47,33 @@ export class GuildService {
 	 * @returns The updated guild
 	 */
 	public async allowjoin(guildId: string) {
-		const guild = await this.db.guild.findUnique({
-			where: {
-				id: guildId,
-			},
-		});
+		const [dbGuild] = await this.db
+			.select({
+				id: guildTable.id,
+				allowJoinRequests: guildTable.allowJoinRequests,
+			})
+			.from(guildTable)
+			.where(eq(guildTable.id, guildId));
 
-		const newGuild = await this.db.guild.update({
-			where: {
-				id: guildId,
-			},
-			data: {
-				allowJoinRequests: !guild.allowJoinRequests,
-			},
-		});
+		if (!dbGuild) {
+			throw new Error("Guild not found, please kick and reinvite the bot");
+		}
+
+		const [newGuild] = await this.db
+			.update(guildTable)
+			.set({
+				allowJoinRequests: !dbGuild.allowJoinRequests,
+			})
+			.where(eq(guildTable.id, guildId))
+			.returning();
 
 		return newGuild;
 	}
 
 	public async info(guildId: string) {
-		const guild = await this.db.guild.findUnique({
-			where: {
-				id: guildId,
-			},
-			include: {
+		const guild = await this.db.query.guildTable.findFirst({
+			where: eq(guildTable.id, guildId),
+			with: {
 				primaryChannels: true,
 				secondaryChannels: true,
 			},

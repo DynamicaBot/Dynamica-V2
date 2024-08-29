@@ -23,7 +23,7 @@ import type { NameDto } from "./dto/NameDto";
 import type { TransferDto } from "./dto/TransferDto";
 import type { UnlockDto } from "./dto/UnlockDto";
 import { SecondaryAutocompleteInterceptor } from "./interceptors/secondary.interceptor";
-import type { SecondaryService } from "./secondary.service";
+import { SecondaryService } from "./secondary.service";
 
 @UseInterceptors(SecondaryAutocompleteInterceptor)
 @Injectable()
@@ -41,9 +41,16 @@ export class SecondaryCommands {
 		@Context() [interaction]: SlashCommandContext,
 		@Options() { secondary }: AllyourbaseDto,
 	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
 		try {
 			const newChannel = await this.secondaryService.allyourbase(
-				interaction.guildId,
+				guildId,
 				secondary,
 				interaction.user.id,
 			);
@@ -73,9 +80,16 @@ export class SecondaryCommands {
 		@Context() [interaction]: SlashCommandContext,
 		@Options() { bitrate, secondary }: BitrateDto,
 	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
 		try {
 			const channel = await this.secondaryService.bitrate(
-				interaction.guildId,
+				guildId,
 				secondary,
 				bitrate,
 				interaction.user.id,
@@ -105,9 +119,16 @@ export class SecondaryCommands {
 		@Context() [interaction]: SlashCommandContext,
 		@Options() { secondary, name }: NameDto,
 	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
 		try {
 			const newChannel = await this.secondaryService.name(
-				interaction.guildId,
+				guildId,
 				secondary,
 				name,
 				interaction.user.id,
@@ -137,9 +158,16 @@ export class SecondaryCommands {
 		@Context() [interaction]: SlashCommandContext,
 		@Options() { secondary, limit }: LimitDto,
 	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
 		try {
 			const newChannel = await this.secondaryService.limit(
-				interaction.guildId,
+				guildId,
 				secondary,
 				limit,
 				interaction.user.id,
@@ -168,9 +196,16 @@ export class SecondaryCommands {
 		@Context() [interaction]: SlashCommandContext,
 		@Options() { secondary }: LockDto,
 	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
 		try {
 			const newChannel = await this.secondaryService.lock(
-				interaction.guildId,
+				guildId,
 				secondary,
 				interaction.user.id,
 			);
@@ -198,9 +233,16 @@ export class SecondaryCommands {
 		@Context() [interaction]: SlashCommandContext,
 		@Options() { secondary }: UnlockDto,
 	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
 		try {
 			const newChannel = await this.secondaryService.unlock(
-				interaction.guildId,
+				guildId,
 				secondary,
 				interaction.user.id,
 			);
@@ -229,9 +271,16 @@ export class SecondaryCommands {
 		@Context() [interaction]: SlashCommandContext,
 		@Options() { secondary, user }: TransferDto,
 	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
 		try {
 			const newChannel = await this.secondaryService.transfer(
-				interaction.guildId,
+				guildId,
 				secondary,
 				interaction.user.id,
 				user.id,
@@ -262,9 +311,16 @@ export class SecondaryCommands {
 		@Context() [interaction]: SlashCommandContext,
 		@Options() { secondary }: JoinDto,
 	) {
+		const guildId = interaction.guildId;
+		if (!guildId) {
+			return interaction.reply({
+				content: "This command can only be used in a guild",
+				ephemeral: true,
+			});
+		}
 		try {
 			const creator = await this.secondaryService.requestJoin(
-				interaction.guildId,
+				guildId,
 				secondary,
 				interaction.user.id,
 			);
