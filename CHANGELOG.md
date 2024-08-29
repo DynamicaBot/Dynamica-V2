@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.2.0
+
+### Minor Changes
+
+- [#383](https://github.com/DynamicaBot/Dynamica-V2/pull/383) [`74ca397`](https://github.com/DynamicaBot/Dynamica-V2/commit/74ca39758c3f1940417e5cc08bec42d660f08d03) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Pinned Channels
+
 ## 3.1.2
 
 ### Patch Changes

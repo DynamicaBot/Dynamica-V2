@@ -80,6 +80,7 @@ export const secondaryTable = pgTable(
 			.notNull()
 			.defaultNow(),
 		lastName: text("lastName").notNull(),
+		pinned: boolean("pinned").notNull().default(false),
 	},
 	(secondaryTable) => ({
 		Secondary_guild_fkey: foreignKey({
