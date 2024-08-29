@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.0.5
+
+### Patch Changes
+
+- [`4829fe5`](https://github.com/DynamicaBot/Dynamica-V2/commit/4829fe56a0e4cc719e541998536400044b25f96a) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Publish Pterodactyl and Default build from same run
+
 ## 3.0.4
 
 ### Patch Changes
