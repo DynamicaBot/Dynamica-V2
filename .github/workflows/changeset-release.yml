@@ -163,8 +163,12 @@ jobs:
           name: build
           path: dist
 
-  docs:
-    uses: ./.github/workflows/docs.yml
-    name: Build Docs
-    needs: release
+  deploy-docs:
+    name: Build and Deploy Docs
+    needs: [release]
     if: needs.release.outputs.published == 'true'
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/docs.yml
