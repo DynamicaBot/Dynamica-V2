@@ -158,7 +158,7 @@ jobs:
       packages: write
     steps:
       - name: Restore Dist
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: dist
