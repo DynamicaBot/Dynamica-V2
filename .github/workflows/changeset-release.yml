@@ -65,12 +65,13 @@ jobs:
       matrix:
         package: ${{ fromJson(needs.release.outputs.publishedPackages) }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Parse Semver
         uses: booxmedialtd/ws-action-parse-semver@v1.4.7
         with:
           input_string: ${{ matrix.package.version }}
         id: parse-semver
-
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
