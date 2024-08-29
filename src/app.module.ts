@@ -12,6 +12,7 @@ import { MqttModule } from "./features/mqtt/mqtt.module";
 import { PrimaryModule } from "./features/primary/primary.module";
 import { SecondaryModule } from "./features/secondary/secondary.module";
 import { DrizzleModule } from "./features/drizzle/drizzle.module";
+import { AppController } from "./app.controller";
 @Module({
 	imports: [
 		ConfigModule.forRoot({
@@ -37,5 +38,6 @@ import { DrizzleModule } from "./features/drizzle/drizzle.module";
 		MqttModule,
 	],
 	providers: [AppService, InfoCommands],
+	controllers: [AppController],
 })
 export class AppModule {}
