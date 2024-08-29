@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.0.3
+
+### Patch Changes
+
+- [`55c6093`](https://github.com/DynamicaBot/Dynamica-V2/commit/55c60930fb8abdff94d3df9620840504a4aac11f) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Rework workflows
+
 ## 3.0.2
 
 ### Patch Changes
