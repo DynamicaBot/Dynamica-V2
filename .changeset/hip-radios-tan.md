@@ -9,7 +9,7 @@ This change removes the project's dependency on Prisma and migrates the database
 To migrate the database, run the following command inside the latest 3.x version of the project:
 
 ```bash
-./dist/utils/migrateToPostgres.js
+node ./dist/utils/migrateToPostgres.js
 ```
 
 Making sure to have `POSTGRES_URL` set in the environment variables.
