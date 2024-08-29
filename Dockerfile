@@ -33,7 +33,8 @@ RUN adduser -H -D container -s /bin/bash
 ENV  USER=container HOME=/home/container
 USER container
 
-HEALTHCHECK CMD curl --fail http://localhost:3000 || exit 1
+HEALTHCHECK  --interval=5m --timeout=3s \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
 
 COPY entrypoint.sh /entrypoint.sh
 
@@ -49,6 +50,7 @@ ENV DATABASE_URL "file:/app/config/db.sqlite"
 ARG VERSION
 ENV VERSION=$VERSION
 
-HEALTHCHECK CMD curl --fail http://localhost:3000 || exit 1
+HEALTHCHECK  --interval=5m --timeout=3s \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
 
 CMD [ "pnpm", "start" ]
