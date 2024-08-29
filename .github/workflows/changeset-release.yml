@@ -73,24 +73,59 @@ jobs:
           input_string: ${{ matrix.package.version }}
         id: parse-semver
 
-      - name: Docker meta (pterodactyl)
+      - name: Docker meta
         id: meta-pterodactyl
         uses: docker/metadata-action@v5
         if: ${{ matrix.package.name == 'pterodactyl' }}
         with:
           images: ${{ env.IMAGE }}
-          flavor: |
-            suffix=-pterodactyl,onlatest=true
           tags: |
             # use custom value instead of git tag
             type=raw,value=${{ matrix.package.version }}
             type=raw,value=${{ steps.parse-semver.outputs.major }}
             type=raw,value=${{ steps.parse-semver.outputs.major }}.${{ steps.parse-semver.outputs.minor }}
             type=raw,value=${{ steps.parse-semver.outputs.major }}.${{ steps.parse-semver.outputs.minor }}.${{ steps.parse-semver.outputs.patch }}
-      - name: Docker Meta (default)
-        id: meta-default
-        uses: docker/metadata-action@v5
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Image (default)
         if: ${{ matrix.package.name == 'default' }}
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            VERSION=${{ matrix.package.version }}
+          tags: ${{ steps.meta-default.outputs.tags }}
+          push: true
+          labels: ${{ steps.meta-default.outputs.labels }}
+          cache-from: type=registry,ref=ghcr.io/dynamicabot/dynamica-v2:latest
+
+  publish-docker-pterodactyl:
+    name: Publish Pterodactyl Docker Image
+    runs-on: ubuntu-latest
+    needs: release
+    if: needs.release.outputs.published == 'true'
+    strategy:
+      fail-fast: true
+      matrix:
+        package: ${{ fromJson(needs.release.outputs.publishedPackages) }}
+    steps:
+      - name: Parse Semver
+        uses: booxmedialtd/ws-action-parse-semver@v1.4.7
+        with:
+          input_string: ${{ matrix.package.version }}
+        id: parse-semver
+
+      - name: Docker meta (pterodactyl)
+        id: meta-pterodactyl
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE }}
           flavor: |
@@ -111,7 +146,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Image (pterodactyl)
+      - name: Build Image
         if: ${{ matrix.package.name == 'pterodactyl' }}
         uses: docker/build-push-action@v6
         with:
@@ -123,14 +158,3 @@ jobs:
           labels: ${{ steps.meta-pterodactyl.outputs.labels }}
           cache-from: type=registry,ref=ghcr.io/dynamicabot/dynamica-v2:latest-pterodactyl
           target: pterodactyl
-      - name: Build Image (default)
-        if: ${{ matrix.package.name == 'default' }}
-        uses: docker/build-push-action@v6
-        with:
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            VERSION=${{ matrix.package.version }}
-          tags: ${{ steps.meta-default.outputs.tags }}
-          push: true
-          labels: ${{ steps.meta-default.outputs.labels }}
-          cache-from: type=registry,ref=ghcr.io/dynamicabot/dynamica-v2:latest
