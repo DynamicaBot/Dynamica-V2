@@ -6,10 +6,10 @@
       "repo": "dynamicabot/dynamica-v2"
     }
   ],
-  "commit": false,
+  "commit": true,
   "fixed": [],
   "linked": [],
-  "access": "restricted",
+  "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": []

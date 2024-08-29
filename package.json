@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "description": "",
   "author": "",
-  "private": true,
+  "private": false,
   "type": "module",
   "license": "UNLICENSED",
   "scripts": {
