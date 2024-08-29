@@ -117,6 +117,7 @@ jobs:
         if: ${{ matrix.package.name == 'pterodactyl' }}
         uses: docker/build-push-action@v6
         with:
+          platforms: linux/amd64,linux/arm64
           build-args: |
             VERSION=${{ matrix.package.version }}
           tags: ${{ steps.meta-pterodactyl.outputs.tags }}
@@ -128,6 +129,7 @@ jobs:
         if: ${{ matrix.package.name == 'default' }}
         uses: docker/build-push-action@v6
         with:
+          platforms: linux/amd64,linux/arm64
           build-args: |
             VERSION=${{ matrix.package.version }}
           tags: ${{ steps.meta-default.outputs.tags }}
