@@ -1,5 +1,5 @@
+import { env } from "@/env";
 import { Injectable, Logger } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import mqtt from "mqtt";
 
 @Injectable()
@@ -7,10 +7,10 @@ export class MqttService {
 	private client: mqtt.MqttClient | undefined = undefined;
 	private logger = new Logger(MqttService.name);
 
-	constructor(private readonly config: ConfigService) {
-		const mqttUrl = this.config.get<string>("MQTT_URL");
-		const mqttUser = this.config.get<string>("MQTT_USER");
-		const mqttPass = this.config.get<string>("MQTT_PASS");
+	constructor() {
+		const mqttUrl = env.MQTT_URL;
+		const mqttUser = env.MQTT_USER;
+		const mqttPass = env.MQTT_PASSWORD;
 
 		if (!mqttUrl || !mqttUser || !mqttPass) {
 			this.logger.debug("MQTT not configured, skipping");

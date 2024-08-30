@@ -1,9 +1,9 @@
 import { Global, Module } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import * as schema from "./schema";
 import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
+import { env } from "@/env";
 
 export const DRIZZLE_TOKEN = Symbol("DRIZZLE_TOKEN");
 
@@ -13,9 +13,9 @@ export const DRIZZLE_TOKEN = Symbol("DRIZZLE_TOKEN");
 	providers: [
 		{
 			provide: DRIZZLE_TOKEN,
-			inject: [ConfigService],
-			useFactory: async (configService: ConfigService) => {
-				const postgresUrl = configService.getOrThrow<string>("POSTGRES_URL");
+			inject: [],
+			useFactory: async () => {
+				const postgresUrl = env.POSTGRES_URL;
 
 				// for migrations
 				const migrationClient = postgres(postgresUrl, { max: 1 });

@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
 import { IntentsBitField } from "discord.js";
 import { NecordModule } from "necord";
@@ -13,21 +12,16 @@ import { PrimaryModule } from "./features/primary/primary.module";
 import { SecondaryModule } from "./features/secondary/secondary.module";
 import { DrizzleModule } from "./features/drizzle/drizzle.module";
 import { AppController } from "./app.controller";
+import { env } from "./env";
 @Module({
 	imports: [
-		ConfigModule.forRoot({
-			isGlobal: true,
-		}),
-		NecordModule.forRootAsync({
-			useFactory: async (configService: ConfigService) => ({
-				token: configService.getOrThrow<string>("TOKEN"),
-				intents: [
-					IntentsBitField.Flags.Guilds,
-					IntentsBitField.Flags.GuildVoiceStates,
-					IntentsBitField.Flags.GuildPresences,
-				],
-			}),
-			inject: [ConfigService],
+		NecordModule.forRoot({
+			token: env.TOKEN,
+			intents: [
+				IntentsBitField.Flags.Guilds,
+				IntentsBitField.Flags.GuildVoiceStates,
+				IntentsBitField.Flags.GuildPresences,
+			],
 		}),
 		ScheduleModule.forRoot(),
 		DrizzleModule,

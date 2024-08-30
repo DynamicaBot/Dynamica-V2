@@ -7,7 +7,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "target": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
