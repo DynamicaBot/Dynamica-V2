@@ -9,6 +9,7 @@ import {
 	Client,
 	DiscordAPIError,
 	type GuildMember,
+	MessageFlags,
 	type ModalActionRowComponentBuilder,
 	ModalBuilder,
 	TextInputBuilder,
@@ -151,6 +152,7 @@ export class SecondaryService {
 				await newDiscordChannel.send({
 					content: "Edit the channel settings here",
 					components: channelSettingsComponents,
+					flags: [MessageFlags.SuppressNotifications],
 				});
 			} catch (error) {
 				if (error instanceof DiscordAPIError) {
