@@ -1,5 +1,17 @@
 # dynamica-v2
 
+## 3.3.0
+
+### Minor Changes
+
+- [`c6eafe7`](https://github.com/DynamicaBot/Dynamica-V2/commit/c6eafe7f5a342b0af4d51f1a48ab7c2d52d52892) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Suppress channel settings notification
+
+### Patch Changes
+
+- [`700f09b`](https://github.com/DynamicaBot/Dynamica-V2/commit/700f09b3e4a47157247096cfc7fc7d0583749de8) Thanks [@sebasptsch](https://github.com/sebasptsch)! - fix sourcemap location
+
+- [`8d6ec0a`](https://github.com/DynamicaBot/Dynamica-V2/commit/8d6ec0afa1e0919b4dd228e24721a9a9c24cd6a7) Thanks [@sebasptsch](https://github.com/sebasptsch)! - fix 10003 error on rename
+
 ## 3.2.0
 
 ### Minor Changes
