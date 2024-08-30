@@ -38,8 +38,12 @@
    cp .env.example .env
    ```
 
+> The Discord bot token can be obtained by creating a new bot application on the [Discord Developer Portal](https://discord.com/developers/applications).
+
 6. Start the development server:
 
    ```sh
     pnpm dev
    ```
+
+The terminal will display the invite URL for the bot, you can invite the bot to your server using that URL.
