@@ -222,20 +222,30 @@ export class SecondaryService {
 		);
 
 		if (databaseChannel.lastName !== newName && discordChannel.manageable) {
-			await discordChannel.edit({
-				name: newName,
-			});
-			await this.db
-				.update(secondaryTable)
-				.set({
-					lastName: newName,
-				})
-				.where(
-					and(
-						eq(secondaryTable.id, channelId),
-						eq(secondaryTable.guildId, guildId),
-					),
-				);
+			try {
+				await discordChannel.edit({
+					name: newName,
+				});
+				await this.db
+					.update(secondaryTable)
+					.set({
+						lastName: newName,
+					})
+					.where(
+						and(
+							eq(secondaryTable.id, channelId),
+							eq(secondaryTable.guildId, guildId),
+						),
+					);
+			} catch (error) {
+				if (error instanceof DiscordAPIError && error.code === 10003) {
+					this.logger.error(
+						`Unable to update channel name ${channelId}, unknown channel`,
+					);
+				} else {
+					throw error;
+				}
+			}
 		}
 
 		return newName;
