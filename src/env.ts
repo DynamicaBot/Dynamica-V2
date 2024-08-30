@@ -1,5 +1,8 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const env = createEnv({
 	server: {
@@ -21,6 +24,18 @@ export const env = createEnv({
 
 		/** Version */
 		VERSION: z.string().optional(),
+		/** The node env */
+		NODE_ENV: z.enum(["development", "production"]).default("development"),
 	},
-	runtimeEnv: process.env,
+	runtimeEnvStrict: {
+		MQTT_PASSWORD: process.env.MQTT_PASSWORD,
+		MQTT_USER: process.env.MQTT_USER,
+		MQTT_URL: process.env.MQTT_URL,
+		POSTGRES_URL: process.env.POSTGRES_URL,
+		TOKEN: process.env.TOKEN,
+		SENTRY_DSN: process.env.SENTRY_DSN,
+		VERSION: process.env.VERSION,
+		NODE_ENV: process.env.NODE_ENV,
+	},
+	emptyStringAsUndefined: true,
 });
