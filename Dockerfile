@@ -29,7 +29,7 @@ ENV DATABASE_URL "file:/home/container/dynamica/db.sqlite"
 ARG VERSION
 ENV VERSION=$VERSION
 
-RUN adduser -H -D container -s /bin/bash
+RUN adduser -H -D container -s /bin/sh
 ENV  USER=container HOME=/home/container
 USER container
 
@@ -38,7 +38,7 @@ HEALTHCHECK  --interval=5m --timeout=3s \
 
 COPY entrypoint.sh /entrypoint.sh
 
-CMD [ "/bin/bash", "/entrypoint.sh" ]
+CMD [ "/bin/sh", "/entrypoint.sh" ]
 
 # Default Image
 FROM base
