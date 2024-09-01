@@ -1018,6 +1018,9 @@ export class SecondaryService {
 				),
 			);
 
+		// update the channel
+		await this.update(guildId, channelId);
+
 		return discordChannel;
 	}
 
