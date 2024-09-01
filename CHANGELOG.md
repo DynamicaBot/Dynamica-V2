@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.3.2
+
+### Patch Changes
+
+- [`738f8eb`](https://github.com/DynamicaBot/Dynamica-V2/commit/738f8eb559647a4d0a363fd8dbcc81a8db0bf11c) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix missing DTOs
+
 ## 3.3.1
 
 ### Patch Changes
