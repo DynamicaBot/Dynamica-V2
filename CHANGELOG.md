@@ -1,5 +1,13 @@
 # dynamica-v2
 
+## 3.3.1
+
+### Patch Changes
+
+- [`c3c4bb8`](https://github.com/DynamicaBot/Dynamica-V2/commit/c3c4bb8f47be645a2d9d7ed1a16bc6329901fb65) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Remove @nestjs/config in favour of @t3-oss/env-core
+
+- [#393](https://github.com/DynamicaBot/Dynamica-V2/pull/393) [`d3f3ccf`](https://github.com/DynamicaBot/Dynamica-V2/commit/d3f3ccfa09bea78cb59ef01d7de5acb186123fdc) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix issue with bash not existing in the pterodactyl container by switching to sh.
+
 ## 3.3.0
 
 ### Minor Changes
