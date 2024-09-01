@@ -1,4 +1,4 @@
-import { ActivityType, type PresenceData } from "discord.js";
+import { ActivityType, PresenceData } from "discord.js";
 
 /**
  * Get the presence data for the bot

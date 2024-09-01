@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import type { AutocompleteInteraction, CacheType } from "discord.js";
+import { AutocompleteInteraction, CacheType } from "discord.js";
 import { AutocompleteInterceptor } from "necord";
 
 import { type Drizzle, DRIZZLE_TOKEN } from "@/features/drizzle/drizzle.module";

@@ -14,14 +14,14 @@ import {
 
 import createErrorEmbed from "@/utils/createErrorEmbed";
 
-import type { AllyourbaseDto } from "./dto/AllyourbaseDto";
-import type { BitrateDto } from "./dto/BitrateDto";
-import type { JoinDto } from "./dto/JoinDto";
-import type { LimitDto } from "./dto/LimitDto";
-import type { LockDto } from "./dto/LockDto";
-import type { NameDto } from "./dto/NameDto";
-import type { TransferDto } from "./dto/TransferDto";
-import type { UnlockDto } from "./dto/UnlockDto";
+import { AllyourbaseDto } from "./dto/AllyourbaseDto";
+import { BitrateDto } from "./dto/BitrateDto";
+import { JoinDto } from "./dto/JoinDto";
+import { LimitDto } from "./dto/LimitDto";
+import { LockDto } from "./dto/LockDto";
+import { NameDto } from "./dto/NameDto";
+import { TransferDto } from "./dto/TransferDto";
+import { UnlockDto } from "./dto/UnlockDto";
 import { SecondaryAutocompleteInterceptor } from "./interceptors/secondary.interceptor";
 import { SecondaryService } from "./secondary.service";
 import { PinDto } from "./dto/PinDto";

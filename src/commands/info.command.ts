@@ -8,8 +8,8 @@ import {
 import { Context, Options, type SlashCommandContext, Subcommand } from "necord";
 
 import { InfoCommandDecorator } from "@/decorators/info.decorator";
-import type { PrimaryInfoDto } from "@/dto/PrimaryInfoDto";
-import type { SecondaryInfoDto } from "@/dto/SecondaryInfoDto";
+import { PrimaryInfoDto } from "@/dto/PrimaryInfoDto";
+import { SecondaryInfoDto } from "@/dto/SecondaryInfoDto";
 import { GuildService } from "@/features/guild";
 import {
 	PrimaryAutocompleteInterceptor,

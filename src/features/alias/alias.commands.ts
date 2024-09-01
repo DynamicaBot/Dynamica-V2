@@ -9,8 +9,8 @@ import {
 import createErrorEmbed from "@/utils/createErrorEmbed";
 
 import { AliasService } from "./alias.service";
-import type { AliasDto } from "./dto/Alias.Dto";
-import type { UnaliasDto } from "./dto/UnaliasDto";
+import { AliasDto } from "./dto/Alias.Dto";
+import { UnaliasDto } from "./dto/UnaliasDto";
 import { AliasAutocompleteInterceptor } from "./interceptors/alias.interceptor";
 import { UnaliasAutocompleteInterceptor } from "./interceptors/unalias.interceptor";
 

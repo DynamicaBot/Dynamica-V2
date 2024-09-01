@@ -1,4 +1,4 @@
-import type { primaryTable } from "@/features/drizzle/schema";
+import { primaryTable } from "@/features/drizzle/schema";
 import { channelMention, time } from "discord.js";
 
 type Primary = typeof primaryTable.$inferSelect;

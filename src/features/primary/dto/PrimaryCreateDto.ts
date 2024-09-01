@@ -1,4 +1,4 @@
-import { ChannelType, type GuildChannel } from "discord.js";
+import { ChannelType, GuildChannel } from "discord.js";
 import { ChannelOption } from "necord";
 
 export class PrimaryCreateDto {

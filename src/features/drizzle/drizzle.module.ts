@@ -1,6 +1,6 @@
 import { Global, Module } from "@nestjs/common";
 import * as schema from "./schema";
-import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { drizzle, PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
 import { env } from "@/env";

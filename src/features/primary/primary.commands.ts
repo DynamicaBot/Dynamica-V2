@@ -9,8 +9,8 @@ import {
 
 import createErrorEmbed from "@/utils/createErrorEmbed";
 
-import type { PrimaryCreateDto } from "./dto/PrimaryCreateDto";
-import type { PrimaryDto } from "./dto/PrimaryDto";
+import { PrimaryCreateDto } from "./dto/PrimaryCreateDto";
+import { PrimaryDto } from "./dto/PrimaryDto";
 import { PrimaryAutocompleteInterceptor } from "./interceptors/primary.interceptor";
 import { PrimaryService } from "./primary.service";
 
