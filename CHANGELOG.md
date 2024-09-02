@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.3.3
+
+### Patch Changes
+
+- [`bcf0803`](https://github.com/DynamicaBot/Dynamica-V2/commit/bcf0803fa50e1817d3db176446d4ef39dd854738) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Check the channel after unpinning to update it's status
+
 ## 3.3.2
 
 ### Patch Changes
