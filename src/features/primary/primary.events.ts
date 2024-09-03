@@ -8,7 +8,7 @@ import { getPresence } from "@/utils/presence";
 import { PrimaryService } from "./primary.service";
 import { type Drizzle, DRIZZLE_TOKEN } from "../drizzle/drizzle.module";
 import { count, eq } from "drizzle-orm";
-import { primaryTable } from "../drizzle/schema";
+import { primaryTable, secondaryTable } from "../drizzle/schema";
 
 @Injectable()
 export class PrimaryEvents {
@@ -42,7 +42,7 @@ export class PrimaryEvents {
 			.select({
 				secondaryCount: count(),
 			})
-			.from(primaryTable);
+			.from(secondaryTable);
 
 		channel.client.user.setPresence(getPresence(primaryCount + secondaryCount));
 
