@@ -52,7 +52,7 @@ importers:
         version: 5.10.1
       necord:
         specifier: ^6.0.0
-        version: 6.8.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(discord.js@14.16.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
+        version: 6.8.4(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(discord-api-types@0.37.98)(discord.js@14.16.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       postgres:
         specifier: ^3.4.4
         version: 3.4.4
@@ -2372,12 +2372,13 @@ packages:
   mz@2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
 
-  necord@6.8.3:
-    resolution: {integrity: sha512-eYCvku/oqWU1uLN/onmKZ1Oy605fdvLTt46JiV6ko0/+XYPXDwYLNEHOrJwP1VY5sVrvMfeU11ZOJCTlpE+OvA==}
+  necord@6.8.4:
+    resolution: {integrity: sha512-AGGRaYImrYM2MIZjCNUqZy/gfuSYPl57vmOBEQChJno6ghFYp0aE/AYCklTwEQA7dUAk9MBFwWW+nwQxWAyhmg==}
     engines: {node: '>=16.6.0', npm: '>=7.0.0'}
     peerDependencies:
       '@nestjs/common': ^10.2.0
       '@nestjs/core': ^10.2.0
+      discord-api-types: ^0.37.99
       discord.js: ^14.0.1
       reflect-metadata: ^0.2.1
       rxjs: ^7.2.0
@@ -2515,8 +2516,9 @@ packages:
   path-to-regexp@3.2.0:
     resolution: {integrity: sha512-jczvQbCUS7XmS7o+y1aEO9OBVFeZBQ1MDSEqmO7xSoPgOPoowY/SxLpZ6Vh97/8qHZOteiCKb7gkG9gA2ZUxJA==}
 
-  path-to-regexp@6.2.2:
-    resolution: {integrity: sha512-GQX3SSMokngb36+whdpRXE+3f9V8UzyAorlYvOGx87ufGHehNTn5lCxrKtLyZ4Yl/wEKnNnr98ZzOwwDZV5ogw==}
+  path-to-regexp@7.1.0:
+    resolution: {integrity: sha512-ZToe+MbUF4lBqk6dV8GKot4DKfzrxXsplOddH8zN3YK+qw9/McvP7+4ICjZvOne0jQhN4eJwHsX6tT0Ns19fvw==}
+    engines: {node: '>=16'}
 
   path-type@4.0.0:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
@@ -5493,12 +5495,13 @@ snapshots:
       object-assign: 4.1.1
       thenify-all: 1.6.0
 
-  necord@6.8.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(discord.js@14.16.1)(reflect-metadata@0.2.2)(rxjs@7.8.1):
+  necord@6.8.4(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(discord-api-types@0.37.98)(discord.js@14.16.1)(reflect-metadata@0.2.2)(rxjs@7.8.1):
     dependencies:
       '@nestjs/common': 10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
+      discord-api-types: 0.37.98
       discord.js: 14.16.1
-      path-to-regexp: 6.2.2
+      path-to-regexp: 7.1.0
       reflect-metadata: 0.2.2
       rxjs: 7.8.1
 
@@ -5622,7 +5625,7 @@ snapshots:
 
   path-to-regexp@3.2.0: {}
 
-  path-to-regexp@6.2.2: {}
+  path-to-regexp@7.1.0: {}
 
   path-type@4.0.0: {}
 
