@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.3.4
+
+### Patch Changes
+
+- [#405](https://github.com/DynamicaBot/Dynamica-V2/pull/405) [`f33b646`](https://github.com/DynamicaBot/Dynamica-V2/commit/f33b646eccc5d6754b6f9980f3023324008d1bbd) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix inaccurate channel count
+
 ## 3.3.3
 
 ### Patch Changes
