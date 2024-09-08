@@ -10,7 +10,7 @@ export class MqttService {
 	constructor() {
 		const mqttUrl = env.MQTT_URL;
 		const mqttUser = env.MQTT_USER;
-		const mqttPass = env.MQTT_PASSWORD;
+		const mqttPass = env.MQTT_PASS;
 
 		if (!mqttUrl || !mqttUser || !mqttPass) {
 			this.logger.debug("MQTT not configured, skipping");

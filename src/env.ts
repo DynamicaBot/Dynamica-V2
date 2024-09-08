@@ -20,7 +20,7 @@ export const env = createEnv({
 		/** The username to use when connecting to the MQTT broker */
 		MQTT_USER: z.string().optional(),
 		/** The password to use when connecting to the MQTT broker */
-		MQTT_PASSWORD: z.string().optional(),
+		MQTT_PASS: z.string().optional(),
 
 		/** Version */
 		VERSION: z.string().optional(),
@@ -28,7 +28,7 @@ export const env = createEnv({
 		NODE_ENV: z.enum(["development", "production"]).default("development"),
 	},
 	runtimeEnvStrict: {
-		MQTT_PASSWORD: process.env.MQTT_PASSWORD,
+		MQTT_PASS: process.env.MQTT_PASS,
 		MQTT_USER: process.env.MQTT_USER,
 		MQTT_URL: process.env.MQTT_URL,
 		POSTGRES_URL: process.env.POSTGRES_URL,
