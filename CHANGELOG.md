@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.3.5
+
+### Patch Changes
+
+- [`719f6c5`](https://github.com/DynamicaBot/Dynamica-V2/commit/719f6c57a8a31d69d717308631b70f18383078c2) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Re-Enable MQTT by Fixing Environment Variables
+
 ## 3.3.4
 
 ### Patch Changes
