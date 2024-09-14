@@ -1,5 +1,11 @@
 # dynamica-v2
 
+## 3.3.6
+
+### Patch Changes
+
+- [`4a05060`](https://github.com/DynamicaBot/Dynamica-V2/commit/4a050604555c4de552be6ba22540a66e28d5041e) Thanks [@sebasptsch](https://github.com/sebasptsch)! - Fix voice channel change and add some comments
+
 ## 3.3.5
 
 ### Patch Changes
