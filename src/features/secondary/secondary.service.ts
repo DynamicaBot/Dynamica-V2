@@ -65,23 +65,36 @@ export class SecondaryService {
 	 * @returns The newly created secondary channel
 	 */
 	public async create(guildId: string, primaryId: string, userId: string) {
-		const discordGuild = await this.client.guilds.fetch(guildId);
-		const discordGuildMember = await discordGuild.members.fetch(userId);
-
-		const discordPrimary = await discordGuild.channels.fetch(primaryId);
+		const discordGuild = await this.client.guilds.fetch(guildId); // The guild the channel is in
+		const discordGuildMember = await discordGuild.members.fetch(userId); // The user who joined the primary channel
+		const discordPrimary = await discordGuild.channels.fetch(primaryId); // The primary channel (hub the user has joined)
 
 		if (discordPrimary === null) {
-			throw new Error("Intents error, cannot fetch guild channel");
+			throw new Error("Intents error, cannot fetch guild channel"); // If the primary channel is not found
 		}
 
+		/** The section to put the channel in */
 		const parent =
 			discordPrimary.parent?.type === ChannelType.GuildCategory
 				? discordPrimary.parent
 				: undefined;
 
-		const channelName = await this.formatName(primaryId, guildId);
+		// Randomly select an emoji from the list
+		const emoji: string = emojiList.random({
+			skintones: false,
+			genders: false,
+			group: "smileys-and-emotion,animals-and-nature,food-and-drink",
+		})[0];
 
+		/** The name of the new channel */
+		const channelName = await this.formatName(primaryId, guildId, undefined, {
+			creator: userId,
+			emoji,
+		});
+
+		/** The new channel */
 		const newDiscordChannel = await discordGuild.channels.create({
+			// Create the new channel in discord
 			name: channelName,
 			parent,
 			type: ChannelType.GuildVoice,
@@ -90,31 +103,7 @@ export class SecondaryService {
 				: undefined,
 		});
 
-		const emoji: string = emojiList.random({
-			skintones: false,
-			genders: false,
-			group: "smileys-and-emotion,animals-and-nature,food-and-drink",
-		})[0];
-
-		// const newDatabaseChannel = await this.db.secondary.create({
-		//   data: {
-		//     id: newDiscordChannel.id,
-		//     emoji,
-		//     creator: userId,
-		//     lastName: channelName,
-		//     primary: {
-		//       connect: {
-		//         id: primaryId,
-		//       },
-		//     },
-		//     guild: {
-		//       connect: {
-		//         id: guildId,
-		//       },
-		//     },
-		//   },
-		// });
-		const [newDatabaseChannel] = await this.db
+		const [newDatabaseChannel] = await this.db // Insert the new channel into the database
 			.insert(secondaryTable)
 			.values({
 				id: newDiscordChannel.id,
@@ -126,20 +115,20 @@ export class SecondaryService {
 			})
 			.returning();
 
-		await discordGuildMember.voice.setChannel(newDiscordChannel);
+		if (discordGuildMember.voice.channel) {
+			// If the user is in a voice channel then move them to the new channel
+			await discordGuildMember.voice.setChannel(newDiscordChannel);
+		}
 
-		const channelSettingsComponents =
-			await this.createSecondarySettingsComponents(
-				guildId,
-				newDiscordChannel.id,
-			);
-
+		// Get the bot user
 		const clientUser = this.client.user;
 
+		// If the bot user is not found then throw an error
 		if (clientUser === null) {
 			throw new Error("Client user not found");
 		}
 
+		// Get the permissions for the bot user in the new channel
 		const newDiscordChannelPermissions =
 			newDiscordChannel.permissionsFor(clientUser);
 
@@ -147,8 +136,16 @@ export class SecondaryService {
 			throw new Error("Unable to access permissions");
 		}
 
+		// If the bot has permission to send messages in the new channel then send the settings message
 		if (newDiscordChannelPermissions.has(PermissionFlagsBits.SendMessages)) {
+			// Create the settings components for the channel, this is the button to edit the channel settings
+
 			try {
+				const channelSettingsComponents =
+					await this.createSecondarySettingsComponents(
+						guildId,
+						newDiscordChannel.id,
+					);
 				await newDiscordChannel.send({
 					content: "Edit the channel settings here",
 					components: channelSettingsComponents,
@@ -333,6 +330,10 @@ export class SecondaryService {
 		primaryId: string,
 		guildId: string,
 		channelId?: string,
+		initialParams?: {
+			emoji?: string;
+			creator?: string;
+		},
 	) {
 		const discordGuild = await this.client.guilds.fetch(guildId);
 
@@ -378,10 +379,10 @@ export class SecondaryService {
 			(activity) => aliasObject[activity] ?? activity,
 		);
 
-		let creatorId: string | undefined;
+		let creatorId: string | undefined = initialParams?.creator;
 		let secondaryNameOverride: string | undefined;
 		let secondaryLocked: boolean | undefined;
-		let secondaryEmoji: string | undefined;
+		let secondaryEmoji: string | undefined = initialParams?.emoji;
 
 		if (channelId) {
 			const [databaseSecondary] = await this.db
