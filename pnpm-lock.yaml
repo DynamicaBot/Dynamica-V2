@@ -34,7 +34,7 @@ importers:
         version: 0.14.1
       discord-api-types:
         specifier: ^0.37.38
-        version: 0.37.100
+        version: 0.37.101
       discord.js:
         specifier: ^14.9.0
         version: 14.16.3
@@ -52,7 +52,7 @@ importers:
         version: 5.10.1
       necord:
         specifier: ^6.0.0
-        version: 6.8.6(@nestjs/common@10.4.4(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.4(@nestjs/common@10.4.4(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.4)(reflect-metadata@0.2.2)(rxjs@7.8.1))(discord-api-types@0.37.100)(discord.js@14.16.3)(reflect-metadata@0.2.2)(rxjs@7.8.1)
+        version: 6.8.6(@nestjs/common@10.4.4(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.4(@nestjs/common@10.4.4(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.4)(reflect-metadata@0.2.2)(rxjs@7.8.1))(discord-api-types@0.37.101)(discord.js@14.16.3)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       postgres:
         specifier: ^3.4.4
         version: 3.4.4
@@ -1690,6 +1690,9 @@ packages:
 
   discord-api-types@0.37.100:
     resolution: {integrity: sha512-a8zvUI0GYYwDtScfRd/TtaNBDTXwP5DiDVX7K5OmE+DRT57gBqKnwtOC5Ol8z0mRW8KQfETIgiB8U0YZ9NXiCA==}
+
+  discord-api-types@0.37.101:
+    resolution: {integrity: sha512-2wizd94t7G3A8U5Phr3AiuL4gSvhqistDwWnlk1VLTit8BI1jWUncFqFQNdPbHqS3661+Nx/iEyIwtVjPuBP3w==}
 
   discord-api-types@0.37.83:
     resolution: {integrity: sha512-urGGYeWtWNYMKnYlZnOnDHm8fVRffQs3U0SpE8RHeiuLKb/u92APS8HoQnPTFbnXmY1vVnXjXO4dOxcAn3J+DA==}
@@ -4757,6 +4760,8 @@ snapshots:
 
   discord-api-types@0.37.100: {}
 
+  discord-api-types@0.37.101: {}
+
   discord-api-types@0.37.83: {}
 
   discord-api-types@0.37.97: {}
@@ -5485,11 +5490,11 @@ snapshots:
       object-assign: 4.1.1
       thenify-all: 1.6.0
 
-  necord@6.8.6(@nestjs/common@10.4.4(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.4(@nestjs/common@10.4.4(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.4)(reflect-metadata@0.2.2)(rxjs@7.8.1))(discord-api-types@0.37.100)(discord.js@14.16.3)(reflect-metadata@0.2.2)(rxjs@7.8.1):
+  necord@6.8.6(@nestjs/common@10.4.4(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.4(@nestjs/common@10.4.4(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.4)(reflect-metadata@0.2.2)(rxjs@7.8.1))(discord-api-types@0.37.101)(discord.js@14.16.3)(reflect-metadata@0.2.2)(rxjs@7.8.1):
     dependencies:
       '@nestjs/common': 10.4.4(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 10.4.4(@nestjs/common@10.4.4(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.4)(reflect-metadata@0.2.2)(rxjs@7.8.1)
-      discord-api-types: 0.37.100
+      discord-api-types: 0.37.101
       discord.js: 14.16.3
       path-to-regexp: 8.0.0
       reflect-metadata: 0.2.2
