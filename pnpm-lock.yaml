@@ -61,7 +61,7 @@ importers:
         version: 0.2.2
       romans:
         specifier: ^2.0.8
-        version: 2.0.16
+        version: 2.0.18
       rxjs:
         specifier: ^7.8.0
         version: 7.8.1
@@ -2712,8 +2712,8 @@ packages:
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
-  romans@2.0.16:
-    resolution: {integrity: sha512-VsNzu29gZf73w+q4LgNJ4eZ4qss7Wyhwzd4b/GDaOaVINs5OTuvr5NuE/fKnpm0ODBCqXxMcIal1elAbybwWpA==}
+  romans@2.0.18:
+    resolution: {integrity: sha512-oVPpCUEGZQF9ohhO4VGpJmw5ilJkXGNKlWQiQs62GesxHXipTqDMI+VHQ2xFeN9KZV/Oetel6KRdCwLvf0qfoQ==}
 
   run-async@2.4.1:
     resolution: {integrity: sha512-tvVnVv01b8c1RrA6Ep7JkStj85Guv/YrMcwqYQnwjsAS2cTmmPGBBjAjpCW7RrSodNSoE2/qg9O4bceNvUuDgQ==}
@@ -5744,7 +5744,7 @@ snapshots:
       '@rollup/rollup-win32-x64-msvc': 4.27.2
       fsevents: 2.3.3
 
-  romans@2.0.16: {}
+  romans@2.0.18: {}
 
   run-async@2.4.1: {}
 
