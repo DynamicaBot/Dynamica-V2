@@ -40,7 +40,7 @@ importers:
         version: 14.16.3
       dotenv:
         specifier: ^16.4.5
-        version: 16.4.6
+        version: 16.4.7
       drizzle-orm:
         specifier: ^0.33.0
         version: 0.33.0(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(postgres@3.4.5)
@@ -1726,8 +1726,8 @@ packages:
     resolution: {integrity: sha512-EPCWE9OkA9DnFFNrO7Kl1WHHDYFXu3CNVFJg63bfU7hVtjZGyhShwZtSBImINQRWxWP2tgo2XI+QhdXx28r0aA==}
     engines: {node: '>=18'}
 
-  dotenv@16.4.6:
-    resolution: {integrity: sha512-JhcR/+KIjkkjiU8yEpaB/USlzVi3i5whwOjpIRNGi9svKEXZSe+Qp6IWAjFjv+2GViAoDRCUv/QLNziQxsLqDg==}
+  dotenv@16.4.7:
+    resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
     engines: {node: '>=12'}
 
   dotenv@8.6.0:
@@ -4776,7 +4776,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  dotenv@16.4.6: {}
+  dotenv@16.4.7: {}
 
   dotenv@8.6.0: {}
 
