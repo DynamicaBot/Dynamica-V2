@@ -32,7 +32,7 @@
     "necord": "^6.0.0",
     "postgres": "^3.4.4",
     "reflect-metadata": "^0.2.0",
-    "romans": "^2.0.8",
+    "romans": "^3.0.0",
     "rxjs": "^7.8.0",
     "zod": "^3.23.8"
   },
