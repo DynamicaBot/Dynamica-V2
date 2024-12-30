@@ -1475,8 +1475,8 @@ packages:
   bl@4.1.0:
     resolution: {integrity: sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==}
 
-  bl@6.0.16:
-    resolution: {integrity: sha512-V/kz+z2Mx5/6qDfRCilmrukUXcXuCoXKg3/3hDvzKKoSUx8CJKudfIoT29XZc3UE9xBvxs5qictiHdprwtteEg==}
+  bl@6.0.18:
+    resolution: {integrity: sha512-2k76XmWCuvu9HTvu3tFOl5HDdCH0wLZ/jHYva/LBVJmc9oX8yUtNQjxrFmbTdXsCSmIxwVTANZPNDfMQrvHFUw==}
 
   body-parser@1.20.3:
     resolution: {integrity: sha512-7rAxByjUMqQ3/bHJy7D6OGXvx/MMc4IqBn/X0fcM1QUcAItpZrBEYhWGem+tzXH90c+G01ypMcYJBO9Y30203g==}
@@ -4554,7 +4554,7 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 3.6.2
 
-  bl@6.0.16:
+  bl@6.0.18:
     dependencies:
       '@types/readable-stream': 4.0.18
       buffer: 6.0.3
@@ -5469,7 +5469,7 @@ snapshots:
 
   mqtt-packet@9.0.1:
     dependencies:
-      bl: 6.0.16
+      bl: 6.0.18
       debug: 4.4.0
       process-nextick-args: 2.0.1
     transitivePeerDependencies:
