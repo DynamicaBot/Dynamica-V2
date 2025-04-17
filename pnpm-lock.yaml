@@ -89,7 +89,7 @@ importers:
         version: 20.17.30
       '@types/romans':
         specifier: ^2.0.0
-        version: 2.0.2
+        version: 2.0.5
       drizzle-kit:
         specifier: ^0.24.2
         version: 0.24.2
@@ -1292,8 +1292,9 @@ packages:
   '@types/readable-stream@4.0.18':
     resolution: {integrity: sha512-21jK/1j+Wg+7jVw1xnSwy/2Q1VgVjWuFssbYGTREPUBeZ+rqVFl2udq0IkxzPC0ZhOzVceUbyIACFZKLqKEBlA==}
 
-  '@types/romans@2.0.2':
-    resolution: {integrity: sha512-oQqH1tkj7Dep61r1JSH4LJ61bmW1beGALbpI29M9kFeBTOAVg+ToLiJkVq01o9ML+K0omx7KGTn6JNAoloXSxQ==}
+  '@types/romans@2.0.5':
+    resolution: {integrity: sha512-M/tVKP4PZ5M04WDm56mju+cL8TvelFieavX+DQpvRjYlB9VbcfgsrNny4m72ssktypSOO5E3RWIm65+IbD5gjg==}
+    deprecated: This is a stub types definition. romans provides its own type definitions, so you do not need this installed.
 
   '@types/shimmer@1.2.0':
     resolution: {integrity: sha512-UE7oxhQLLd9gub6JKIAhDq06T0F6FnztwMNRvYgjeQSBeMc1ZG/tA47EwfduvkuQS8apbkM/lpLpWsaCeYsXVg==}
@@ -4349,7 +4350,9 @@ snapshots:
       '@types/node': 20.17.30
       safe-buffer: 5.1.2
 
-  '@types/romans@2.0.2': {}
+  '@types/romans@2.0.5':
+    dependencies:
+      romans: 2.0.18
 
   '@types/shimmer@1.2.0': {}
 
