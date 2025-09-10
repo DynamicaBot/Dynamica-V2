@@ -33,8 +33,8 @@ importers:
         specifier: ^0.14.0
         version: 0.14.1
       discord-api-types:
-        specifier: ^0.37.38
-        version: 0.37.120
+        specifier: ^0.38.0
+        version: 0.38.24
       discord.js:
         specifier: ^14.9.0
         version: 14.18.0
@@ -52,7 +52,7 @@ importers:
         version: 5.11.0
       necord:
         specifier: ^6.0.0
-        version: 6.8.8(@nestjs/common@10.4.17(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17)(discord-api-types@0.37.120)(discord.js@14.18.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 6.8.8(@nestjs/common@10.4.17(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17)(discord-api-types@0.38.24)(discord.js@14.18.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       postgres:
         specifier: ^3.4.4
         version: 3.4.5
@@ -1745,6 +1745,9 @@ packages:
   discord-api-types@0.37.120:
     resolution: {integrity: sha512-7xpNK0EiWjjDFp2nAhHXezE4OUWm7s1zhc/UXXN6hnFFU8dfoPHgV0Hx0RPiCa3ILRpdeh152icc68DGCyXYIw==}
 
+  discord-api-types@0.38.24:
+    resolution: {integrity: sha512-P7/DkcFIiIoaBogStnhhcGRX7KR+gIFp0SpmwsZUIM0bgDkYMEUx+8l+t3quYc/KSgg92wvE9w/4mabO57EMug==}
+
   discord.js@14.18.0:
     resolution: {integrity: sha512-SvU5kVUvwunQhN2/+0t55QW/1EHfB1lp0TtLZUSXVHDmyHTrdOj5LRKdR0zLcybaA15F+NtdWuWmGOX9lE+CAw==}
     engines: {node: '>=18'}
@@ -2428,6 +2431,7 @@ packages:
   multer@1.4.4-lts.1:
     resolution: {integrity: sha512-WeSGziVj6+Z2/MwQo3GvqzgR+9Uc+qt8SwHKh3gvNPiISKfsMfG4SvCOFYlxxgkXt7yIV2i1yczehm0EOKIxIg==}
     engines: {node: '>= 6.0.0'}
+    deprecated: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
 
   mute-stream@0.0.8:
     resolution: {integrity: sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==}
@@ -2890,6 +2894,7 @@ packages:
   source-map@0.8.0-beta.0:
     resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
     engines: {node: '>= 8'}
+    deprecated: The work that was done in this beta branch won't be included in future versions
 
   spawndamnit@3.0.1:
     resolution: {integrity: sha512-MmnduQUuHCoFckZoWnXsTg7JaiLBJrKFj9UI2MbRPGaJeVpsLcVBu6P/IGZovziM/YBsellCmsprgNA+w0CzVg==}
@@ -4890,6 +4895,8 @@ snapshots:
 
   discord-api-types@0.37.120: {}
 
+  discord-api-types@0.38.24: {}
+
   discord.js@14.18.0:
     dependencies:
       '@discordjs/builders': 1.10.1
@@ -5620,11 +5627,11 @@ snapshots:
       object-assign: 4.1.1
       thenify-all: 1.6.0
 
-  necord@6.8.8(@nestjs/common@10.4.17(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17)(discord-api-types@0.37.120)(discord.js@14.18.0)(reflect-metadata@0.2.2)(rxjs@7.8.2):
+  necord@6.8.8(@nestjs/common@10.4.17(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.17)(discord-api-types@0.38.24)(discord.js@14.18.0)(reflect-metadata@0.2.2)(rxjs@7.8.2):
     dependencies:
       '@nestjs/common': 10.4.17(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 10.4.17(@nestjs/common@10.4.17(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@10.4.17)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      discord-api-types: 0.37.120
+      discord-api-types: 0.38.24
       discord.js: 14.18.0
       path-to-regexp: 8.2.0
       reflect-metadata: 0.2.2
